@@ -1,0 +1,15 @@
+<Ui>
+    <Script file="metadata.lua" />
+    <Script file="data.lua" />
+    <Script file="locales.lua" />
+    <Script file="functions.lua" />
+    <Script file="window.lua" />
+    <Script file="core.lua" />
+
+    <Frame name="ravShadowlands">
+        <Scripts>
+            <OnLoad function="ravShadowlands_OnLoad" />
+            <OnEvent function="ravShadowlands_OnEvent" />
+        </Scripts>
+    </Frame>
+</Ui>
