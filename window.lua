@@ -10,6 +10,19 @@ local small = 6
 local medium = 12
 local large = 16
 
+function colorText(text, color)
+    color = color and color or "bbbbbb"
+    return "|cff" .. color .. text .. "|r"
+end
+
+function icon(id, size)
+    size = size and size or 16
+    return "|T" .. id .. ":" .. size .. "|t"
+end
+
+local skull = icon(137025)
+local checkmark = icon(628564)
+
 local Window = CreateFrame("Frame", name .. "Window", UIParent)
 Window.name = name .. "Window"
 Window:SetFrameStrata("LOW")
@@ -37,7 +50,7 @@ Close:SetScript("OnClick", function(self)
 end)
 
 local Parent = CreateFrame("ScrollFrame", nil, Window, "UIPanelScrollFrameTemplate")
-Parent:SetWidth(width - (medium * 2) - 18) -- 22 seems to be width of the scrollbar
+Parent:SetWidth(width - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
 Parent:SetHeight(height - (medium * 2) - (large * 2))
 Parent:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, medium)
 
@@ -66,10 +79,10 @@ Window:SetScript("OnShow", function()
         ravShadowlands:CreateLabel({
             name = zone.id,
             parent = Content,
-            label = "|T" .. zone.icon .. ":16|t |cff" .. zone.color .. mapName .. "|r",
+            label = icon(zone.icon) .. "  " .. colorText(mapName, zone.color),
             relativeTo = (i == 1 and Content or nil),
             relativePoint = (i == 1 and "TOPLEFT" or nil),
-            offsetY = (i == 1 and 0 or -large*2),
+            offsetY = (i == 1 and 0 or -large*3),
             fontObject = "GameFontNormalLarge",
         })
         if covenant then
@@ -77,7 +90,7 @@ Window:SetScript("OnShow", function()
             ravShadowlands:CreateLabel({
                 name = zone.id .. "-" .. covenant,
                 parent = Content,
-                label = "|cff" .. zone.color .. "(" .. covenant .. ")|r",
+                label = colorText("(" .. covenant .. ")", zone.color),
                 initialPoint = "LEFT",
                 relativePoint = "RIGHT",
                 offsetX = small,
@@ -87,42 +100,42 @@ Window:SetScript("OnShow", function()
         end
         -- For each Rare in the Zone
         for j, rare in ipairs(zone.rares) do
-            local killed = "|T137025:16|t "
+            local killed = skull
             if rare.quest then
                 if type(rare.quest) == "table" then
                     for _, quest in ipairs(rare.quest) do
                         if not C_QuestLog.IsQuestFlaggedCompleted(quest) then break end
-                        killed = "|T628564:16|t "
+                        killed = checkmark
                     end
                 else
-                    killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and "|T628564:16|t " or "|T137025:16|t "
+                    killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and checkmark or skull
                 end
             end
-            local covenantRequired = rare.covenantRequired and "|cffbbbbbb, when|r |T" .. zone.icon .. ":16|t |cff" .. zone.color .. covenant .. "|r |cffbbbbbbsummon|r" or ""
+            local covenantRequired = rare.covenantRequired and colorText(", summoned by ") .. icon(zone.icon) .. " " .. colorText(covenant, zone.color) .. colorText(",") or ""
             -- Rare
             ravShadowlands:CreateLabel({
                 type = "Label",
                 name = rare.id,
                 parent = Content,
-                label = killed .. "|cffbbbbbb" .. j .. ".|r " .. rare.name .. " |cffbbbbbbdrops|r" .. covenantRequired .. "|cffbbbbbb:|r"
+                label = killed .. " " .. colorText(j .. ". ") .. rare.name .. covenantRequired .. " " .. colorText("drops:")
             })
             -- For each Item dropped by the Rare in the Zone
             for _, item in ipairs(rare.items) do
-                local itemName, itemLink = GetItemInfo(item.id)
-                local covenantOnly = item.covenantOnly and " |cffbbbbbbonly for |T" .. zone.icon .. ":16|t |cff" .. zone.color .. "" .. covenant .. "|r" or ""
+                local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
+                local covenantOnly = item.covenantOnly and colorText(" only for ") .. icon(zone.icon) .. " " .. colorText(covenant, zone.color) or ""
                 local owned = ""
                 if item.mount then
                     local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
-                    owned = isCollected == true and " |T628564:16|t" or ""
+                    owned = isCollected == true and " " .. checkmark or ""
                 end
-                local guaranteed = item.guaranteed and " |cffbbbbbbGuaranteed drop!|r" or ""
+                local guaranteed = item.guaranteed and colorText(" Guaranteed drop!") or ""
+                local achievement = item.achievement and colorText(" from ") .. GetAchievementLink(item.achievement) or ""
                 -- Item
                 ravShadowlands:CreateLabel({
                     type = "Label",
                     name = rare.id .. "-items",
                     parent = Content,
-                    label = "  " .. itemLink .. guaranteed .. covenantOnly .. owned,
-                    link = itemLink,
+                    label = "    " .. icon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
                     offsetY = -small,
                 })
             end

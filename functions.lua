@@ -22,10 +22,6 @@ function ravShadowlands:CreateLabel(cfg)
     end
     label:SetText(cfg.label)
 
-    if cfg.link then
-        print(cfg.link)
-    end
-
     if not cfg.ignorePlacement then
         prevControl = label
     end
