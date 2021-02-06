@@ -262,6 +262,39 @@ ravShadowlands.data = {
                         },
                     },
                 },
+                {
+                    id = 162849,
+                    name = "Morguliax <Lord of Decapitation>",
+                    quest = 60987,
+                    waypoint = {16.6, 50.6},
+                    items = {
+                        {
+                            id = 184292,
+                        },
+                    },
+                },
+                {
+                    id = 172577,
+                    name = "Orophea",
+                    quest = 61519,
+                    waypoint = {23.8, 21.6},
+                    items = {
+                        {
+                            id = 181794,
+                        },
+                    },
+                },
+                {
+                    id = 157833,
+                    name = "Borr-Geth",
+                    quest = 57469,
+                    waypoint = {39.6, 40.8},
+                    items = {
+                        {
+                            id = 184312,
+                        },
+                    },
+                },
             }
         },
         {
