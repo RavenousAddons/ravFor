@@ -1,6 +1,6 @@
 # Ravenous for Shadowlands Rares
 
-![The Addon's Interface](https://i.imgur.com/anMgfmr.gif)
+![The Addon's Interface](https://i.imgur.com/iIbZP35.gif)
 
 ## Get in touch
 
