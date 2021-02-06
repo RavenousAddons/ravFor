@@ -14,8 +14,8 @@ ravShadowlands.data = {
                 {
                     id = 162853,
                     name = "Theater of Pain",
-                    waypoint = {33.7, 80.1},
                     quest = 62786,
+                    waypoint = {28.9, 51.3},
                     items = {
                         {
                             id = 184062,
@@ -24,10 +24,21 @@ ravShadowlands.data = {
                     },
                 },
                 {
+                    id = 162669,
+                    name = "Devour'us",
+                    quest = 58835,
+                    waypoint = {44.0, 29.5},
+                    items = {
+                        {
+                            id = 184178,
+                        },
+                    },
+                },
+                {
                     id = 162819,
                     name = "Warbringer Mal'korak",
-                    waypoint = {33.7, 80.1},
                     quest = 58889,
+                    waypoint = {33.6, 80.4},
                     items = {
                         {
                             id = 182085,
@@ -38,8 +49,8 @@ ravShadowlands.data = {
                 {
                     id = 162690,
                     name = "Nerissa Heartless",
-                    waypoint = {66.1, 35.3},
                     quest = 58851,
+                    waypoint = {66.0, 35.7},
                     items = {
                         {
                             id = 182084,
@@ -50,8 +61,8 @@ ravShadowlands.data = {
                 {
                     id = 162586,
                     name = "Tahonta",
-                    waypoint = {44.2, 51.1},
                     quest = 58783,
+                    waypoint = {44.0, 51.1},
                     items = {
                         {
                             id = 182075,
@@ -63,8 +74,8 @@ ravShadowlands.data = {
                 {
                     id = 162741,
                     name = "Gieger",
-                    waypoint = {31.5, 35.3},
                     quest = 58837,
+                    waypoint = {31.5, 35.3},
                     covenantRequired = true,
                     items = {
                         {
@@ -79,8 +90,8 @@ ravShadowlands.data = {
                 {
                     id = 174108,
                     name = "Necromatic Anomaly",
-                    waypoint = {72.4, 28.6},
                     quest = 58889,
+                    waypoint = {72.4, 28.6},
                     items = {
                         {
                             id = 181810,
@@ -90,8 +101,8 @@ ravShadowlands.data = {
                 {
                     id = 162727,
                     name = "Bubbleblood",
-                    waypoint = {72.4, 28.6},
                     quest = 58870,
+                    waypoint = {51.9, 36.4},
                     items = {
                         {
                             id = 184154,
@@ -104,8 +115,8 @@ ravShadowlands.data = {
                 {
                     id = 157125,
                     name = "Zargox the Reborn",
-                    waypoint = {72.4, 28.6},
                     quest = 59290,
+                    waypoint = {28.9, 51.3},
                     items = {
                         {
                             id = 181804,
@@ -114,10 +125,22 @@ ravShadowlands.data = {
                     },
                 },
                 {
+                    id = 157226,
+                    name = "Pool of Mixed Monstrosities",
+                    quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
+                    waypoint = {61.9, 76.8},
+                    items = {
+                        {
+                            id = 183903,
+                            achievement = 14721,
+                        },
+                    },
+                },
+                {
                     id = 157309,
                     name = "Violet Mistake",
-                    waypoint = {31.5, 35.3},
                     quest = 61720,
+                    waypoint = {61.9, 76.8},
                     items = {
                         {
                             id = 182079,
@@ -128,24 +151,12 @@ ravShadowlands.data = {
                 {
                     id = 48859,
                     name = "Oily Invertebrate",
-                    waypoint = {31.5, 35.3},
                     quest = 61724,
+                    waypoint = {61.9, 76.8},
                     items = {
                         {
                             id = 184155,
                             quest = 62804,
-                        },
-                    },
-                },
-                {
-                    id = 157226,
-                    name = "Pool of Mixed Monstrosities",
-                    waypoint = {31.5, 35.3},
-                    quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
-                    items = {
-                        {
-                            id = 183903,
-                            achievement = 14721,
                         },
                     },
                 },
@@ -161,8 +172,8 @@ ravShadowlands.data = {
                 {
                     id = 166521,
                     name = "Famu the Infinite",
-                    waypoint = {62.4, 47.1},
                     quest = 59869,
+                    waypoint = {62.2, 47.0},
                     items = {
                         {
                             id = 180582,
@@ -173,8 +184,8 @@ ravShadowlands.data = {
                 {
                     id = 165290,
                     name = "Harika the Horrid",
-                    waypoint = {45.3, 79.3},
                     quest = 59612,
+                    waypoint = {45.8, 78.9},
                     covenantRequired = true,
                     items = {
                         {
@@ -186,8 +197,8 @@ ravShadowlands.data = {
                 {
                     id = 166679,
                     name = "Hopecrusher",
-                    waypoint = {52.0, 51.8},
                     quest = 59900,
+                    waypoint = {52.0, 51.6},
                     items = {
                         {
                             id = 180581,
@@ -198,8 +209,8 @@ ravShadowlands.data = {
                 {
                     id = 159496,
                     name = "Forgemaster Madalav",
-                    waypoint = {52.0, 51.8},
                     quest = 61618,
+                    waypoint = {32.6, 15.4},
                     covenantRequired = true,
                     items = {
                         {
@@ -210,11 +221,24 @@ ravShadowlands.data = {
                 {
                     id = 160857,
                     name = "Sire Ladinas",
-                    waypoint = {52.0, 51.8},
                     quest = 58263,
+                    waypoint = {34.0, 55.4},
                     items = {
                         {
                             id = 180873,
+                        },
+                    },
+                },
+                {
+                    id = 160821,
+                    name = "Worldedge Gorger",
+                    quest = 58259,
+                    waypoint = {38.6, 72.2},
+                    items = {
+                        {
+                            id = 182589,
+                            mount = 1391,
+                            quest = 61188,
                         },
                     },
                 },
@@ -229,8 +253,8 @@ ravShadowlands.data = {
                 {
                     id = 174827,
                     name = "Gorged Shadehound",
-                    waypoint = {62.4, 47.1},
                     -- quest = 61124,
+                    waypoint = {53.6, 78.6},
                     items = {
                         {
                             id = 184167,
@@ -250,7 +274,8 @@ ravShadowlands.data = {
                 {
                     id = 170548,
                     name = "Sundancer",
-                    waypoint = {60.0, 93.6},
+                    -- quest = ?????,
+                    waypoint = {60.3, 79.7},
                     items = {
                         {
                             id = 180773,
@@ -261,8 +286,8 @@ ravShadowlands.data = {
                 {
                     id = 167078,
                     name = "Wingflayer the Cruel",
-                    waypoint = {60.0, 93.6},
                     quest = 60314,
+                    waypoint = {40.7, 52.9},
                     items = {
                         {
                             id = 182749,
@@ -273,8 +298,8 @@ ravShadowlands.data = {
                 {
                     id = 170623,
                     name = "Dark Watcher",
-                    waypoint = {60.0, 93.6},
                     quest = 60883,
+                    waypoint = {27.7, 30.0},
                     items = {
                         {
                             id = 184297,
@@ -283,9 +308,9 @@ ravShadowlands.data = {
                 },
                 {
                     id = 156339,
-                    name = "Orstus and Sotiros",
-                    waypoint = {60.0, 93.6},
+                    name = "Orstus & Sotiros",
                     quest = 61634,
+                    waypoint = {22.6, 22.9},
                     items = {
                         {
                             id = 184365,
@@ -295,8 +320,8 @@ ravShadowlands.data = {
                 {
                     id = 170832,
                     name = "Ascended Council",
-                    waypoint = {60.0, 93.6},
                     quest = 60977,
+                    waypoint = {53.5, 88.2},
                     items = {
                         {
                             id = 183741,
@@ -307,8 +332,8 @@ ravShadowlands.data = {
                 {
                     id = 171009,
                     name = "Enforcer Aegeon",
-                    waypoint = {60.0, 93.6},
                     quest = 60998,
+                    waypoint = {50.8, 19.6},
                     items = {
                         {
                             id = 184404,
@@ -318,8 +343,8 @@ ravShadowlands.data = {
                 {
                     id = 171008,
                     name = "Unstable Memory",
-                    waypoint = {60.0, 93.6},
                     quest = 60997,
+                    waypoint = {43.4, 25.2},
                     items = {
                         {
                             id = 184413,
@@ -338,8 +363,8 @@ ravShadowlands.data = {
                 {
                     id = 164112,
                     name = "Humon'gozz",
-                    waypoint = {32.5, 30.5},
                     quest = 59157,
+                    waypoint = {32.4, 30.4},
                     items = {
                         {
                             id = 182650,
@@ -351,8 +376,8 @@ ravShadowlands.data = {
                 {
                     id = 168647,
                     name = "Valfir the Unrelenting",
-                    waypoint = {30.3, 56.0},
                     quest = 61632,
+                    waypoint = {30.6, 55.0},
                     covenantRequired = true,
                     items = {
                         {
@@ -364,8 +389,8 @@ ravShadowlands.data = {
                 {
                     id = 164107,
                     name = "Gormtamer Tizo",
-                    waypoint = {30.3, 56.0},
                     quest = 59145,
+                    waypoint = {26.4, 54.3},
                     items = {
                         {
                             id = 180725,
@@ -376,9 +401,9 @@ ravShadowlands.data = {
                 },
                 {
                     id = 168135,
-                    name = "Swift Gloomhoof",
-                    waypoint = {30.3, 56.0},
+                    name = "Night Mare",
                     quest = 60306,
+                    waypoint = {62.2, 53.9},
                     items = {
                         {
                             id = 180728,
@@ -390,8 +415,8 @@ ravShadowlands.data = {
                 {
                     id = 160448,
                     name = "Hunter Vivian",
-                    waypoint = {30.3, 56.0},
                     quest = 59221,
+                    waypoint = {67.1, 24.6},
                     items = {
                         {
                             id = 179596,

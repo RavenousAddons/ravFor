@@ -10,22 +10,22 @@ local small = 6
 local medium = 12
 local large = 16
 
-function colorText(text, color)
+local function TextColor(text, color)
     color = color and color or "bbbbbb"
     return "|cff" .. color .. text .. "|r"
 end
 
-function icon(id, size)
+local function TextIcon(id, size)
     size = size and size or 16
     return "|T" .. id .. ":" .. size .. "|t"
 end
 
-local skull = icon(137025)
-local checkmark = icon(628564)
+local skull = TextIcon(137025)
+local checkmark = TextIcon(628564)
 
 local Window = CreateFrame("Frame", name .. "Window", UIParent)
 Window.name = name .. "Window"
-Window:SetFrameStrata("LOW")
+Window:SetFrameStrata("MEDIUM")
 Window:SetWidth(width)
 Window:SetHeight(height)
 Window:SetPoint("CENTER", 0, 0)
@@ -51,8 +51,8 @@ end)
 
 local Parent = CreateFrame("ScrollFrame", nil, Window, "UIPanelScrollFrameTemplate")
 Parent:SetWidth(width - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-Parent:SetHeight(height - (medium * 2) - (large * 2))
-Parent:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, medium)
+Parent:SetHeight(height - small - (medium * 2) - (large * 2))
+Parent:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, large)
 
 local Content = CreateFrame("Frame", nil, ScrollFrame)
 Content:SetWidth(1)
@@ -64,7 +64,7 @@ Window:SetScript("OnShow", function()
     ravShadowlands:CreateLabel({
         name = "Heading",
         parent = Window,
-        label = "|cffffffff" .. ravShadowlands.title,
+        label = TextColor(ravShadowlands.title, "ffffff"),
         relativeTo = Window,
         relativePoint = "TOPLEFT",
         fontObject = "GameFontNormalLarge",
@@ -79,7 +79,7 @@ Window:SetScript("OnShow", function()
         ravShadowlands:CreateLabel({
             name = zone.id,
             parent = Content,
-            label = icon(zone.icon) .. "  " .. colorText(mapName, zone.color),
+            label = TextIcon(zone.icon) .. "  " .. TextColor(mapName, zone.color),
             relativeTo = (i == 1 and Content or nil),
             relativePoint = (i == 1 and "TOPLEFT" or nil),
             offsetY = (i == 1 and 0 or -large*3),
@@ -90,7 +90,7 @@ Window:SetScript("OnShow", function()
             ravShadowlands:CreateLabel({
                 name = zone.id .. "-" .. covenant,
                 parent = Content,
-                label = colorText("(" .. covenant .. ")", zone.color),
+                label = TextColor("(" .. covenant .. ")", zone.color),
                 initialPoint = "LEFT",
                 relativePoint = "RIGHT",
                 offsetX = small,
@@ -111,32 +111,41 @@ Window:SetScript("OnShow", function()
                     killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and checkmark or skull
                 end
             end
-            local covenantRequired = rare.covenantRequired and colorText(", summoned by ") .. icon(zone.icon) .. " " .. colorText(covenant, zone.color) .. colorText(",") or ""
+            local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zone.icon) .. " " .. TextColor(covenant, zone.color) .. TextColor(",") or ""
             -- Rare
-            ravShadowlands:CreateLabel({
-                type = "Label",
+            ravShadowlands:CreateButton({
                 name = rare.id,
                 parent = Content,
-                label = killed .. " " .. colorText(j .. ". ") .. rare.name .. covenantRequired .. " " .. colorText("drops:")
+                label = killed .. " " .. TextColor(j .. ". ") .. rare.name .. covenantRequired .. " " .. TextColor("drops:"),
+                width = width - (medium * 2) - 18,
+                rare = rare.name,
+                zone = zone.id,
+                zoneColor = zone.color,
+                waypoint = rare.waypoint,
             })
             -- For each Item dropped by the Rare in the Zone
             for _, item in ipairs(rare.items) do
-                local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
-                local covenantOnly = item.covenantOnly and colorText(" only for ") .. icon(zone.icon) .. " " .. colorText(covenant, zone.color) or ""
+                local itemName, itemLink, _, _, _, _, _, _, _, itemTexture = GetItemInfo(item.id)
+                local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zone.icon) .. " " .. TextColor(covenant, zone.color) or ""
                 local owned = ""
                 if item.mount then
                     local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
                     owned = isCollected == true and " " .. checkmark or ""
+                elseif item.achievement then
+                    local _, _, _, completed = GetAchievementInfo(item.achievement)
+                    owned = completed == true and " " .. checkmark or ""
                 end
-                local guaranteed = item.guaranteed and colorText(" Guaranteed drop!") or ""
-                local achievement = item.achievement and colorText(" from ") .. GetAchievementLink(item.achievement) or ""
+                local guaranteed = item.guaranteed and TextColor(" Guaranteed drop!") or ""
+                local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
                 -- Item
-                ravShadowlands:CreateLabel({
-                    type = "Label",
+                ravShadowlands:CreateButton({
                     name = rare.id .. "-items",
                     parent = Content,
-                    label = "    " .. icon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
+                    label = "    " .. TextIcon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
+                    width = width - (medium * 2) - 18,
                     offsetY = -small,
+                    id = item.id,
+                    mount = item.mount,
                 })
             end
         end
