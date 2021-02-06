@@ -12,6 +12,18 @@ ravShadowlands.data = {
             icon = "3257749",
             rares = {
                 {
+                    id = 162853,
+                    name = "Theater of Pain",
+                    waypoint = {33.7, 80.1},
+                    quest = 62786,
+                    items = {
+                        {
+                            id = 184062,
+                            mount = 1437,
+                        },
+                    },
+                },
+                {
                     id = 162819,
                     name = "Warbringer Mal'korak",
                     waypoint = {33.7, 80.1},
@@ -44,6 +56,7 @@ ravShadowlands.data = {
                         {
                             id = 182075,
                             mount = 1366,
+                            covenantOnly = true,
                         },
                     },
                 },
@@ -52,11 +65,14 @@ ravShadowlands.data = {
                     name = "Gieger",
                     waypoint = {31.5, 35.3},
                     quest = 58837,
+                    covenantRequired = true,
                     items = {
                         {
                             id = 182080,
                             mount = 1411,
-                            covenantOnly = true,
+                        },
+                        {
+                            id = 184298,
                         },
                     },
                 },
@@ -72,6 +88,32 @@ ravShadowlands.data = {
                     },
                 },
                 {
+                    id = 162727,
+                    name = "Bubbleblood",
+                    waypoint = {72.4, 28.6},
+                    quest = 58870,
+                    items = {
+                        {
+                            id = 184154,
+                        },
+                        {
+                            id = 184476,
+                        },
+                    },
+                },
+                {
+                    id = 157125,
+                    name = "Zargox the Reborn",
+                    waypoint = {72.4, 28.6},
+                    quest = 59290,
+                    items = {
+                        {
+                            id = 181804,
+                            covenantOnly = true,
+                        },
+                    },
+                },
+                {
                     id = 157309,
                     name = "Violet Mistake",
                     waypoint = {31.5, 35.3},
@@ -80,6 +122,30 @@ ravShadowlands.data = {
                         {
                             id = 182079,
                             mount = 1410,
+                        },
+                    },
+                },
+                {
+                    id = 48859,
+                    name = "Oily Invertebrate",
+                    waypoint = {31.5, 35.3},
+                    quest = 61724,
+                    items = {
+                        {
+                            id = 184155,
+                            quest = 62804,
+                        },
+                    },
+                },
+                {
+                    id = 157226,
+                    name = "Pool of Mixed Monstrosities",
+                    waypoint = {31.5, 35.3},
+                    quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
+                    items = {
+                        {
+                            id = 183903,
+                            achievement = 14721,
                         },
                     },
                 },
@@ -126,6 +192,29 @@ ravShadowlands.data = {
                         {
                             id = 180581,
                             mount = 1298,
+                        },
+                    },
+                },
+                {
+                    id = 159496,
+                    name = "Forgemaster Madalav",
+                    waypoint = {52.0, 51.8},
+                    quest = 61618,
+                    covenantRequired = true,
+                    items = {
+                        {
+                            id = 180939,
+                        },
+                    },
+                },
+                {
+                    id = 160857,
+                    name = "Sire Ladinas",
+                    waypoint = {52.0, 51.8},
+                    quest = 58263,
+                    items = {
+                        {
+                            id = 180873,
                         },
                     },
                 },
@@ -215,6 +304,28 @@ ravShadowlands.data = {
                         },
                     },
                 },
+                {
+                    id = 171009,
+                    name = "Enforcer Aegeon",
+                    waypoint = {60.0, 93.6},
+                    quest = 60998,
+                    items = {
+                        {
+                            id = 184404,
+                        },
+                    },
+                },
+                {
+                    id = 171008,
+                    name = "Unstable Memory",
+                    waypoint = {60.0, 93.6},
+                    quest = 60997,
+                    items = {
+                        {
+                            id = 184413,
+                        },
+                    },
+                },
             }
         },
         {
@@ -273,6 +384,17 @@ ravShadowlands.data = {
                             id = 180728,
                             mount = 1306,
                             guaranteed = true,
+                        },
+                    },
+                },
+                {
+                    id = 160448,
+                    name = "Hunter Vivian",
+                    waypoint = {30.3, 56.0},
+                    quest = 59221,
+                    items = {
+                        {
+                            id = 179596,
                         },
                     },
                 },

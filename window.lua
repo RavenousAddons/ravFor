@@ -3,7 +3,7 @@ local L = ravShadowlands.L
 
 local zones = ravShadowlands.data.zones
 
-local width = 350
+local width = 400
 local height = 450
 
 local small = 6
@@ -12,11 +12,12 @@ local large = 16
 
 local Window = CreateFrame("Frame", name .. "Window", UIParent)
 Window.name = name .. "Window"
-Window:SetFrameStrata("DIALOG")
+Window:SetFrameStrata("LOW")
 Window:SetWidth(width)
 Window:SetHeight(height)
 Window:SetPoint("CENTER", 0, 0)
 Window:EnableMouse(true)
+Window:SetResizable(true)
 Window:SetMovable(true)
 Window:SetClampedToScreen(true)
 Window:RegisterForDrag("LeftButton")
@@ -60,6 +61,7 @@ Window:SetScript("OnShow", function()
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
+        local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name:gsub("%Necrolord", "Necrolords") or nil
         -- Zone
         ravShadowlands:CreateLabel({
             name = zone.id,
@@ -70,36 +72,57 @@ Window:SetScript("OnShow", function()
             offsetY = (i == 1 and 0 or -large*2),
             fontObject = "GameFontNormalLarge",
         })
+        if covenant then
+            -- Covenant for Zone
+            ravShadowlands:CreateLabel({
+                name = zone.id .. "-" .. covenant,
+                parent = Content,
+                label = "|cff" .. zone.color .. "(" .. covenant .. ")|r",
+                initialPoint = "LEFT",
+                relativePoint = "RIGHT",
+                offsetX = small,
+                offsetY = 0,
+                ignorePlacement = true,
+            })
+        end
         -- For each Rare in the Zone
-        for _, rare in ipairs(zone.rares) do
+        for j, rare in ipairs(zone.rares) do
             local killed = "|T137025:16|t "
             if rare.quest then
-                killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and "|T628564:16|t " or "|T137025:16|t "
+                if type(rare.quest) == "table" then
+                    for _, quest in ipairs(rare.quest) do
+                        if not C_QuestLog.IsQuestFlaggedCompleted(quest) then break end
+                        killed = "|T628564:16|t "
+                    end
+                else
+                    killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and "|T628564:16|t " or "|T137025:16|t "
+                end
             end
-            local covenantRequired = rare.covenantRequired and "|T" .. zone.icon .. ":16|t |cff" .. zone.color .. C_Covenants.GetCovenantData(zone.covenant).name .. " to summon|r " or ""
+            local covenantRequired = rare.covenantRequired and "|cffbbbbbb, when|r |T" .. zone.icon .. ":16|t |cff" .. zone.color .. covenant .. "|r |cffbbbbbbsummon|r" or ""
             -- Rare
             ravShadowlands:CreateLabel({
                 type = "Label",
                 name = rare.id,
                 parent = Content,
-                label = killed .. covenantRequired .. rare.name .. " |cffbbbbbbdrops:|r"
+                label = killed .. "|cffbbbbbb" .. j .. ".|r " .. rare.name .. " |cffbbbbbbdrops|r" .. covenantRequired .. "|cffbbbbbb:|r"
             })
             -- For each Item dropped by the Rare in the Zone
             for _, item in ipairs(rare.items) do
                 local itemName, itemLink = GetItemInfo(item.id)
-                local covenantOnly = item.covenantOnly and " |cff" .. zone.color .. "only for |T" .. zone.icon .. ":16|t " .. C_Covenants.GetCovenantData(zone.covenant).name .. "|r" or ""
+                local covenantOnly = item.covenantOnly and " |cffbbbbbbonly for |T" .. zone.icon .. ":16|t |cff" .. zone.color .. "" .. covenant .. "|r" or ""
                 local owned = ""
                 if item.mount then
                     local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
                     owned = isCollected == true and " |T628564:16|t" or ""
                 end
-                local guaranteed = (not owned and item.guaranteed) and " |cffbbbbbbGuaranteed!|r" or ""
+                local guaranteed = item.guaranteed and " |cffbbbbbbGuaranteed drop!|r" or ""
                 -- Item
                 ravShadowlands:CreateLabel({
                     type = "Label",
                     name = rare.id .. "-items",
                     parent = Content,
                     label = "  " .. itemLink .. guaranteed .. covenantOnly .. owned,
+                    link = itemLink,
                     offsetY = -small,
                 })
             end
