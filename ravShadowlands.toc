@@ -1,8 +1,8 @@
 ## Interface: 90002
-## Version: 0.0.1-alpha
+## Version: 0.0.2-alpha
 
 ## Name: Ravenous for Shadowlands Rares
-## Title: Ravenous |cffffc478for Shadowlands Rares|r
+## Title: Ravenous for |cffffc478Shadowlands|r Rares
 ## Notes: "Shows the order we kill rares in as well as tracks your progress on their drops and deaths."
 ## Author: RavenousAddons
 

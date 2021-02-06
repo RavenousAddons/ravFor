@@ -3,41 +3,24 @@ local L = ravShadowlands.L
 
 local zones = ravShadowlands.data.zones
 
+local width = 500
+local height = 400
+
 local small = 6
 local medium = 12
 local large = 16
 
-local function FixScrollOnUpdate(frame)
-    frame:SetScript("OnUpdate", nil)
-    frame.scrollframe.obj:FixScroll()
-end
-
-local function ScrollFrame_OnMouseWheel(frame, value)
-    frame.obj:MoveScroll(value)
-end
-
-local function ScrollFrame_OnSizeChanged(frame)
-    frame:SetScript("OnUpdate", FixScrollOnUpdate)
-end
-
-local function ScrollBar_OnScrollValueChanged(frame, value)
-    frame.obj:SetScroll(value)
-end
-
-local Window = CreateFrame("ScrollFrame", name .. "Window", UIParent, "FauxScrollFrameTemplate")
+local Window = CreateFrame("Frame", name .. "Window", UIParent)
 Window.name = name .. "Window"
 Window:SetFrameStrata("DIALOG")
-Window:SetWidth(600)
-Window:SetHeight(450)
+Window:SetWidth(width)
+Window:SetHeight(height)
 Window:SetPoint("CENTER", 0, 0)
-Window:SetMovable(true)
 Window:EnableMouse(true)
-Window:EnableMouseWheel(true)
-Window:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
-Window:SetScript("OnSizeChanged", ScrollFrame_OnSizeChanged)
+Window:SetMovable(true)
 Window:RegisterForDrag("LeftButton")
-Window:SetScript("OnDragStart", Window.StartMoving)
-Window:SetScript("OnDragStop", Window.StopMovingOrSizing)
+Window:SetScript("OnDragStart", function(self) self:StartMoving() end)
+Window:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 Window:SetClampedToScreen(true)
 
 -- This makes it close with ESC
@@ -48,56 +31,41 @@ Texture:SetColorTexture(0, 0, 0, 0.8)
 Texture:SetAllPoints(Window)
 Window.texture = Texture
 
-Window:Hide()
+local Parent = CreateFrame("ScrollFrame", nil, Window, "UIPanelScrollFrameTemplate")
+Parent:SetWidth(width - (medium * 2) - 22) -- 22 seems to be width of the scrollbar
+Parent:SetHeight(height - (medium * 2) - (large * 2))
+Parent:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, medium)
+
+local Content = CreateFrame("Frame", nil, ScrollFrame)
+Content:SetWidth(1)
+Content:SetHeight(1)
+Parent:SetScrollChild(Content)
+
 Window:SetScript("OnShow", function()
-    local fullWidth = Window:GetWidth() - (small * 2)
-    local columns = {
-        "A",
-        "B",
-        "C",
-        "D",
-    }
-
-    local HeaderPanel = CreateFrame("Frame", "HeaderPanel", Window)
-    HeaderPanel:SetPoint("TOPLEFT", Window, "TOPLEFT", small, small * -1)
-    HeaderPanel:SetWidth(fullWidth)
-    HeaderPanel:SetHeight(small * 3)
-
-    for _, title in ipairs(columns) do
-        columns[title] = CreateFrame("Frame", "Column" .. title, Window)
-        columns[title]:SetPoint("TOPLEFT", HeaderPanel, "BOTTOMLEFT", 0, small * -1)
-        columns[title]:SetWidth(fullWidth / 4 - small)
-        columns[title]:SetHeight(Window:GetHeight() - HeaderPanel:GetHeight() - (small * 2))
-    end
-
-    local WindowElements = {
-        {
-            name = "Heading",
-            parent = Window,
-            label = "|cffdcdde2" .. ravShadowlands.name .. ":",
-            relativeTo = HeaderPanel,
-            relativePoint = "TOPLEFT",
-            fontObject = "GameFontNormalLarge",
-            offsetX = 16,
-        },
-    }
-
-    for _, control in pairs(WindowElements) do
-        ravShadowlands:CreateLabel(control)
-    end
-
+    ravShadowlands:CreateLabel({
+        name = "Heading",
+        parent = Window,
+        label = "|cffffffff" .. ravShadowlands.title,
+        relativeTo = Window,
+        relativePoint = "TOPLEFT",
+        fontObject = "GameFontNormalLarge",
+        offsetX = medium,
+    })
     -- For each Zone
-    for _, zone in pairs(zones) do
+    for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
         -- Zone Heading
         ravShadowlands:CreateLabel({
             name = zone.id,
-            parent = Window,
+            parent = Content,
             label = "|cff" .. zone.color .. mapName .. ":|r",
+            relativeTo = (i == 1 and Content or nil),
+            relativePoint = (i == 1 and "TOPLEFT" or nil),
+            offsetY = (i == 1 and 0 or nil),
             fontObject = "GameFontNormalLarge",
         })
         -- For each Boss in the Zone
-        for i, bossData in ipairs(zone.bosses) do
+        for _, bossData in ipairs(zone.bosses) do
             local itemName, itemLink = GetItemInfo(bossData.item)
             local owned = false
             local killed = false
@@ -112,8 +80,8 @@ Window:SetScript("OnShow", function()
             ravShadowlands:CreateLabel({
                 type = "Label",
                 name = bossData.id,
-                parent = Window,
-                label = "|cffffffff" .. i .. ".|r " .. (killed and "{rt8} " or "") .. bossData.name .. "|cffffffff drops " .. itemLink .. (owned and " {rt3}" or ""),
+                parent = Content,
+                label = (killed and "|T628564:16|t " or "|T137025:16|t ") .. bossData.name .. "|cffffffff drops " .. itemLink .. (owned and " |T628564:16|t" or "") -- .. " |cffffff00|Hworldmap:84:7222:2550|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a Location]|h|r",
             })
         end
     end
