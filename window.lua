@@ -161,7 +161,7 @@ Window:SetScript("OnShow", function()
             ns:CreateLabel({
                 name = nil,
                 parent = Content,
-                label = TextColor("Work to increase your Renown to the current maximum of " .. maxRenown .. "!", "ff3333"),
+                label = TextColor("Try to work increasing your Renown to the current maximum!", "ff3333"),
             })
         end
     end
