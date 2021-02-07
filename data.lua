@@ -1,7 +1,30 @@
 local _, ns = ...
 
+---
 -- The order of the data represents the order presented by the
 -- Addon's Interface.
+--
+-- Zones:
+--   id = Map ID,
+--   covenant = Covenant ID,
+--   color = Hex Color,
+--   icon = Icon Texture ID,
+--   rares = Notable Rares,
+--
+-- Rares:
+--   id = NPC ID,
+--   name = NPC Name (need to figure out how to get this from the Blizzard API),
+--   quest = Quest ID(s) for completion,
+--   waypoint = {X Coordinate, Y Coordinate},
+--   covenantRequired = Requires the Zone's Covenant to summon
+--   items = Notable Items Dropped
+--
+-- Items:
+--   id = Item ID,
+--   mount = Mount ID (if mount),
+--   achievement = Achievement ID (if associated),
+---
+
 ns.data = {
     zones = {
         {
@@ -339,7 +362,6 @@ ns.data = {
                         {
                             id = 182589,
                             mount = 1391,
-                            quest = 61188,
                         },
                     },
                 },
@@ -615,6 +637,7 @@ ns.data = {
                         {
                             id = 180728,
                             mount = 1306,
+                            covenantOnly = true,
                             guaranteed = true,
                         },
                     },
