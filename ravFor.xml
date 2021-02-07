@@ -6,10 +6,10 @@
     <Script file="window.lua" />
     <Script file="core.lua" />
 
-    <Frame name="RavenousFor">
+    <Frame name="ravFor">
         <Scripts>
-            <OnLoad function="RavenousFor_OnLoad" />
-            <OnEvent function="RavenousFor_OnEvent" />
+            <OnLoad function="ravFor_OnLoad" />
+            <OnEvent function="ravFor_OnEvent" />
         </Scripts>
     </Frame>
 </Ui>

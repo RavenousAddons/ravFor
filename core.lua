@@ -1,11 +1,12 @@
 local name, ns = ...
 local L = ns.L
 
-function RavenousFor_OnLoad(self)
+function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
-function RavenousFor_OnEvent(self, event, arg, ...)
+function ravFor_OnEvent(self, event, arg, ...)
     if arg == name then
         if event == "ADDON_LOADED" then
             if not RAVFOR_version then
@@ -15,17 +16,17 @@ function RavenousFor_OnEvent(self, event, arg, ...)
             end
             RAVFOR_version = ns.version
         end
-    elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then
-
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        ns:EnsureMacro()
     end
 end
 
-SlashCmdList["RAVENOUSFOR"] = function(message, editbox)
+SlashCmdList["RAVFOR"] = function(message, editbox)
     local command, argument = strsplit(" ", message)
     if command == "version" or command == "v" then
         ns:PrettyPrint(string.format(L.Version, ns.version))
     else
-        ns.Window:Show()
+        if (ns.Window:IsVisible()) then ns.Window:Hide() else ns.Window:Show() end
     end
 end
-SLASH_RAVENOUSFOR1 = "/" .. ns.command
+SLASH_RAVFOR1 = "/" .. ns.command

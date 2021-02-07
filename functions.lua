@@ -5,6 +5,22 @@ function ns:PrettyPrint(message)
     DEFAULT_CHAT_FRAME:AddMessage("|cff" .. ns.color .. ns.name .. ":|r " .. message)
 end
 
+local hasSeenNoSpaceMessage = false
+function ns:EnsureMacro()
+    if not UnitAffectingCombat("player") then
+        local body = "/" .. ns.command
+        local numberOfMacros, _ = GetNumMacros()
+        if GetMacroIndexByName(ns.name) > 0 then
+            EditMacro(GetMacroIndexByName(ns.name), ns.name, ns.icon, body)
+        elseif numberOfMacros < 120 then
+            CreateMacro(ns.name, ns.icon, body)
+        elseif not hasSeenNoSpaceMessage then
+            hasSeenNoSpaceMessage = true
+            ns:PrettyPrint(L.NoMacroSpace)
+        end
+    end
+end
+
 function ns:CreateLabel(cfg)
     cfg.initialPoint = cfg.initialPoint or "TOPLEFT"
     cfg.relativePoint = cfg.relativePoint or "BOTTOMLEFT"

@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: 0.0.8-alpha
+## Version: 0.1.0
 
 ## Name: Ravenous For
 ## Title: Ravenous |cffffc478For|r
@@ -10,6 +10,6 @@
 ## SavedVariablesPerCharacter: RAVFOR_data
 
 ## X-License: Public Domain
-## X-Website: https://github.com/RavenousAddons/ns
+## X-Website: https://github.com/RavenousAddons/ravFor
 
-ravenousFor.xml
+ravFor.xml
