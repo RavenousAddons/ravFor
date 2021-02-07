@@ -22,7 +22,7 @@ function ravFor_OnEvent(self, event, arg, ...)
             if string.match(message, "target") then
                 local rare, zone, x, y, zoneColor = strsplit(",", message)
                 rare = string.gsub(rare, "target={", "")
-                y = string.gsub(y, "}", "")
+                zoneColor = string.gsub(zoneColor, "}", "")
                 ns:NewTarget(rare, zone, x, y, zoneColor)
             end
         end

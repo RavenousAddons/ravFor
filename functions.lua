@@ -21,20 +21,33 @@ function ns:EnsureMacro()
     end
 end
 
-function ns:SendTarget(rare, zone, x, y)
-    local target = "target={" .. rare .. "," .. zone .. "," .. x .. "," .. y .. "}"
-    local inInstance, _ = IsInInstance()
-    if inInstance then
-        C_ChatInfo.SendAddonMessage(name, target, "INSTANCE_CHAT")
-    elseif IsInGroup() then
-        if GetNumGroupMembers() > 5 then
-            C_ChatInfo.SendAddonMessage(name, target, "RAID")
+function ns:SendTarget(rare, zone, x, y, zoneColor)
+    local target = "target={" .. rare .. "," .. zone .. "," .. x .. "," .. y .. "," .. zoneColor .. "}"
+    local playerName = UnitName("player")
+    local isLeadOrAssist = false
+    for i = 1, MAX_RAID_MEMBERS do
+        local name, rank = GetRaidRosterInfo(i)
+        if name == playerName then
+            if rank > 0 then isLeadOrAssist = true end
+            break
         end
-        C_ChatInfo.SendAddonMessage(name, target, "PARTY")
-    -- Disable for testing
-    -- else
-    --     print("Whisper")
-    --     C_ChatInfo.SendAddonMessage(name, target, "WHISPER", UnitName("player"))
+    end
+    if isLeadOrAssist then
+        local inInstance, _ = IsInInstance()
+        if inInstance then
+            C_ChatInfo.SendAddonMessage(name, target, "INSTANCE_CHAT")
+            print("Sending target to Instance members…")
+        elseif IsInGroup() then
+            if GetNumGroupMembers() > 5 then
+                C_ChatInfo.SendAddonMessage(name, target, "RAID")
+                print("Sending target to Raid members…")
+            end
+            C_ChatInfo.SendAddonMessage(name, target, "PARTY")
+            print("Sending target to Party members…")
+        -- Enable for testing
+        -- else
+        --     C_ChatInfo.SendAddonMessage(name, target, "WHISPER", UnitName("player"))
+        end
     end
 end
 
