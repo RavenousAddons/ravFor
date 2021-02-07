@@ -21,6 +21,33 @@ function ns:EnsureMacro()
     end
 end
 
+function ns:SendTarget(rare, zone, x, y)
+    local target = "target={" .. rare .. "," .. zone .. "," .. x .. "," .. y .. "}"
+    local inInstance, _ = IsInInstance()
+    if inInstance then
+        C_ChatInfo.SendAddonMessage(name, target, "INSTANCE_CHAT")
+    elseif IsInGroup() then
+        if GetNumGroupMembers() > 5 then
+            C_ChatInfo.SendAddonMessage(name, target, "RAID")
+        end
+        C_ChatInfo.SendAddonMessage(name, target, "PARTY")
+    -- Disable for testing
+    -- else
+    --     print("Whisper")
+    --     C_ChatInfo.SendAddonMessage(name, target, "WHISPER", UnitName("player"))
+    end
+end
+
+function ns:NewTarget(rare, zone, x, y, zoneColor)
+    local zoneName = C_Map.GetMapInfo(zone).name
+    zoneColor = zoneColor and zoneColor or "ffffff"
+    -- Print message to chat
+    ns:PrettyPrint("\n" .. rare .. "  |cffffd100|Hworldmap:" .. zone .. ":" .. x * 100 .. ":" .. y * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffffffff" .. string.format("%.1f", x) .. ", " .. string.format("%.1f", y) .. "|r]|h|r")
+    -- Add the waypoint to the map and track it
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone, x / 100, y / 100))
+    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+end
+
 function ns:CreateLabel(cfg)
     cfg.initialPoint = cfg.initialPoint or "TOPLEFT"
     cfg.relativePoint = cfg.relativePoint or "BOTTOMLEFT"
@@ -64,23 +91,23 @@ function ns:CreateButton(cfg)
     if cfg.height then
         button:SetHeight(cfg.height)
     end
-    if cfg.rare and cfg.zone and cfg.waypoint then
+    if cfg.rare and cfg.zone and cfg.waypoint and cfg.zoneColor then
         button:SetScript("OnClick", function()
-            local zone = C_Map.GetMapInfo(cfg.zone).name
-            ns:PrettyPrint("\n" .. cfg.rare .. "  |cffffd100|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r |cffffffff" .. string.format("%.1f", cfg.waypoint[1]) .. ", " .. string.format("%.1f", cfg.waypoint[2]) .. "|r]|h|r")
-            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(cfg.zone, cfg.waypoint[1] / 100, cfg.waypoint[2] / 100))
-            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+            -- Mark the Rare
+            ns:NewTarget(cfg.rare, cfg.zone, cfg.waypoint[1], cfg.waypoint[2], cfg.zoneColor)
+            -- Send the Rare to Party/Raid Members
+            ns:SendTarget(cfg.rare, cfg.zone, cfg.waypoint[1], cfg.waypoint[2], cfg.zoneColor)
         end)
     elseif cfg.id or cfg.mount then
         button:SetScript("OnClick", function()
-            -- print(cfg.id)
+            -- TODO Should open Mount Journal with Mount selected/opened
         end)
     elseif cfg.showRenown then
-        print("cfg.showRenown")
         button:SetScript("OnClick", function()
-            print("showRenown")
-            GarrisonLandingPage:Show()
-            CovenantRenownFrame:Show()
+            -- TODO Should open Covenent Renown Frame
+            -- print("showRenown")
+            -- GarrisonLandingPage:Show()
+            -- CovenantRenownFrame:Show()
         end)
     end
 

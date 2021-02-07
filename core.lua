@@ -4,6 +4,7 @@ local L = ns.L
 function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("CHAT_MSG_ADDON")
 end
 
 function ravFor_OnEvent(self, event, arg, ...)
@@ -15,6 +16,15 @@ function ravFor_OnEvent(self, event, arg, ...)
                 ns:PrettyPrint(string.format(L.Update, ns.color, ns.version))
             end
             RAVFOR_version = ns.version
+            C_ChatInfo.RegisterAddonMessagePrefix(name)
+        elseif event == "CHAT_MSG_ADDON" then
+            local message, _ = ...
+            if string.match(message, "target") then
+                local rare, zone, x, y, zoneColor = strsplit(",", message)
+                rare = string.gsub(rare, "target={", "")
+                y = string.gsub(y, "}", "")
+                ns:NewTarget(rare, zone, x, y, zoneColor)
+            end
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:EnsureMacro()
