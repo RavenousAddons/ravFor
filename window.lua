@@ -1,7 +1,10 @@
 local name, ns = ...
 local L = ns.L
 
-local zones = ns.data.zones
+local expansion = ns.data.expansions[ns.expansion]
+local notes = expansion.notes
+local npcs = expansion.npcs
+local zones = expansion.zones
 
 local width = 400
 local height = 450
@@ -9,6 +12,7 @@ local height = 450
 local small = 6
 local medium = 12
 local large = 16
+local gigantic = 24
 
 local function TextColor(text, color)
     color = color and color or "bbbbbb"
@@ -107,13 +111,13 @@ Window:SetScript("OnShow", function()
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
-        local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name:gsub("%Necrolord", "Necrolords") or nil
+        local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
         -- Zone
         ns:CreateLabel({
             name = zone.id,
             parent = Content,
             label = TextIcon(zone.icon) .. "  " .. TextColor(mapName, zone.color),
-            offsetY = -large*2.5,
+            offsetY = -gigantic,
             fontObject = "GameFontNormalLarge",
         })
         if covenant then
@@ -172,7 +176,7 @@ Window:SetScript("OnShow", function()
                             local _, _, _, completed = GetAchievementInfo(item.achievement)
                             owned = completed == true and " " .. checkmark or ""
                         end
-                        local guaranteed = item.guaranteed and TextColor(" Guaranteed drop!") or ""
+                        local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
                         local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
                         -- Item
                         ns:CreateButton({
@@ -187,6 +191,24 @@ Window:SetScript("OnShow", function()
                     end
                 end
             end
+        end
+    end
+    -- Notes
+    if notes then
+        ns:CreateLabel({
+            name = "notes",
+            parent = Content,
+            label = TextIcon(1506451) .. "  " .. TextColor("Notes", "ffffff"),
+            offsetY = -gigantic,
+            fontObject = "GameFontNormalLarge",
+        })
+        for _, note in ipairs(notes) do
+            ns:CreateLabel({
+                name = nil,
+                parent = Content,
+                label = TextColor(note, "ffffff"),
+                offsetY = -medium,
+            })
         end
     end
 
