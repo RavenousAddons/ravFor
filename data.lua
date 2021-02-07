@@ -1,43 +1,33 @@
 local _, ns = ...
 
 ---
--- The order of the data represents the order presented by the
--- Addon's Interface.
---
--- Zones:
---   id = Map ID,
---   covenant = Covenant ID,
---   color = Hex Color,
---   icon = Icon Texture ID,
---   rares = Notable Rares,
---
--- Rares:
---   id = NPC ID,
---   name = NPC Name (need to figure out how to get this from the Blizzard API),
---   quest = Quest ID(s) for completion,
---   waypoint = {X Coordinate, Y Coordinate},
---   covenantRequired = Requires the Zone's Covenant to summon
---   items = Notable Items Dropped
---
--- Items:
---   id = Item ID,
---   mount = Mount ID (if mount),
---   achievement = Achievement ID (if associated),
+--  Covenants:
+--    Covenant IDs:
+--      color = Hex Color,
+--      icon = Icon Texture ID,
+--  Zones:
+--    id = Map ID,
+--    covenant = Covenant ID *,
+--    color = Hex Color *,
+--    icon = Icon Texture ID *,
+--    rares = Notable Rares,
+--    Rares:
+--      id = NPC ID,
+--      name = NPC Name (need to figure out how to get this from the Blizzard API),
+--      quest = Quest ID(s) for completion,
+--      waypoint = {X Coordinate, Y Coordinate},
+--      covenantRequired = Requires the Zone's Covenant to summon *
+--      items = Notable Items Dropped
+--    Items:
+--      id = Item ID,
+--      mount = Mount ID *,
+--      achievement = Achievement ID *,
+--  * Optional
 ---
-
--- Builds Covenants
-function covenants()
-    return
-end
 
 ns.data = {
     expansions = {
         ["Shadowlands"] = {
-            notes = {
-                "This is very much a work-in-progress!",
-                "Message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
-                "And make sure you're in the RUIN Discord! |cff0099ffdiscord.gg/ruin|r"
-            },
             covenants = {
                 -- Kyrian
                 [1] = {
@@ -681,6 +671,11 @@ ns.data = {
                         },
                     }
                 },
+            },
+            notes = {
+                "This is very much a work-in-progress!",
+                "Message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
+                "And make sure you're in the RUIN Discord! |cff0099ffdiscord.gg/ruin|r"
             },
         },
     },
