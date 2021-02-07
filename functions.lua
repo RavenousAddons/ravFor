@@ -68,6 +68,8 @@ function ns:CreateButton(cfg)
         button:SetScript("OnClick", function()
             local zone = C_Map.GetMapInfo(cfg.zone).name
             ns:PrettyPrint("\n" .. cfg.rare .. "  |cffffd100|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r |cffffffff" .. string.format("%.1f", cfg.waypoint[1]) .. ", " .. string.format("%.1f", cfg.waypoint[2]) .. "|r]|h|r")
+            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(cfg.zone, cfg.waypoint[1] / 100, cfg.waypoint[2] / 100))
+            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
         end)
     elseif cfg.id or cfg.mount then
         button:SetScript("OnClick", function()

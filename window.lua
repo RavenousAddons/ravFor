@@ -77,7 +77,7 @@ Window:SetScript("OnShow", function()
     })
     -- Renown
     local covenant = C_Covenants.GetActiveCovenantID()
-    if covenant then
+    if covenant ~= 0 then
         local renown = C_CovenantSanctumUI.GetRenownLevel()
         local maxRenown = renown
         for i = renown + 1, #C_CovenantSanctumUI.GetRenownLevels(covenant), 1 do
@@ -109,6 +109,14 @@ Window:SetScript("OnShow", function()
             ignorePlacement = true,
             fontObject = "GameFontNormal",
         })
+        -- Under Max Renown Note
+        if renown < maxRenown then
+            ns:CreateLabel({
+                name = nil,
+                parent = Content,
+                label = TextColor("Work to increase your Renown to the current maximum of " .. maxRenown .. "!", "ff3333"),
+            })
+        end
     end
     -- For each Zone
     for i, zone in ipairs(zones) do
