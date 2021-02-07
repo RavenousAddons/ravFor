@@ -679,4 +679,9 @@ ns.data = {
             },
         },
     },
+    targetMessages = {
+        "Moving out to",
+        "Let's go and delete",
+        "We ride for",
+    },
 }

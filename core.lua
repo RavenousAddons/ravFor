@@ -11,9 +11,9 @@ function ravFor_OnEvent(self, event, arg, ...)
     if arg == name then
         if event == "ADDON_LOADED" then
             if not RAVFOR_version then
-                ns:PrettyPrint(string.format(L.Install, ns.color, ns.version))
+                ns:PrettyPrint(string.format(L.Install, ns.color, ns.version, ns.command))
             elseif RAVFOR_version ~= ns.version then
-                ns:PrettyPrint(string.format(L.Update, ns.color, ns.version))
+                ns:PrettyPrint(string.format(L.Update, ns.color, ns.version, ns.command))
             end
             RAVFOR_version = ns.version
             C_ChatInfo.RegisterAddonMessagePrefix(name)
@@ -24,6 +24,8 @@ function ravFor_OnEvent(self, event, arg, ...)
                 rare = string.gsub(rare, "target={", "")
                 zoneColor = string.gsub(zoneColor, "}", "")
                 ns:NewTarget(rare, zone, x, y, zoneColor)
+                local n = random(#ns.data.targetMessages)
+                RaidNotice_AddMessage(RaidBossEmoteFrame, ns.data.targetMessages[n] .. " " .. rare .. " @ " .. x .. ", " .. y .. "!", ChatTypeInfo["RAID_WARNING"])
             end
         end
     elseif event == "PLAYER_ENTERING_WORLD" then

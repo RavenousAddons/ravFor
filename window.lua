@@ -98,7 +98,7 @@ Window:SetScript("OnShow", function()
     ns:CreateLabel({
         name = "Heading",
         parent = Window,
-        label = TextColor(ns.title, "ffffff"),
+        label = TextColor(ns.name, "ffffff") .. " " .. TextColor(ns.expansion, ns.color),
         relativeTo = Window,
         relativePoint = "TOPLEFT",
         fontObject = "GameFontNormalLarge",

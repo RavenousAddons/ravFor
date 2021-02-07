@@ -2,7 +2,7 @@ local name, ns = ...
 local L = ns.L
 
 function ns:PrettyPrint(message)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff" .. ns.color .. ns.name .. ":|r " .. message)
+    DEFAULT_CHAT_FRAME:AddMessage("|cffffffff" .. ns.name .. "|r |cff" .. ns.color .. ns.expansion .. "|r|cffffffff:|r " .. message)
 end
 
 local hasSeenNoSpaceMessage = false
@@ -36,14 +36,14 @@ function ns:SendTarget(rare, zone, x, y, zoneColor)
         local inInstance, _ = IsInInstance()
         if inInstance then
             C_ChatInfo.SendAddonMessage(name, target, "INSTANCE_CHAT")
-            print("Sending target to Instance members…")
+            -- print("Sending target to Instance members…")
         elseif IsInGroup() then
             if GetNumGroupMembers() > 5 then
                 C_ChatInfo.SendAddonMessage(name, target, "RAID")
-                print("Sending target to Raid members…")
+                -- print("Sending target to Raid members…")
             end
             C_ChatInfo.SendAddonMessage(name, target, "PARTY")
-            print("Sending target to Party members…")
+            -- print("Sending target to Party members…")
         -- Enable for testing
         -- else
         --     C_ChatInfo.SendAddonMessage(name, target, "WHISPER", UnitName("player"))
