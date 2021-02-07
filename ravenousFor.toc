@@ -1,0 +1,15 @@
+## Interface: 90002
+## Version: 0.0.8-alpha
+
+## Name: Ravenous For
+## Title: Ravenous |cffffc478For|r
+## Notes: Notable Rares and their drops.
+## Author: RavenousAddons
+
+## SavedVariables: RAVFOR_version
+## SavedVariablesPerCharacter: RAVFOR_data
+
+## X-License: Public Domain
+## X-Website: https://github.com/RavenousAddons/ns
+
+ravenousFor.xml

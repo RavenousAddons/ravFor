@@ -1,7 +1,7 @@
-local name, ravShadowlands = ...
+local name, ns = ...
 
 local L = {}
-ravShadowlands.L = L
+ns.L = L
 
 setmetatable(L, { __index = function(t, k)
     local v = tostring(k)
@@ -10,9 +10,9 @@ setmetatable(L, { __index = function(t, k)
 end })
 
 -- Default (English)
-L.Version = "%s is the current version." -- ravShadowlands.version
-L.Install = "Thanks for installing |cff%1$sv%2$s|r!" -- ravShadowlands.color, ravShadowlands.version
-L.Update = "Thanks for updating to |cff%1$sv%2$s|r!" -- ravShadowlands.color, ravShadowlands.version
+L.Version = "%s is the current version." -- ns.version
+L.Install = "Thanks for installing |cff%1$sv%2$s|r!" -- ns.color, ns.version
+L.Update = "Thanks for updating to |cff%1$sv%2$s|r!" -- ns.color, ns.version
 
 -- Check locale and assign appropriate
 local CURRENT_LOCALE = GetLocale()

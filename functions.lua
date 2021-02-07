@@ -1,11 +1,11 @@
-local name, ravShadowlands = ...
-local L = ravShadowlands.L
+local name, ns = ...
+local L = ns.L
 
-function ravShadowlands:PrettyPrint(message)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff" .. ravShadowlands.color .. ravShadowlands.name .. ":|r " .. message)
+function ns:PrettyPrint(message)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff" .. ns.color .. ns.name .. ":|r " .. message)
 end
 
-function ravShadowlands:CreateLabel(cfg)
+function ns:CreateLabel(cfg)
     cfg.initialPoint = cfg.initialPoint or "TOPLEFT"
     cfg.relativePoint = cfg.relativePoint or "BOTTOMLEFT"
     cfg.offsetX = cfg.offsetX or 0
@@ -26,7 +26,7 @@ function ravShadowlands:CreateLabel(cfg)
     return label
 end
 
-function ravShadowlands:CreateButton(cfg)
+function ns:CreateButton(cfg)
     cfg.initialPoint = cfg.initialPoint or "TOPLEFT"
     cfg.relativePoint = cfg.relativePoint or "BOTTOMLEFT"
     cfg.offsetX = cfg.offsetX or 0
@@ -45,14 +45,24 @@ function ravShadowlands:CreateButton(cfg)
     if cfg.width then
         button:SetWidth(cfg.width)
     end
+    if cfg.height then
+        button:SetHeight(cfg.height)
+    end
     if cfg.rare and cfg.zone and cfg.waypoint then
         button:SetScript("OnClick", function()
             local zone = C_Map.GetMapInfo(cfg.zone).name
-            ravShadowlands:PrettyPrint("\n" .. cfg.rare .. " |cffffff00|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r |cffffffff" .. string.format("%.1f", cfg.waypoint[1]) .. ", " .. string.format("%.1f", cfg.waypoint[2]) .. "|r]|h|r")
+            ns:PrettyPrint("\n" .. cfg.rare .. "  |cffffd100|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r |cffffffff" .. string.format("%.1f", cfg.waypoint[1]) .. ", " .. string.format("%.1f", cfg.waypoint[2]) .. "|r]|h|r")
         end)
     elseif cfg.id or cfg.mount then
         button:SetScript("OnClick", function()
             -- print(cfg.id)
+        end)
+    elseif cfg.showRenown then
+        print("cfg.showRenown")
+        button:SetScript("OnClick", function()
+            print("showRenown")
+            GarrisonLandingPage:Show()
+            CovenantRenownFrame:Show()
         end)
     end
 

@@ -1,7 +1,7 @@
-local name, ravShadowlands = ...
-local L = ravShadowlands.L
+local name, ns = ...
+local L = ns.L
 
-local zones = ravShadowlands.data.zones
+local zones = ns.data.zones
 
 local width = 400
 local height = 450
@@ -61,33 +61,64 @@ Parent:SetScrollChild(Content)
 
 Window:Hide()
 Window:SetScript("OnShow", function()
-    ravShadowlands:CreateLabel({
+    ns:CreateLabel({
         name = "Heading",
         parent = Window,
-        label = TextColor(ravShadowlands.title, "ffffff"),
+        label = TextColor(ns.name, "ffffff") .. " " .. TextColor(ns.expansion, ns.color),
         relativeTo = Window,
         relativePoint = "TOPLEFT",
         fontObject = "GameFontNormalLarge",
         offsetX = medium,
         offsetY = -12,
     })
+    -- Renown
+    if C_Covenants.GetActiveCovenantID() then
+        local renown = C_CovenantSanctumUI.GetRenownLevel()
+        local maxRenown = renown
+        for i = renown + 1, #C_CovenantSanctumUI.GetRenownLevels(C_Covenants.GetActiveCovenantID()), 1 do
+            if C_CovenantSanctumUI.GetRenownLevels(C_Covenants.GetActiveCovenantID())[i].locked then break end
+            maxRenown = renown
+        end
+        ns:CreateLabel({
+            name = "renown",
+            parent = Content,
+            label = TextIcon(3726261) .. "  " .. TextColor("Renown", "ffffff"),
+            relativeTo = Content,
+            relativePoint = "TOPLEFT",
+            offsetY = 0,
+            fontObject = "GameFontNormalLarge",
+            -- width = width - (medium * 2) - 18,
+            -- height = 22,
+            -- showRenown = true,
+        })
+        -- Level of Renown
+        ns:CreateLabel({
+            name = "renown-level",
+            parent = Content,
+            label = TextColor("Level ", "ffffff") .. (renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")),
+            initialPoint = "LEFT",
+            relativePoint = "RIGHT",
+            offsetX = large,
+            offsetY = 0,
+            ignorePlacement = true,
+            fontObject = (renown < maxRenown and "GameFontNormalLarge" or "GameFontNormal"),
+        })
+    end
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
         local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name:gsub("%Necrolord", "Necrolords") or nil
         -- Zone
-        ravShadowlands:CreateLabel({
+        ns:CreateLabel({
             name = zone.id,
             parent = Content,
             label = TextIcon(zone.icon) .. "  " .. TextColor(mapName, zone.color),
-            relativeTo = (i == 1 and Content or nil),
-            relativePoint = (i == 1 and "TOPLEFT" or nil),
-            offsetY = (i == 1 and 0 or -large*3),
+            offsetY = -large*2.5,
             fontObject = "GameFontNormalLarge",
         })
         if covenant then
             -- Covenant for Zone
-            ravShadowlands:CreateLabel({
+            ns:CreateLabel({
                 name = zone.id .. "-" .. covenant,
                 parent = Content,
                 label = TextColor("(" .. covenant .. ")", zone.color),
@@ -117,7 +148,7 @@ Window:SetScript("OnShow", function()
                 local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zone.icon) .. " " .. TextColor(covenant, zone.color) .. TextColor(",") or ""
                 local drops = rare.items and  " " .. TextColor("drops:") or ""
                 -- Rare
-                ravShadowlands:CreateButton({
+                ns:CreateButton({
                     name = rare.id,
                     parent = Content,
                     label = killed .. " " .. TextColor(j .. ". ") .. rare.name .. covenantRequired .. drops,
@@ -144,7 +175,7 @@ Window:SetScript("OnShow", function()
                         local guaranteed = item.guaranteed and TextColor(" Guaranteed drop!") or ""
                         local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
                         -- Item
-                        ravShadowlands:CreateButton({
+                        ns:CreateButton({
                             name = rare.id .. "-items",
                             parent = Content,
                             label = "    " .. TextIcon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
@@ -161,4 +192,4 @@ Window:SetScript("OnShow", function()
 
     Window:SetScript("OnShow", nil)
 end)
-ravShadowlands.Window = Window
+ns.Window = Window

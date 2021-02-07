@@ -1,4 +1,4 @@
-# Ravenous for Shadowlands Rares
+# Ravenous For
 
 ![The Addon's Interface](https://i.imgur.com/F3oNc0K.gif)
 

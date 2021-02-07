@@ -1,9 +1,9 @@
-local name, ravShadowlands = ...
+local name, ns = ...
 
-ravShadowlands.name = "Ravenous for Shadowlands Rares"
-ravShadowlands.title = GetAddOnMetadata(name, "Title")
-ravShadowlands.notes = GetAddOnMetadata(name, "Notes")
-ravShadowlands.version = GetAddOnMetadata(name, "Version")
-ravShadowlands.color = "ffc478"
-ravShadowlands.command = "ravfor"
-ravShadowlands.github = "https://github.com/RavenousAddons/ravShadowlands"
+ns.name = "Ravenous For"
+ns.title = GetAddOnMetadata(name, "Title")
+ns.notes = GetAddOnMetadata(name, "Notes")
+ns.version = GetAddOnMetadata(name, "Version")
+ns.color = "ffc478"
+ns.command = "ravfor"
+ns.expansion = "Shadowlands"

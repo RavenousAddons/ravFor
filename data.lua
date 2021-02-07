@@ -1,8 +1,8 @@
-local name, ravShadowlands = ...
+local name, ns = ...
 
 -- The order of the data represents the order presented by the
 -- Addon's Interface.
-ravShadowlands.data = {
+ns.data = {
     zones = {
         {
             -- Maldraxxus

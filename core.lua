@@ -1,31 +1,31 @@
-local name, ravShadowlands = ...
-local L = ravShadowlands.L
+local name, ns = ...
+local L = ns.L
 
-function ravShadowlands_OnLoad(self)
+function RavenousFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
 end
 
-function ravShadowlands_OnEvent(self, event, arg, ...)
+function RavenousFor_OnEvent(self, event, arg, ...)
     if arg == name then
         if event == "ADDON_LOADED" then
-            if not ravShadowlands_version then
-                ravShadowlands:PrettyPrint(string.format(L.Install, ravShadowlands.color, ravShadowlands.version))
-            elseif ravShadowlands_version ~= ravShadowlands.version then
-                ravShadowlands:PrettyPrint(string.format(L.Update, ravShadowlands.color, ravShadowlands.version))
+            if not RAVFOR_version then
+                ns:PrettyPrint(string.format(L.Install, ns.color, ns.version))
+            elseif RAVFOR_version ~= ns.version then
+                ns:PrettyPrint(string.format(L.Update, ns.color, ns.version))
             end
-            ravShadowlands_version = ravShadowlands.version
+            RAVFOR_version = ns.version
         end
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then
 
     end
 end
 
-SlashCmdList["RAVSHADOWLANDS"] = function(message, editbox)
+SlashCmdList["RAVENOUSFOR"] = function(message, editbox)
     local command, argument = strsplit(" ", message)
     if command == "version" or command == "v" then
-        ravShadowlands:PrettyPrint(string.format(L.Version, ravShadowlands.version))
+        ns:PrettyPrint(string.format(L.Version, ns.version))
     else
-        ravShadowlands.Window:Show()
+        ns.Window:Show()
     end
 end
-SLASH_RAVSHADOWLANDS1 = "/" .. ravShadowlands.command
+SLASH_RAVENOUSFOR1 = "/" .. ns.command
