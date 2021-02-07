@@ -4,7 +4,7 @@
 
 ## Get in touch
 
-If you wish to get in touch with me, please get in touch through the [Ravenous Addons Discord](https://discord.gg/9XeTpbcjzu).
+If you wish to get in touch with me, please get in touch through the [RUIN Discord](https://discord.gg/ruin).
 
 ## License
 
