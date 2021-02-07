@@ -7,7 +7,7 @@ local covenants = expansion.covenants
 local zones = expansion.zones
 
 local width = 400
-local height = 450
+local height = 400
 
 local small = 6
 local medium = 12
@@ -34,37 +34,67 @@ Window:SetWidth(width)
 Window:SetHeight(height)
 Window:SetPoint("CENTER", 0, 0)
 Window:EnableMouse(true)
-Window:SetResizable(true)
 Window:SetMovable(true)
 Window:SetClampedToScreen(true)
+Window:SetResizable(true)
+Window:SetMinResize(width, height)
+Window:SetMinResize(width, height)
 Window:RegisterForDrag("LeftButton")
-Window:SetScript("OnDragStart", function(self) self:StartMoving() end)
-Window:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+Window:SetScript("OnMouseDown", function(self, button)
+    self:StartMoving()
+end)
+Window:SetScript("OnMouseUp", function(self)
+    self:StopMovingOrSizing()
+end)
 
 local WindowBackground = Window:CreateTexture(nil, "BACKGROUND")
 WindowBackground:SetColorTexture(0, 0, 0, 0.85)
 WindowBackground:SetAllPoints(Window)
 Window.texture = WindowBackground
 
-local Close = CreateFrame("Button", nil, Window, "UIPanelCloseButton")
-Close:SetPoint("TOPRIGHT", Window, "TOPRIGHT")
-Close:RegisterForClicks("AnyUp")
-Close:SetScript("OnClick", function(self)
-    Window:Hide()
-end)
-
-local Parent = CreateFrame("ScrollFrame", nil, Window, "UIPanelScrollFrameTemplate")
-Parent:SetWidth(width - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-Parent:SetHeight(height - small - (medium * 2) - (large * 2))
+local Parent = CreateFrame("ScrollFrame", "Parent", Window, "UIPanelScrollFrameTemplate")
+Parent:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+Parent:SetHeight(Window:GetHeight() - small - (medium * 2) - (large * 2))
 Parent:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, large)
 
-local Content = CreateFrame("Frame", nil, ScrollFrame)
+local Content = CreateFrame("Frame", "Content", ScrollFrame)
 Content:SetWidth(1)
 Content:SetHeight(1)
 Parent:SetScrollChild(Content)
 
+local Close = CreateFrame("Button", "Close", Window, "UIPanelCloseButton")
+Close:SetPoint("TOPRIGHT", Window, "TOPRIGHT")
+Close:RegisterForClicks("AnyUp")
+Close:SetScript("OnMouseUp", function(self)
+    Window:StopMovingOrSizing()
+    Window:Hide()
+    Window:SetWidth(width)
+    Window:SetHeight(height)
+end)
+
+local Resize = CreateFrame("Button", "Resize", Window)
+Resize:SetWidth(10)
+Resize:SetHeight(10)
+Resize:SetPoint("BOTTOMRIGHT", Window, "BOTTOMRIGHT")
+Resize:RegisterForClicks("AnyUp")
+Resize:SetScript("OnMouseDown", function(self, button)
+    Window:StartSizing()
+    self.isMoving = true
+    self.hasMoved = false
+end)
+Resize:SetScript("OnMouseUp", function(self)
+    if self.isMoving then
+        Window:StopMovingOrSizing()
+        -- Parent:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+        -- Parent:SetHeight(Window:GetHeight() - small - (medium * 2) - (large * 2))
+        self.isMoving = false
+        self.hasMoved = true
+    end
+end)
+
 Window:Hide()
 Window:SetScript("OnShow", function()
+    -- Window Title
     ns:CreateLabel({
         name = "Heading",
         parent = Window,
@@ -74,6 +104,25 @@ Window:SetScript("OnShow", function()
         fontObject = "GameFontNormalLarge",
         offsetX = medium,
         offsetY = -12,
+    })
+    -- Version
+    ns:CreateLabel({
+        name = "Version",
+        parent = Window,
+        label = TextColor("v" .. ns.version),
+        relativeTo = Window,
+        relativePoint = "TOPRIGHT",
+        offsetX = -large*4,
+        offsetY = -12,
+    })
+    -- Introduction
+    ns:CreateLabel({
+        name = "introduction",
+        parent = Content,
+        label = TextColor(ns.notes, "ffffff"),
+        relativeTo = Content,
+        relativePoint = "TOPLEFT",
+        offsetY = 0,
     })
     -- Renown
     local covenant = C_Covenants.GetActiveCovenantID()
@@ -88,9 +137,7 @@ Window:SetScript("OnShow", function()
             name = "renown",
             parent = Content,
             label = TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, covenants[covenant].color) .. TextColor(" Renown", "ffffff"),
-            relativeTo = Content,
-            relativePoint = "TOPLEFT",
-            offsetY = 0,
+            offsetY = -gigantic,
             fontObject = "GameFontNormalLarge",
             -- TODO Button not working
             -- width = width - (medium * 2) - 18,
@@ -168,7 +215,7 @@ Window:SetScript("OnShow", function()
                     name = rare.id,
                     parent = Content,
                     label = killed .. " " .. TextColor(j .. ". ") .. rare.name .. covenantRequired .. drops,
-                    width = width - (medium * 2) - 18,
+                    width = Window:GetWidth() - (medium * 2) - 18,
                     rare = rare.name,
                     zone = zone.id,
                     zoneColor = zoneColor,
@@ -195,7 +242,7 @@ Window:SetScript("OnShow", function()
                             name = rare.id .. "-items",
                             parent = Content,
                             label = "    " .. TextIcon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
-                            width = width - (medium * 2) - 18,
+                            width = Window:GetWidth() - (medium * 2) - 18,
                             offsetY = -small,
                             id = item.id,
                             mount = item.mount,

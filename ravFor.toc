@@ -1,9 +1,9 @@
 ## Interface: 90002
-## Version: 0.1.6
+## Version: 0.1.7
 
 ## Name: Ravenous For Shadowlands
 ## Title: Ravenous For |cffffc478Shadowlands|r
-## Notes: Notable Rares and their drops.
+## Notes: Keep track of your progress through the expansion!
 ## Author: RavenousAddons
 
 ## SavedVariables: RAVFOR_version
