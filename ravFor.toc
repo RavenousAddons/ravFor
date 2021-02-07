@@ -1,8 +1,8 @@
 ## Interface: 90002
-## Version: 0.1.1
+## Version: 0.1.2
 
-## Name: Ravenous For
-## Title: Ravenous |cffffc478For|r
+## Name: Ravenous For Shadowlands
+## Title: Ravenous For |cffffc478Shadowlands|r
 ## Notes: Notable Rares and their drops.
 ## Author: RavenousAddons
 
