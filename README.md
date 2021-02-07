@@ -1,10 +1,10 @@
-# Ravenous For
+# Ravenous For *Shadowlands*
 
-![The Addon's Interface](https://i.imgur.com/F3oNc0K.gif)
+![The Addon's Interface](https://i.imgur.com/PjHrjj9.gif)
 
 ## Get in touch
 
-If you wish to get in touch with me, please get in touch through the [Ravenous Addons Discord](https://discord.gg/dNfqnRf2fq).
+If you wish to get in touch with me, please get in touch through the [Ravenous Addons Discord](https://discord.gg/9XeTpbcjzu).
 
 ## License
 
