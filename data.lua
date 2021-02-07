@@ -12,6 +12,42 @@ ravShadowlands.data = {
             icon = "3257749",
             rares = {
                 {
+                    hidden = true,
+                    id = 173104,
+                    name = "Mortanis",
+                    quest = 61816,
+                    waypoint = {32.3, 67.0},
+                    items = {
+                        {
+                            id = 184133,
+                        },
+                        {
+                            id = 184140,
+                        },
+                        {
+                            id = 184173,
+                        },
+                        {
+                            id = 184128,
+                        },
+                        {
+                            id = 184135,
+                        },
+                        {
+                            id = 184143,
+                        },
+                        {
+                            id = 183295,
+                        },
+                        {
+                            id = 183386,
+                        },
+                        {
+                            id = 183341,
+                        },
+                    },
+                },
+                {
                     id = 162853,
                     name = "Theater of Pain",
                     quest = 62786,
@@ -24,6 +60,82 @@ ravShadowlands.data = {
                     },
                 },
                 {
+                    id = 157226,
+                    name = "Pool of Mixed Monstrosities",
+                    quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
+                    waypoint = {61.9, 76.8},
+                    items = {
+                        {
+                            id = 183903,
+                            achievement = 14721,
+                        },
+                    },
+                },
+                {
+                    id = 157309,
+                    name = "Violet Mistake",
+                    quest = 61720,
+                    waypoint = {61.9, 76.8},
+                    items = {
+                        {
+                            id = 182079,
+                            mount = 1410,
+                        },
+                    },
+                },
+                {
+                    id = 48859,
+                    name = "Oily Invertebrate",
+                    quest = 61724,
+                    waypoint = {61.9, 76.8},
+                    items = {
+                        {
+                            id = 184155,
+                            quest = 62804,
+                        },
+                    },
+                },
+                {
+                    id = 174108,
+                    name = "Necromatic Anomaly",
+                    quest = 58889,
+                    waypoint = {72.4, 28.6},
+                    items = {
+                        {
+                            id = 181810,
+                        },
+                    },
+                },
+                {
+                    id = 162727,
+                    name = "Bubbleblood",
+                    quest = 58870,
+                    waypoint = {51.9, 36.4},
+                    items = {
+                        {
+                            id = 184154,
+                        },
+                        {
+                            id = 184476,
+                        },
+                    },
+                },
+                {
+                    id = 159886,
+                    name = "Sister Chelicerae",
+                    quest = 58003,
+                    waypoint = {55.0, 23.0},
+                    items = {
+                        {
+                            id = 184289,
+                        },
+                        {
+                            id = 181172,
+                            pet = 2948,
+                        },
+                    },
+                },
+                {
                     id = 162669,
                     name = "Devour'us",
                     quest = 58835,
@@ -31,6 +143,48 @@ ravShadowlands.data = {
                     items = {
                         {
                             id = 184178,
+                        },
+                    },
+                },
+                {
+                    id = 157058,
+                    name = "Corpsecutter Moroc",
+                    quest = 58335,
+                    waypoint = {26.7, 26.5},
+                    items = {
+                        {
+                            id = 184177,
+                        },
+                        {
+                            id = 184176,
+                        },
+                    },
+                },
+                {
+                    id = 162741,
+                    name = "Gieger",
+                    quest = 58872,
+                    waypoint = {31.5, 35.3},
+                    covenantRequired = true,
+                    items = {
+                        {
+                            id = 182080,
+                            mount = 1411,
+                        },
+                        {
+                            id = 184298,
+                        },
+                    },
+                },
+                {
+                    id = 157125,
+                    name = "Zargox the Reborn",
+                    quest = 59290,
+                    waypoint = {28.9, 51.3},
+                    items = {
+                        {
+                            id = 181804,
+                            covenantOnly = true,
                         },
                     },
                 },
@@ -71,95 +225,6 @@ ravShadowlands.data = {
                         },
                     },
                 },
-                {
-                    id = 162741,
-                    name = "Gieger",
-                    quest = 58837,
-                    waypoint = {31.5, 35.3},
-                    covenantRequired = true,
-                    items = {
-                        {
-                            id = 182080,
-                            mount = 1411,
-                        },
-                        {
-                            id = 184298,
-                        },
-                    },
-                },
-                {
-                    id = 174108,
-                    name = "Necromatic Anomaly",
-                    quest = 58889,
-                    waypoint = {72.4, 28.6},
-                    items = {
-                        {
-                            id = 181810,
-                        },
-                    },
-                },
-                {
-                    id = 162727,
-                    name = "Bubbleblood",
-                    quest = 58870,
-                    waypoint = {51.9, 36.4},
-                    items = {
-                        {
-                            id = 184154,
-                        },
-                        {
-                            id = 184476,
-                        },
-                    },
-                },
-                {
-                    id = 157125,
-                    name = "Zargox the Reborn",
-                    quest = 59290,
-                    waypoint = {28.9, 51.3},
-                    items = {
-                        {
-                            id = 181804,
-                            covenantOnly = true,
-                        },
-                    },
-                },
-                {
-                    id = 157226,
-                    name = "Pool of Mixed Monstrosities",
-                    quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
-                    waypoint = {61.9, 76.8},
-                    items = {
-                        {
-                            id = 183903,
-                            achievement = 14721,
-                        },
-                    },
-                },
-                {
-                    id = 157309,
-                    name = "Violet Mistake",
-                    quest = 61720,
-                    waypoint = {61.9, 76.8},
-                    items = {
-                        {
-                            id = 182079,
-                            mount = 1410,
-                        },
-                    },
-                },
-                {
-                    id = 48859,
-                    name = "Oily Invertebrate",
-                    quest = 61724,
-                    waypoint = {61.9, 76.8},
-                    items = {
-                        {
-                            id = 184155,
-                            quest = 62804,
-                        },
-                    },
-                },
             }
         },
         {
@@ -169,6 +234,42 @@ ravShadowlands.data = {
             color = "ff4040",
             icon = "3257751",
             rares = {
+                {
+                    hidden = true,
+                    id = 167526,
+                    name = "Nurgash Muckformed",
+                    -- quest = 61816,
+                    waypoint = {27.6, 14.6},
+                    items = {
+                        {
+                            id = 184137,
+                        },
+                        {
+                            id = 184131,
+                        },
+                        {
+                            id = 184130,
+                        },
+                        {
+                            id = 184134,
+                        },
+                        {
+                            id = 184171,
+                        },
+                        {
+                            id = 184144,
+                        },
+                        {
+                            id = 182638,
+                        },
+                        {
+                            id = 183215,
+                        },
+                        {
+                            id = 183376,
+                        },
+                    },
+                },
                 {
                     id = 166521,
                     name = "Famu the Infinite",
@@ -251,6 +352,7 @@ ravShadowlands.data = {
             icon = "3743739",
             rares = {
                 {
+                    hidden = true,
                     id = 174827,
                     name = "Gorged Shadehound",
                     -- quest = 61124,
@@ -304,6 +406,42 @@ ravShadowlands.data = {
             color = "68ccef",
             icon = "3257748",
             rares = {
+                {
+                    hidden = true,
+                    id = 167524,
+                    name = "Valinor, the Light of Eons",
+                    quest = 61813,
+                    waypoint = {26.6, 22.8},
+                    items = {
+                        {
+                            id = 184170,
+                        },
+                        {
+                            id = 184136,
+                        },
+                        {
+                            id = 184125,
+                        },
+                        {
+                            id = 184132,
+                        },
+                        {
+                            id = 184139,
+                        },
+                        {
+                            id = 184141,
+                        },
+                        {
+                            id = 183311,
+                        },
+                        {
+                            id = 183325,
+                        },
+                        {
+                            id = 183353,
+                        },
+                    }
+                },
                 {
                     id = 170548,
                     name = "Sundancer",
@@ -393,6 +531,42 @@ ravShadowlands.data = {
             color = "8b55d7",
             icon = "3257750",
             rares = {
+                {
+                    hidden = true,
+                    id = 167527,
+                    name = "Oranomonos the Everbranching",
+                    quest = 61815,
+                    waypoint = {20.6, 63.6},
+                    items = {
+                        {
+                            id = 184127,
+                        },
+                        {
+                            id = 184129,
+                        },
+                        {
+                            id = 184172,
+                        },
+                        {
+                            id = 184126,
+                        },
+                        {
+                            id = 184138,
+                        },
+                        {
+                            id = 184142,
+                        },
+                        {
+                            id = 183238,
+                        },
+                        {
+                            id = 183261,
+                        },
+                        {
+                            id = 183274,
+                        },
+                    },
+                },
                 {
                     id = 164112,
                     name = "Humon'gozz",

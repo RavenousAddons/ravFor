@@ -5,5 +5,5 @@ ravShadowlands.title = GetAddOnMetadata(name, "Title")
 ravShadowlands.notes = GetAddOnMetadata(name, "Notes")
 ravShadowlands.version = GetAddOnMetadata(name, "Version")
 ravShadowlands.color = "ffc478"
-ravShadowlands.command = "rsl"
+ravShadowlands.command = "ravfor"
 ravShadowlands.github = "https://github.com/RavenousAddons/ravShadowlands"

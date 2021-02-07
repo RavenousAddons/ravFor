@@ -48,7 +48,7 @@ function ravShadowlands:CreateButton(cfg)
     if cfg.rare and cfg.zone and cfg.waypoint then
         button:SetScript("OnClick", function()
             local zone = C_Map.GetMapInfo(cfg.zone).name
-            ravShadowlands:PrettyPrint("\n" .. cfg.rare .. " |cffffff00|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r " .. string.format("%.1f", cfg.waypoint[1]) .. "|cffffffff,|r " .. string.format("%.1f", cfg.waypoint[2]) .. " ]|h|r")
+            ravShadowlands:PrettyPrint("\n" .. cfg.rare .. " |cffffff00|Hworldmap:" .. cfg.zone .. ":" .. cfg.waypoint[1] * 100 .. ":" .. cfg.waypoint[2] * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. cfg.zoneColor .. zone .. "|r |cffffffff" .. string.format("%.1f", cfg.waypoint[1]) .. ", " .. string.format("%.1f", cfg.waypoint[2]) .. "|r]|h|r")
         end)
     elseif cfg.id or cfg.mount then
         button:SetScript("OnClick", function()
