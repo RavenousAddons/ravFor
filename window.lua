@@ -3,7 +3,7 @@ local L = ns.L
 
 local expansion = ns.data.expansions[ns.expansion]
 local notes = expansion.notes
-local npcs = expansion.npcs
+local covenants = expansion.covenants
 local zones = expansion.zones
 
 local width = 400
@@ -76,21 +76,23 @@ Window:SetScript("OnShow", function()
         offsetY = -12,
     })
     -- Renown
-    if C_Covenants.GetActiveCovenantID() then
+    local covenant = C_Covenants.GetActiveCovenantID()
+    if covenant then
         local renown = C_CovenantSanctumUI.GetRenownLevel()
         local maxRenown = renown
-        for i = renown + 1, #C_CovenantSanctumUI.GetRenownLevels(C_Covenants.GetActiveCovenantID()), 1 do
-            if C_CovenantSanctumUI.GetRenownLevels(C_Covenants.GetActiveCovenantID())[i].locked then break end
-            maxRenown = renown
+        for i = renown + 1, #C_CovenantSanctumUI.GetRenownLevels(covenant), 1 do
+            if C_CovenantSanctumUI.GetRenownLevels(covenant)[i].locked then break end
+            maxRenown = i
         end
         ns:CreateLabel({
             name = "renown",
             parent = Content,
-            label = TextIcon(3726261) .. "  " .. TextColor("Renown", "ffffff"),
+            label = TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, covenants[covenant].color) .. TextColor(" Renown", "ffffff"),
             relativeTo = Content,
             relativePoint = "TOPLEFT",
             offsetY = 0,
             fontObject = "GameFontNormalLarge",
+            -- TODO Button not working
             -- width = width - (medium * 2) - 18,
             -- height = 22,
             -- showRenown = true,
@@ -105,18 +107,20 @@ Window:SetScript("OnShow", function()
             offsetX = large,
             offsetY = 0,
             ignorePlacement = true,
-            fontObject = (renown < maxRenown and "GameFontNormalLarge" or "GameFontNormal"),
+            fontObject = "GameFontNormal",
         })
     end
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
         local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
+        local zoneColor = covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+        local zoneIcon = covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
         -- Zone
         ns:CreateLabel({
             name = zone.id,
             parent = Content,
-            label = TextIcon(zone.icon) .. "  " .. TextColor(mapName, zone.color),
+            label = TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor),
             offsetY = -gigantic,
             fontObject = "GameFontNormalLarge",
         })
@@ -125,7 +129,7 @@ Window:SetScript("OnShow", function()
             ns:CreateLabel({
                 name = zone.id .. "-" .. covenant,
                 parent = Content,
-                label = TextColor("(" .. covenant .. ")", zone.color),
+                label = TextColor("(" .. covenant .. ")", zoneColor),
                 initialPoint = "LEFT",
                 relativePoint = "RIGHT",
                 offsetX = small,
@@ -149,7 +153,7 @@ Window:SetScript("OnShow", function()
                         killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and checkmark or skull
                     end
                 end
-                local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zone.icon) .. " " .. TextColor(covenant, zone.color) .. TextColor(",") or ""
+                local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zoneIcon) .. " " .. TextColor(covenant, zoneColor) .. TextColor(",") or ""
                 local drops = rare.items and  " " .. TextColor("drops:") or ""
                 -- Rare
                 ns:CreateButton({
@@ -159,7 +163,7 @@ Window:SetScript("OnShow", function()
                     width = width - (medium * 2) - 18,
                     rare = rare.name,
                     zone = zone.id,
-                    zoneColor = zone.color,
+                    zoneColor = zoneColor,
                     waypoint = rare.waypoint,
                 })
                 if rare.items then
@@ -167,7 +171,7 @@ Window:SetScript("OnShow", function()
                     for _, item in ipairs(rare.items) do
                         if not GetItemInfo(item.id) then break end
                         local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
-                        local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zone.icon) .. " " .. TextColor(covenant, zone.color) or ""
+                        local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. " " .. TextColor(covenant, zoneColor) or ""
                         local owned = ""
                         if item.mount then
                             local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)

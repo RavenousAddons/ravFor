@@ -36,17 +36,35 @@ ns.data = {
             notes = {
                 "This is very much a work-in-progress!",
                 "Message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
-                "And make sure you're in the RUIN Discord! |cff0099ffhttps://discord.gg/ruin|r"
+                "And make sure you're in the RUIN Discord! |cff0099ffdiscord.gg/ruin|r"
             },
-            npcs = {
+            covenants = {
+                -- Kyrian
+                [1] = {
+                    color = "68ccef",
+                    icon = 3257748,
+                },
+                -- Venthyr
+                [2] = {
+                    color = "ff4040",
+                    icon = 3257751,
+                },
+                -- Night Fae
+                [3] = {
+                    color = "8b55d7",
+                    icon = 3257750,
+                },
+                -- Necrolord
+                [4] = {
+                    color = "40bf40",
+                    icon = 3257749,
+                },
             },
             zones = {
                 {
                     -- Maldraxxus
                     id = 1536,
                     covenant = 4,
-                    color = "40bf40",
-                    icon = "3257749",
                     rares = {
                         {
                             hidden = true,
@@ -268,8 +286,6 @@ ns.data = {
                     -- Revendreth
                     id = 1525,
                     covenant = 2,
-                    color = "ff4040",
-                    icon = "3257751",
                     rares = {
                         {
                             hidden = true,
@@ -439,8 +455,6 @@ ns.data = {
                     -- Bastion
                     id = 1533,
                     covenant = 1,
-                    color = "68ccef",
-                    icon = "3257748",
                     rares = {
                         {
                             hidden = true,
@@ -564,8 +578,6 @@ ns.data = {
                     -- Ardenweald
                     id = 1565,
                     covenant = 3,
-                    color = "8b55d7",
-                    icon = "3257750",
                     rares = {
                         {
                             hidden = true,
