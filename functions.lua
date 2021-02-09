@@ -24,15 +24,15 @@ end
 function ns:SendTarget(rare, zone, x, y, zoneColor)
     local target = "target={" .. rare .. "," .. zone .. "," .. x .. "," .. y .. "," .. zoneColor .. "}"
     local playerName = UnitName("player")
-    local isLeadOrAssist = false
+    local isLead = false
     for i = 1, MAX_RAID_MEMBERS do
         local name, rank = GetRaidRosterInfo(i)
         if name == playerName then
-            if rank > 0 then isLeadOrAssist = true end
+            if rank > 1 then isLead = true end
             break
         end
     end
-    if isLeadOrAssist then
+    if isLead then
         local inInstance, _ = IsInInstance()
         if inInstance then
             C_ChatInfo.SendAddonMessage(name, target, "INSTANCE_CHAT")
@@ -128,4 +128,22 @@ function ns:CreateButton(cfg)
         prevControl = button
     end
     return button
+end
+
+function ns:RegisterDefaultOption(key, value)
+    if RAVFOR_data.options[key] == nil then
+        RAVFOR_data.options[key] = value
+    end
+end
+
+function ns:SetDefaultOptions()
+    if RAVFOR_data == nil then
+        RAVFOR_data = {}
+    end
+    if RAVFOR_data.options == nil then
+        RAVFOR_data.options = {}
+    end
+    for k, v in pairs(ns.data.defaults) do
+        ns:RegisterDefaultOption(k, v)
+    end
 end

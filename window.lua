@@ -3,11 +3,13 @@ local L = ns.L
 
 local expansion = ns.data.expansions[ns.expansion]
 local notes = expansion.notes
-local covenants = expansion.covenants
 local zones = expansion.zones
 
-local width = 400
-local height = 400
+local covenants = ns.data.covenants
+local renownLevels = ns.data.renownLevels
+
+local width = 420
+local height = 360
 
 local small = 6
 local medium = 12
@@ -128,10 +130,22 @@ Window:SetScript("OnShow", function()
     local covenant = C_Covenants.GetActiveCovenantID()
     if covenant ~= 0 then
         local renown = C_CovenantSanctumUI.GetRenownLevel()
+        -- Max can't be lower than our current
         local maxRenown = renown
-        for i = renown + 1, #C_CovenantSanctumUI.GetRenownLevels(covenant), 1 do
-            if C_CovenantSanctumUI.GetRenownLevels(covenant)[i].locked then break end
-            maxRenown = i
+        -- if 0, then reset is today but has not yet happened
+        local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
+        local now = C_DateAndTime.GetCurrentCalendarTime()
+        local year, month, day = now.year, now.month, now.monthDay
+        local lookup_year, lookup_month, lookup_day
+        for _, lookup in ipairs(renownLevels) do
+            lookup_year = lookup.year and lookup.year or lookup_year
+            lookup_month = lookup.month and lookup.month or lookup_month
+            lookup_day = lookup.day and lookup.day or lookup_day
+            if lookup_year > year then break end
+            if lookup_year <= year and lookup_month > month then break end
+            if lookup_year <= year and lookup_month <= month and lookup_day > day then break end
+            if lookup_year <= year and lookup_month <= month and lookup_day <= day and daysUntilWeeklyReset < 0 then break end
+            maxRenown = lookup.level
         end
         ns:CreateLabel({
             name = "renown",
@@ -168,9 +182,9 @@ Window:SetScript("OnShow", function()
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name
-        local covenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
-        local zoneColor = covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-        local zoneIcon = covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
+        local zoneCovenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
+        local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+        local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
         -- Zone
         ns:CreateLabel({
             name = zone.id,
@@ -179,12 +193,12 @@ Window:SetScript("OnShow", function()
             offsetY = -gigantic,
             fontObject = "GameFontNormalLarge",
         })
-        if covenant then
+        if zoneCovenant then
             -- Covenant for Zone
             ns:CreateLabel({
-                name = zone.id .. "-" .. covenant,
+                name = zone.id .. "-" .. zoneCovenant,
                 parent = Content,
-                label = TextColor("(" .. covenant .. ")", zoneColor),
+                label = TextColor("(" .. zoneCovenant .. ")", zoneColor),
                 initialPoint = "LEFT",
                 relativePoint = "RIGHT",
                 offsetX = small,
@@ -196,7 +210,45 @@ Window:SetScript("OnShow", function()
         local j = 0
         for _, rare in ipairs(zone.rares) do
             if not rare.hidden then
-                j = j + 1
+                j = j + 1-- Build a list of items matching user options
+                local items = {}
+                if rare.items then
+                    -- For each Item dropped by the Rare in the Zone
+                    for _, item in ipairs(rare.items) do
+                        local owned = ""
+                        if item.mount then
+                            local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
+                            owned = isCollected == true and " " .. checkmark or ""
+                        elseif item.achievement then
+                            local _, _, _, completed = GetAchievementInfo(item.achievement)
+                            owned = completed == true and " " .. checkmark or ""
+                        end
+                        if not GetItemInfo(item.id) then
+                        elseif RAVFOR_data.options.showTransmog == false and item.transmog then
+                        elseif RAVFOR_data.options.showMounts == false and item.mount then
+                        elseif RAVFOR_data.options.showPets == false and item.pet then
+                        elseif RAVFOR_data.options.showToys == false and item.toy then
+                        elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
+                        elseif RAVFOR_data.options.showOtherCovenantItems == false and item.covenantOnly and (covenant ~= zone.covenant) then
+                        elseif RAVFOR_data.options.showOwned == false and owned ~= "" then
+                        else
+                            local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
+                            local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. " " .. TextColor(zoneCovenant, zoneColor) or ""
+                            local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
+                            local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
+                            -- Insert Item into Items
+                            table.insert(items, {
+                                name = rare.id .. "-items",
+                                parent = Content,
+                                label = "    " .. TextIcon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
+                                width = Window:GetWidth() - (medium * 2) - 18,
+                                offsetY = -small,
+                                id = item.id,
+                                mount = item.mount,
+                            })
+                        end
+                    end
+                end
                 local killed = skull
                 if rare.quest then
                     if type(rare.quest) == "table" then
@@ -208,45 +260,26 @@ Window:SetScript("OnShow", function()
                         killed = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and checkmark or skull
                     end
                 end
-                local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zoneIcon) .. " " .. TextColor(covenant, zoneColor) .. TextColor(",") or ""
-                local drops = rare.items and  " " .. TextColor("drops:") or ""
-                -- Rare
-                ns:CreateButton({
-                    name = rare.id,
-                    parent = Content,
-                    label = killed .. " " .. TextColor(j .. ". ") .. rare.name .. covenantRequired .. drops,
-                    width = Window:GetWidth() - (medium * 2) - 18,
-                    rare = rare.name,
-                    zone = zone.id,
-                    zoneColor = zoneColor,
-                    waypoint = rare.waypoint,
-                })
-                if rare.items then
-                    -- For each Item dropped by the Rare in the Zone
-                    for _, item in ipairs(rare.items) do
-                        if not GetItemInfo(item.id) then break end
-                        local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
-                        local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. " " .. TextColor(covenant, zoneColor) or ""
-                        local owned = ""
-                        if item.mount then
-                            local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
-                            owned = isCollected == true and " " .. checkmark or ""
-                        elseif item.achievement then
-                            local _, _, _, completed = GetAchievementInfo(item.achievement)
-                            owned = completed == true and " " .. checkmark or ""
+                local drops = #items > 0 and  " " .. TextColor("drops:") or ""
+                local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. TextIcon(zoneIcon) .. " " .. TextColor(zoneCovenant, zoneColor) .. (#items > 0 and TextColor(",") or "") or ""
+                if RAVFOR_data.options.showKilled == false and killed == skull then
+                elseif RAVFOR_data.options.showNoDrops and #items == 0 then
+                else
+                    -- Rare
+                    ns:CreateButton({
+                        name = rare.id,
+                        parent = Content,
+                        label = killed .. " " .. TextColor(j .. ". ") .. rare.name .. covenantRequired .. drops,
+                        width = Window:GetWidth() - (medium * 2) - 18,
+                        rare = rare.name,
+                        zone = zone.id,
+                        zoneColor = zoneColor,
+                        waypoint = rare.waypoint,
+                    })
+                    if #items > 0 then
+                        for _, item in ipairs(items) do
+                            ns:CreateButton(item)
                         end
-                        local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
-                        local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
-                        -- Item
-                        ns:CreateButton({
-                            name = rare.id .. "-items",
-                            parent = Content,
-                            label = "    " .. TextIcon(itemTexture) .. " " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned,
-                            width = Window:GetWidth() - (medium * 2) - 18,
-                            offsetY = -small,
-                            id = item.id,
-                            mount = item.mount,
-                        })
                     end
                 end
             end

@@ -12,8 +12,8 @@ local _, ns = ...
 --    icon = Icon Texture ID *,
 --    rares = Notable Rares,
 --    Rares:
---      id = NPC ID,
 --      name = NPC Name (need to figure out how to get this from the Blizzard API),
+--      id = NPC ID,
 --      quest = Quest ID(s) for completion,
 --      waypoint = {X Coordinate, Y Coordinate},
 --      covenantRequired = Requires the Zone's Covenant to summon *
@@ -26,30 +26,19 @@ local _, ns = ...
 ---
 
 ns.data = {
+    defaults = {
+        showKilled = true,
+        showNoDrops = true,
+        showOwned = true,
+        showGear = true,
+        showTransmog = true,
+        showMounts = true,
+        showPets = true,
+        showToys = true,
+        showOtherCovenantItems = true,
+    },
     expansions = {
         ["Shadowlands"] = {
-            covenants = {
-                -- Kyrian
-                [1] = {
-                    color = "68ccef",
-                    icon = 3257748,
-                },
-                -- Venthyr
-                [2] = {
-                    color = "ff4040",
-                    icon = 3257751,
-                },
-                -- Night Fae
-                [3] = {
-                    color = "8b55d7",
-                    icon = 3257750,
-                },
-                -- Necrolord
-                [4] = {
-                    color = "40bf40",
-                    icon = 3257749,
-                },
-            },
             zones = {
                 {
                     -- Maldraxxus
@@ -58,8 +47,8 @@ ns.data = {
                     rares = {
                         {
                             hidden = true,
-                            id = 173104,
                             name = "Mortanis",
+                            id = 173104,
                             quest = 61816,
                             waypoint = {32.3, 67.0},
                             items = {
@@ -93,8 +82,8 @@ ns.data = {
                             },
                         },
                         {
-                            id = 162853,
                             name = "Theater of Pain",
+                            id = 162853,
                             quest = 62786,
                             waypoint = {28.9, 51.3},
                             items = {
@@ -105,8 +94,37 @@ ns.data = {
                             },
                         },
                         {
-                            id = 157226,
+                            name = "Sabriel the Bonecleaver",
+                            id = 168147,
+                            quest = 58784,
+                            waypoint = {28.9, 51.3},
+                            covenantRequired = true,
+                            items = {
+                                {
+                                    id = 181815,
+                                    mount = 1370,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Scunner",
+                            id = 158406,
+                            quest = 58006,
+                            waypoint = {62.0, 75.9},
+                            items = {
+                                {
+                                    id = 184287,
+                                },
+                                {
+                                    id = 181267,
+                                    pet = 2957,
+                                },
+                            },
+                        },
+                        {
                             name = "Pool of Mixed Monstrosities",
+                            id = 157226,
                             quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
                             waypoint = {61.9, 76.8},
                             items = {
@@ -117,11 +135,14 @@ ns.data = {
                             },
                         },
                         {
-                            id = 157309,
                             name = "Violet Mistake",
+                            id = 157309,
                             quest = 61720,
                             waypoint = {61.9, 76.8},
                             items = {
+                                {
+                                    id = 184301,
+                                },
                                 {
                                     id = 182079,
                                     mount = 1410,
@@ -129,8 +150,8 @@ ns.data = {
                             },
                         },
                         {
-                            id = 48859,
                             name = "Oily Invertebrate",
+                            id = 48859,
                             quest = 61724,
                             waypoint = {61.9, 76.8},
                             items = {
@@ -141,33 +162,72 @@ ns.data = {
                             },
                         },
                         {
-                            id = 174108,
-                            name = "Necromatic Anomaly",
-                            quest = 58889,
-                            waypoint = {72.4, 28.6},
+                            name = "Deadly Dapperling",
+                            id = 162711,
+                            quest = 58868,
+                            waypoint = {76.8, 57.0},
                             items = {
                                 {
-                                    id = 181810,
+                                    id = 184280,
+                                },
+                                {
+                                    id = 181263,
+                                    pet = 2953,
                                 },
                             },
                         },
                         {
-                            id = 162727,
+                            name = "Nerissa Heartless",
+                            id = 162690,
+                            quest = 58851,
+                            waypoint = {66.0, 35.7},
+                            items = {
+                                {
+                                    id = 184179,
+                                },
+                                {
+                                    id = 182084,
+                                    mount = 1373,
+                                },
+                            },
+                        },
+                        {
+                            name = "Necromantic Anomaly",
+                            id = 174108,
+                            quest = 62369,
+                            waypoint = {72.4, 28.6},
+                            items = {
+                                -- {
+                                --     id = 184174,
+                                -- },
+                                {
+                                    id = 181810,
+                                    transmog = true,
+                                },
+                            },
+                        },
+                        {
                             name = "Bubbleblood",
+                            id = 162727,
                             quest = 58870,
                             waypoint = {51.9, 36.4},
                             items = {
                                 {
+                                    id = 184290,
+                                },
+                                {
                                     id = 184154,
+                                    transmog = true,
                                 },
                                 {
                                     id = 184476,
+                                    toy = true,
                                 },
                             },
                         },
                         {
-                            id = 159886,
                             name = "Sister Chelicerae",
+                            id = 159886,
                             quest = 58003,
                             waypoint = {55.0, 23.0},
                             items = {
@@ -181,8 +241,28 @@ ns.data = {
                             },
                         },
                         {
-                            id = 162669,
+                            name = "Collector Kash",
+                            id = 159105,
+                            quest = 58005,
+                            waypoint = {49.0, 23.4},
+                            items = {
+                                {
+                                    id = 184188,
+                                },
+                                {
+                                    id = 184181,
+                                },
+                                {
+                                    id = 184189,
+                                },
+                                {
+                                    id = 184182,
+                                },
+                            },
+                        },
+                        {
                             name = "Devour'us",
+                            id = 162669,
                             quest = 58835,
                             waypoint = {44.0, 29.5},
                             items = {
@@ -192,8 +272,8 @@ ns.data = {
                             },
                         },
                         {
-                            id = 157058,
                             name = "Corpsecutter Moroc",
+                            id = 157058,
                             quest = 58335,
                             waypoint = {26.7, 26.5},
                             items = {
@@ -206,39 +286,47 @@ ns.data = {
                             },
                         },
                         {
-                            id = 162741,
                             name = "Gieger",
+                            id = 162741,
                             quest = 58872,
                             waypoint = {31.5, 35.3},
                             covenantRequired = true,
                             items = {
                                 {
-                                    id = 182080,
-                                    mount = 1411,
-                                },
-                                {
                                     id = 184298,
                                 },
-                            },
-                        },
-                        {
-                            id = 157125,
-                            name = "Zargox the Reborn",
-                            quest = 59290,
-                            waypoint = {28.9, 51.3},
-                            items = {
                                 {
-                                    id = 181804,
+                                    id = 182080,
+                                    mount = 1411,
                                     covenantOnly = true,
                                 },
                             },
                         },
                         {
-                            id = 162819,
+                            name = "Zargox the Reborn",
+                            id = 157125,
+                            quest = 59290,
+                            waypoint = {28.9, 51.3},
+                            items = {
+                                {
+                                    id = 184285,
+                                },
+                                {
+                                    id = 181804,
+                                    transmog = true,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
                             name = "Warbringer Mal'korak",
+                            id = 162819,
                             quest = 58889,
                             waypoint = {33.6, 80.4},
                             items = {
+                                {
+                                    id = 184288,
+                                },
                                 {
                                     id = 182085,
                                     mount = 1372,
@@ -246,23 +334,14 @@ ns.data = {
                             },
                         },
                         {
-                            id = 162690,
-                            name = "Nerissa Heartless",
-                            quest = 58851,
-                            waypoint = {66.0, 35.7},
-                            items = {
-                                {
-                                    id = 182084,
-                                    mount = 1373,
-                                },
-                            },
-                        },
-                        {
-                            id = 162586,
                             name = "Tahonta",
+                            id = 162586,
                             quest = 58783,
                             waypoint = {44.0, 51.1},
                             items = {
+                                {
+                                    id = 182190,
+                                },
                                 {
                                     id = 182075,
                                     mount = 1366,
@@ -270,7 +349,124 @@ ns.data = {
                                 },
                             },
                         },
-                    }
+                        {
+                            name = "Deepscar",
+                            id = 162797,
+                            quest = 58878,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 182191,
+                                },
+                            },
+                        },
+                        {
+                            name = "Gristlebeak",
+                            id = 162588,
+                            quest = 58837,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 182196,
+                                },
+                            },
+                        },
+                        {
+                            name = "Indomitable Schmitd",
+                            id = 161105,
+                            quest = 58332,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 182192,
+                                },
+                            },
+                        },
+                        {
+                            name = "Nirvaska the Summoner",
+                            id = 161857,
+                            quest = 58629,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183700,
+                                },
+                            },
+                        },
+                        {
+                            name = "Pesticide",
+                            id = 162767,
+                            quest = 58875,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 182205,
+                                },
+                            },
+                        },
+                        {
+                            name = "Ravenomous",
+                            id = 159753,
+                            quest = 58004,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 184184,
+                                },
+                                {
+                                    id = 181283,
+                                    pet = 2964,
+                                },
+                            },
+                        },
+                        {
+                            name = "Smorgas the Feaster",
+                            id = 162528,
+                            quest = 58768,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 184299,
+                                },
+                                {
+                                    id = 181266,
+                                    pet = 2956,
+                                },
+                                {
+                                    id = 181265,
+                                    pet = 2955,
+                                },
+                            },
+                        },
+                        {
+                            name = "Taskmaster Xox",
+                            id = 160059,
+                            quest = 58091,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 184186,
+                                },
+                                {
+                                    id = 184192,
+                                },
+                                {
+                                    id = 184187,
+                                },
+                            },
+                        },
+                        {
+                            name = "Thread Mistress Leeda",
+                            id = 162180,
+                            quest = 58678,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 184180,
+                                },
+                            },
+                        },
+                    },
                 },
                 {
                     -- Revendreth
@@ -279,8 +475,8 @@ ns.data = {
                     rares = {
                         {
                             hidden = true,
-                            id = 167526,
                             name = "Nurgash Muckformed",
+                            id = 167526,
                             -- quest = 61816,
                             waypoint = {27.6, 14.6},
                             items = {
@@ -314,8 +510,70 @@ ns.data = {
                             },
                         },
                         {
-                            id = 166521,
+                            name = "Tollkeeper Varaboss",
+                            id = 165253,
+                            quest = 59595,
+                            waypoint = {66.6, 71.2},
+                        },
+                        {
+                            name = "Harika the Horrid",
+                            id = 165290,
+                            quest = 59612,
+                            waypoint = {45.8, 78.9},
+                            covenantRequired = true,
+                            items = {
+                                {
+                                    id = 180461,
+                                    mount = 1310,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Worldedge Gorger",
+                            id = 160821,
+                            quest = 58259,
+                            waypoint = {38.6, 72.2},
+                            items = {
+                                {
+                                    id = 182589,
+                                    mount = 1391,
+                                },
+                            },
+                        },
+                        {
+                            name = "Hopecrusher",
+                            id = 166679,
+                            quest = 59900,
+                            waypoint = {52.0, 51.6},
+                            items = {
+                                {
+                                    id = 180581,
+                                    mount = 1298,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Soulstalker Doina",
+                            id = 160392,
+                            quest = 58130,
+                            waypoint = {65.0, 56.8},
+                        },
+                        {
+                            name = "Endlurker",
+                            id = 165206,
+                            quest = 59582,
+                            waypoint = {66.6, 59.2},
+                            items = {
+                                {
+                                    id = 179927,
+                                },
+                            },
+                        },
+                        {
                             name = "Famu the Infinite",
+                            id = 166521,
                             quest = 59869,
                             waypoint = {62.2, 47.0},
                             items = {
@@ -326,66 +584,238 @@ ns.data = {
                             },
                         },
                         {
-                            id = 165290,
-                            name = "Harika the Horrid",
-                            quest = 59612,
-                            waypoint = {45.8, 78.9},
-                            covenantRequired = true,
-                            items = {
-                                {
-                                    id = 180461,
-                                    mount = 1310,
-                                },
-                            },
-                        },
-                        {
-                            id = 166679,
-                            name = "Hopecrusher",
-                            quest = 59900,
-                            waypoint = {52.0, 51.6},
-                            items = {
-                                {
-                                    id = 180581,
-                                    mount = 1298,
-                                },
-                            },
-                        },
-                        {
-                            id = 159496,
                             name = "Forgemaster Madalav",
+                            id = 159496,
                             quest = 61618,
                             waypoint = {32.6, 15.4},
                             covenantRequired = true,
                             items = {
                                 {
                                     id = 180939,
+                                    transmog = true,
                                 },
                             },
                         },
                         {
-                            id = 160857,
                             name = "Sire Ladinas",
+                            id = 160857,
                             quest = 58263,
                             waypoint = {34.0, 55.4},
                             items = {
                                 {
                                     id = 180873,
+                                    toy = true,
                                 },
                             },
                         },
                         {
-                            id = 160821,
-                            name = "Worldedge Gorger",
-                            quest = 58259,
-                            waypoint = {38.6, 72.2},
+                            name = "Amalgamation of Filth",
+                            id = 166393,
+                            quest = 59854,
+                            waypoint = {99.9, 99.9},
                             items = {
                                 {
-                                    id = 182589,
-                                    mount = 1391,
+                                    id = 183729,
                                 },
                             },
                         },
-                    }
+                        {
+                            name = "Amalgamation of Light",
+                            id = 164388,
+                            quest = 59584,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179926,
+                                },
+                                {
+                                    id = 179924,
+                                },
+                                {
+                                    id = 179653,
+                                },
+                                {
+                                    id = 179925,
+                                },
+                                {
+                                    id = 180688,
+                                },
+                            },
+                        },
+                        {
+                            name = "Amalgamation of Sin",
+                            id = 170434,
+                            quest = 60836,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183730,
+                                },
+                            },
+                        },
+                        {
+                            name = "Azgar",
+                            id = 166576,
+                            quest = 59893,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183731,
+                                },
+                            },
+                        },
+                        {
+                            name = "Bog Beast",
+                            id = 166292,
+                            quest = 59823,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180588,
+                                    pet = 2896,
+                                },
+                            },
+                        },
+                        {
+                            name = "Executioner Aatron",
+                            id = 166710,
+                            quest = 59913,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183737,
+                                },
+                            },
+                        },
+                        {
+                            name = "Executioner Adrastia",
+                            id = 161310,
+                            quest = 58441,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180502,
+                                },
+                            },
+                        },
+                        {
+                            name = "Grand Arcanist Dimitri",
+                            id = 167464,
+                            quest = 60173,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180503,
+                                },
+                            },
+                        },
+                        {
+                            name = "Huntmaster Petrus",
+                            id = 166993,
+                            quest = 60022,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180705,
+                                },
+                            },
+                        },
+                        {
+                            name = "Innervus",
+                            id = 160640,
+                            quest = 58210,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183735,
+                                },
+                            },
+                        },
+                        {
+                            name = "Leeched Soul",
+                            id = 165152,
+                            quest = 59580,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183736,
+                                },
+                                {
+                                    id = 180585,
+                                    pet = 2897,
+                                },
+                            },
+                        },
+                        {
+                            name = "Lord Mortegore",
+                            id = 161891,
+                            quest = 58633,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180501,
+                                },
+                            },
+                        },
+                        {
+                            name = "Manifestation of Wrath",
+                            id = 170048,
+                            quest = 60729,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180585,
+                                    pet = 2897,
+                                },
+                            },
+                        },
+                        {
+                            name = "Scrivener Lenua",
+                            id = 160675,
+                            quest = 58213,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180587,
+                                    pet = 2893,
+                                },
+                            },
+                        },
+                        {
+                            name = "Sinstone Hoarder",
+                            id = 162481,
+                            quest = 62252,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183732,
+                                },
+                            },
+                        },
+                        {
+                            name = "Stonefist",
+                            id = 159503,
+                            quest = 62220,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180488,
+                                },
+                            },
+                        },
+                        {
+                            name = "Tomb Burster",
+                            id = 155779,
+                            quest = 56877,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180584,
+                                    pet = 2891,
+                                },
+                            },
+                        },
+                    },
                 },
                 {
                     -- The Maw
@@ -395,8 +825,8 @@ ns.data = {
                     rares = {
                         {
                             hidden = true,
-                            id = 174827,
                             name = "Gorged Shadehound",
+                            id = 174827,
                             -- quest = 61124,
                             waypoint = {53.6, 78.6},
                             items = {
@@ -407,39 +837,45 @@ ns.data = {
                             },
                         },
                         {
+                            name = "Morguliax",
                             id = 162849,
-                            name = "Morguliax <Lord of Decapitation>",
                             quest = 60987,
                             waypoint = {16.6, 50.6},
+                            reputation = 100,
                             items = {
                                 {
                                     id = 184292,
+                                    toy = true,
                                 },
                             },
                         },
                         {
-                            id = 172577,
                             name = "Orophea",
+                            id = 172577,
                             quest = 61519,
                             waypoint = {23.8, 21.6},
+                            reputation = 80,
                             items = {
                                 {
                                     id = 181794,
+                                    toy = true,
                                 },
                             },
                         },
                         {
-                            id = 157833,
                             name = "Borr-Geth",
+                            id = 157833,
                             quest = 57469,
                             waypoint = {39.6, 40.8},
+                            reputation = 100,
                             items = {
                                 {
                                     id = 184312,
+                                    toy = true,
                                 },
                             },
                         },
-                    }
+                    },
                 },
                 {
                     -- Bastion
@@ -448,8 +884,8 @@ ns.data = {
                     rares = {
                         {
                             hidden = true,
-                            id = 167524,
                             name = "Valinor, the Light of Eons",
+                            id = 167524,
                             quest = 61813,
                             waypoint = {26.6, 22.8},
                             items = {
@@ -480,11 +916,11 @@ ns.data = {
                                 {
                                     id = 183353,
                                 },
-                            }
+                            },
                         },
                         {
-                            id = 170548,
                             name = "Sundancer",
+                            id = 170548,
                             -- quest = ?????,
                             waypoint = {60.3, 79.7},
                             items = {
@@ -495,20 +931,20 @@ ns.data = {
                             },
                         },
                         {
-                            id = 167078,
                             name = "Wingflayer the Cruel",
+                            id = 167078,
                             quest = 60314,
                             waypoint = {40.7, 52.9},
+                            covenantRequired = true,
                             items = {
                                 {
                                     id = 182749,
-                                    covenantOnly = true,
                                 },
                             },
                         },
                         {
-                            id = 170623,
                             name = "Dark Watcher",
+                            id = 170623,
                             quest = 60883,
                             waypoint = {27.7, 30.0},
                             items = {
@@ -518,19 +954,28 @@ ns.data = {
                             },
                         },
                         {
-                            id = 156339,
                             name = "Orstus & Sotiros",
+                            id = 156339,
                             quest = 61634,
+                            covenantRequired = true,
                             waypoint = {22.6, 22.9},
                             items = {
                                 {
                                     id = 184365,
                                 },
+                                {
+                                    id = 184401,
+                                    pet = true, -- todo
+                                },
+                                {
+                                    id = 184397,
+                                    pet = true, -- todo
+                                },
                             },
                         },
                         {
-                            id = 170832,
                             name = "Ascended Council",
+                            id = 170899,
                             quest = 60977,
                             waypoint = {53.5, 88.2},
                             items = {
@@ -541,28 +986,244 @@ ns.data = {
                             },
                         },
                         {
-                            id = 171009,
                             name = "Enforcer Aegeon",
+                            id = 171009,
                             quest = 60998,
                             waypoint = {50.8, 19.6},
                             items = {
                                 {
                                     id = 184404,
+                                    toy = true,
                                 },
                             },
                         },
                         {
-                            id = 171008,
                             name = "Unstable Memory",
+                            id = 171008,
                             quest = 60997,
                             waypoint = {43.4, 25.2},
                             items = {
                                 {
                                     id = 184413,
+                                    toy = true,
                                 },
                             },
                         },
-                    }
+                        {
+                            name = "Aspirant Eolis",
+                            id = 171211,
+                            quest = 61083,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183607,
+                                },
+                            },
+                        },
+                        {
+                            name = "Baedos",
+                            id = 160629,
+                            quest = {58648, 62192},
+                            waypoint = {99.9, 99.9},
+                        },
+                        {
+                            name = "Basilofos",
+                            id = 170659,
+                            quest = {60897, 62158},
+                            waypoint = {99.9, 99.9},
+                            -- items = {
+                            --     {
+                            --         id = 182655,
+                            --         toy = true,
+                            --     },
+                            -- },
+                        },
+                        {
+                            name = "Beasts of Bastion",
+                            id = 161527,
+                            quest = {60570, 60571, 60569, 58526},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179485,
+                                },
+                                {
+                                    id = 179486,
+                                },
+                                {
+                                    id = 179487,
+                                },
+                                {
+                                    id = 179488,
+                                },
+                            },
+                        },
+                        {
+                            name = "Bookkeeper Mnemis",
+                            id = 171189,
+                            quest = 59022,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 182682,
+                                },
+                            },
+                        },
+                        {
+                            name = "Cloudfeather Guardian",
+                            id = 170932,
+                            quest = {60978, 62191},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180812,
+                                    pet = 2925,
+                                },
+                            },
+                        },
+                        {
+                            name = "Collector Astorestes",
+                            id = 171014,
+                            quest = 61002,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183608,
+                                },
+                            },
+                        },
+                        {
+                            name = "Corrupted Clawguard",
+                            id = 171010,
+                            quest = 60999,
+                            waypoint = {99.9, 99.9},
+                        },
+                        {
+                            name = "Collector Astorestes",
+                            id = 171014,
+                            quest = 61002,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183608,
+                                },
+                            },
+                        },
+                        {
+                            name = "Demi the Relic Hoarder",
+                            id = 171011,
+                            quest = {61069, 61000},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183606,
+                                },
+                                {
+                                    id = 183608,
+                                },
+                                {
+                                    id = 183613,
+                                },
+                                {
+                                    id = 183611,
+                                },
+                                {
+                                    id = 183609,
+                                },
+                                {
+                                    id = 183607,
+                                },
+                            },
+                        },
+                        {
+                            name = "Dionae",
+                            id = 163460,
+                            quest = 62650,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180856,
+                                    pet = 2932,
+                                },
+                            },
+                        },
+                        {
+                            name = "Echo of Aella",
+                            id = 171255,
+                            quest = {61082, 61091, 62251},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180062,
+                                },
+                            },
+                        },
+                        {
+                            name = "Fallen Acolyte Erisne",
+                            id = 160721,
+                            quest = 58222,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180444,
+                                },
+                            },
+                        },
+                        {
+                            name = "Herculon",
+                            id = 158659,
+                            quest = {57705, 57708},
+                            waypoint = {99.9, 99.9},
+                            -- items = {
+                            --     {
+                            --         id = 182759,
+                            --     },
+                            -- },
+                        },
+                        {
+                            name = "Nikara Blackheart",
+                            id = 160882,
+                            quest = 58319,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183608,
+                                },
+                            },
+                        },
+                        -- {
+                        --     name = "Reekmonger",
+                        --     id = 171327,
+                        --     -- quest = ?????,
+                        --     waypoint = {99.9, 99.9},
+                        -- },
+                        {
+                            name = "Selena the Reborn",
+                            id = 160985,
+                            quest = 58320,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183608,
+                                },
+                            },
+                        },
+                        {
+                            name = "Swelling Tear",
+                            id = 171012,
+                            quest = {61001, 61046, 61047},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183605,
+                                },
+                                {
+                                    id = 180869,
+                                    pet = 2940,
+                                },
+                            },
+                        },
+                    },
                 },
                 {
                     -- Ardenweald
@@ -571,8 +1232,8 @@ ns.data = {
                     rares = {
                         {
                             hidden = true,
-                            id = 167527,
                             name = "Oranomonos the Everbranching",
+                            id = 167527,
                             quest = 61815,
                             waypoint = {20.6, 63.6},
                             items = {
@@ -606,8 +1267,8 @@ ns.data = {
                             },
                         },
                         {
-                            id = 164112,
                             name = "Humon'gozz",
+                            id = 164112,
                             quest = 59157,
                             waypoint = {32.4, 30.4},
                             items = {
@@ -619,21 +1280,30 @@ ns.data = {
                             },
                         },
                         {
-                            id = 168647,
                             name = "Valfir the Unrelenting",
+                            id = 168647,
                             quest = 61632,
                             waypoint = {30.6, 55.0},
                             covenantRequired = true,
                             items = {
                                 {
+                                    id = 180154,
+                                },
+                                {
                                     id = 180730,
                                     mount = 1393,
+                                    covenantOnly = true,
+                                },
+                                {
+                                    id = 182176,
+                                    quest = 62431,
+                                    covenantOnly = true,
                                 },
                             },
                         },
                         {
-                            id = 164107,
                             name = "Gormtamer Tizo",
+                            id = 164107,
                             quest = 59145,
                             waypoint = {26.4, 54.3},
                             items = {
@@ -645,8 +1315,8 @@ ns.data = {
                             },
                         },
                         {
-                            id = 168135,
                             name = "Night Mare",
+                            id = 168135,
                             quest = 60306,
                             waypoint = {62.2, 53.9},
                             items = {
@@ -659,17 +1329,197 @@ ns.data = {
                             },
                         },
                         {
-                            id = 160448,
                             name = "Hunter Vivian",
+                            id = 160448,
                             quest = 59221,
                             waypoint = {67.1, 24.6},
                             items = {
                                 {
                                     id = 179596,
+                                    transmog = true,
+                                },
+                                {
+                                    id = 183091,
+                                    quest = 62246,
                                 },
                             },
                         },
-                    }
+                        {
+                            name = "Deifir the Untamed",
+                            id = 164238,
+                            quest = {59201, 62271},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180631,
+                                    pet = 2920,
+                                },
+                            },
+                        },
+                        {
+                            name = "Dustbrawl",
+                            id = 163229,
+                            quest = 58987,
+                            waypoint = {99.9, 99.9},
+                        },
+                        {
+                            name = "Egg-Tender Leh'go",
+                            id = 167851,
+                            quest = 60266,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179539,
+                                },
+                            },
+                        },
+                        {
+                            name = "Faeflayer",
+                            id = 171688,
+                            quest = 61184,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180144,
+                                },
+                            },
+                        },
+                        {
+                            name = "Gormbore",
+                            id = 163370,
+                            quest = 59006,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 183196,
+                                    pet = 3035,
+                                },
+                            },
+                        },
+                        {
+                            name = "Macabre",
+                            id = 164093,
+                            quest = 59140,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180644,
+                                    pet = 2907,
+                                },
+                            },
+                        },
+                        {
+                            name = "Mymaen",
+                            id = 165053,
+                            quest = 59431,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179502,
+                                },
+                            },
+                        },
+                        {
+                            name = "Mystic Rainbowhorn",
+                            id = 164547,
+                            quest = 59235,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179586,
+                                },
+                                {
+                                    id = 182179,
+                                    quest = 62434,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Old Ardeite",
+                            id = 164391,
+                            quest = {59208, 62270},
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180643,
+                                    pet = 2908,
+                                },
+                            },
+                        },
+                        {
+                            name = "Rootwrithe",
+                            id = 167726,
+                            quest = 60273,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 179603,
+                                },
+                            },
+                        },
+                        {
+                            name = "Rotbriar Boggart",
+                            id = 167724,
+                            quest = 60258,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 175729,
+                                },
+                            },
+                        },
+                        {
+                            name = "Soultwister Cero",
+                            id = 171451,
+                            quest = 61177,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 180164,
+                                },
+                            },
+                        },
+                        {
+                            name = "Skuld Vit",
+                            id = 164415,
+                            quest = 59220,
+                            waypoint = {99.9, 99.9},
+                            covenantRequired = true,
+                            items = {
+                                {
+                                    id = 180146,
+                                },
+                                {
+                                    id = 182183,
+                                    quest = 62439,
+                                    covenantOnly = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "The Slumbering Emperor",
+                            id = 167721,
+                            quest = 60290,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 175711,
+                                },
+                            },
+                        },
+                        {
+                            name = "Wrigglemortis",
+                            id = 164147,
+                            quest = 59170,
+                            waypoint = {99.9, 99.9},
+                            items = {
+                                {
+                                    id = 181396,
+                                },
+                            },
+                        },
+                    },
                 },
             },
             notes = {
@@ -683,5 +1533,52 @@ ns.data = {
         "Moving out to",
         "Let's go and delete",
         "We ride for",
+    },
+    covenants = {
+        -- Kyrian
+        [1] = {
+            color = "68ccef",
+            icon = 3257748,
+        },
+        -- Venthyr
+        [2] = {
+            color = "ff4040",
+            icon = 3257751,
+        },
+        -- Night Fae
+        [3] = {
+            color = "8b55d7",
+            icon = 3257750,
+        },
+        -- Necrolord
+        [4] = {
+            color = "40bf40",
+            icon = 3257749,
+        },
+    },
+    renownLevels = {
+        {
+            level = 32,
+            year = 2021,
+            month = 2,
+            day = 9,
+        },
+        {
+            level = 34,
+            day = 16,
+        },
+        {
+            level = 36,
+            day = 23,
+        },
+        {
+            level = 38,
+            month = 3,
+            day = 2,
+        },
+        {
+            level = 40,
+            day = 9,
+        },
     },
 }
