@@ -1,6 +1,6 @@
 # Ravenous For *Shadowlands*
 
-![The Addon's Interface](https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor0.2.0.gif)
+![The Addon's Interface](https://github.com/RavenousAddons/assets/raw/main/ravFor0.2.0.gif)
 
 ## Get in touch
 
