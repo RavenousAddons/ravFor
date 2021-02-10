@@ -103,14 +103,14 @@ ns.data = {
                             name = "Adjutant Dekaris",
                             id = 157964,
                             quest = 57482,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {25.8, 31.2},
                             reputation = 80,
                         },
                         {
                             name = "Apholeias, Herald of Loss",
                             id = 170301,
                             quest = 60788,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {19.6, 41.8},
                             reputation = 100,
                             items = {
                                 {
@@ -127,7 +127,7 @@ ns.data = {
                             name = "Conjured Death",
                             id = 171317,
                             quest = 61106,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {27.8, 13.6},
                             reputation = 80,
                             items = {
                                 {
@@ -139,35 +139,35 @@ ns.data = {
                             name = "Darithis the Bleak",
                             id = 160770,
                             quest = 62281,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {61.0, 48.6},
                             reputation = 100,
                         },
                         {
                             name = "Darklord Taraxis",
                             id = 158025,
                             quest = 62282,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {48.8, 81.4},
                             reputation = 80,
                         },
                         {
                             name = "Dolos <Death's Knife>",
                             id = 170711,
                             quest = 60909,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {28.2, 60.6},
                             reputation = 100,
                         },
                         {
                             name = "Eketra <The Impaler>",
                             id = 170774,
                             quest = 60915,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {23.6, 53.2},
                             reputation = 100,
                         },
                         {
                             name = "Ekphoras, Herald of Grief",
                             id = 169827,
                             quest = 60666,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {42.6, 21.0},
                             reputation = 100,
                             items = {
                                 {
@@ -184,7 +184,7 @@ ns.data = {
                             name = "Eternas the Tormentor",
                             id = 154330,
                             quest = 57509,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {19.2, 46.0},
                             reputation = 80,
                             items = {
                                 {
@@ -197,7 +197,7 @@ ns.data = {
                             name = "Exos, Herald of Domination",
                             id = 170303,
                             quest = 62260,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {21.0, 70.6},
                             reputation = 100,
                             items = {
                                 {
@@ -225,28 +225,28 @@ ns.data = {
                             name = "Ikras the Devourer",
                             id = 175012,
                             quest = 62788,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {30.8, 50.0},
                             reputation = 100,
                         },
                         {
                             name = "Nascent Devourer",
                             id = 158278,
                             quest = 57573,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {45.5, 73.8},
                             reputation = 80,
                         },
                         {
                             name = "Obolos <Prime Adjutant>",
                             id = 164064,
                             quest = 60667,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {48.8, 18.3},
                             reputation = 80,
                         },
                         {
                             name = "Shadeweaver Zeris",
                             id = 170634,
                             quest = 60884,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {32.9, 66.5},
                             reputation = 100,
                             items = {
                                 {
@@ -270,14 +270,14 @@ ns.data = {
                             name = "Soulforger Rhovus",
                             id = 166398,
                             quest = 60834,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {36.0, 41.6},
                             reputation = 80,
                         },
                         {
                             name = "Talaporas, Herald of Pain",
                             id = 170302,
                             quest = 60789,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {28.7,12.0},
                             reputation = 100,
                             items = {
                                 {
@@ -293,14 +293,14 @@ ns.data = {
                             name = "Thanassos <Death's Voice>",
                             id = 170731,
                             quest = 60914,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {27.4, 71.5},
                             reputation = 100,
                         },
                         {
                             name = "Yero the Skittish",
                             id = 172862,
                             quest = 61568,
-                            waypoint = {99.9, 99.9},
+                            waypoint = {37.4, 62.1},
                             reputation = 80,
                         },
                     },

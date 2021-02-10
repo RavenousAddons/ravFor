@@ -280,7 +280,7 @@ function ns:CreateItem(zone, rare, item, covenant)
     itemLink = string.gsub(itemLink, "]", itemMeta .. "]")
     local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
     local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
-    local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. "  " .. TextColor(zoneCovenant, zoneColor) or ""
+    local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. " " .. TextColor(zoneCovenant, zoneColor) or ""
     local owned = ns:IsItemOwned(item) and " " .. checkmark or ""
 
     local button = CreateFrame("Button", name .. "Item" .. item.id, ns.Content)

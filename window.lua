@@ -190,10 +190,6 @@ Window:SetScript("OnShow", function()
                         elseif RAVFOR_data.options.showOtherCovenantItems == false and item.covenantOnly and (covenant ~= zone.covenant) then
                         elseif RAVFOR_data.options.showOwned == false and ns:IsItemOwned(item) then
                         else
-                            local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
-                            local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. " " .. TextColor(zoneCovenant, zoneColor) or ""
-                            local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
-                            local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
                             -- Insert Item into Items
                             table.insert(items, item)
                         end
