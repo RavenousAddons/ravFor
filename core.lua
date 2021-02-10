@@ -10,6 +10,8 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
+    self:RegisterEvent("ENCOUNTER_END")
+    self:RegisterEvent("BOSS_KILL")
     self:RegisterEvent("WORLD_QUEST_COMPLETED_BY_SPELL")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
     self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
@@ -52,7 +54,7 @@ function ravFor_OnEvent(self, event, arg, ...)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:EnsureMacro()
-    elseif event == "WORLD_QUEST_COMPLETED_BY_SPELL" then
+    elseif event == "ENCOUNTER_END" or event == "BOSS_KILL" or event == "WORLD_QUEST_COMPLETED_BY_SPELL" then
         if ns.Content and ns.Content.rares then
             ns:RefreshRares(ns.Content.rares)
         end
