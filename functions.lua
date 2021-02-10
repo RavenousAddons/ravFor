@@ -263,10 +263,13 @@ function ns:RegisterRare(rare, parentFrame)
     table.insert(parentFrame.rares, rare)
 end
 
-function ns:RefreshRares(rares)
-    for _, label in ipairs(rares) do
-        local withoutDead = string.gsub(string.gsub(label:GetText(), skull, ""), checkmark, "")
-        label:SetText((ns:IsRareDead(label.rare) and checkmark or skull) .. withoutDead)
+function ns:RefreshRares(rares, id)
+    for _, rare in ipairs(rares) do
+        if rare.rare.id == math.floor(id) then
+            local withoutDead = string.gsub(string.gsub(rare:GetText(), skull, ""), checkmark, "")
+            rare:SetText((ns:IsRareDead(rare.rare) and checkmark or skull) .. withoutDead)
+            break
+        end
     end
 end
 

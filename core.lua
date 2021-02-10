@@ -10,9 +10,7 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
-    self:RegisterEvent("ENCOUNTER_END")
-    self:RegisterEvent("BOSS_KILL")
-    self:RegisterEvent("WORLD_QUEST_COMPLETED_BY_SPELL")
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
     self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
 end
@@ -54,9 +52,14 @@ function ravFor_OnEvent(self, event, arg, ...)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:EnsureMacro()
-    elseif event == "ENCOUNTER_END" or event == "BOSS_KILL" or event == "WORLD_QUEST_COMPLETED_BY_SPELL" then
-        if ns.Content and ns.Content.rares then
-            ns:RefreshRares(ns.Content.rares)
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        local timestamp, subtype, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2 = CombatLogGetCurrentEventInfo()
+        if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
+            local _, _, _, _, _, id = strsplit("-", destGUID)
+            if id and ns.Content and ns.Content.rares then
+                ns:RefreshRares(ns.Content.rares, id)
+            end
         end
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then
         if ns.Content and ns.Content.items then
