@@ -27,7 +27,7 @@ local _, ns = ...
 
 ns.data = {
     defaults = {
-        showKilled = true,
+        showDead = true,
         showNoDrops = true,
         showOwned = true,
         showGear = true,
@@ -36,6 +36,7 @@ ns.data = {
         showPets = true,
         showToys = true,
         showOtherCovenantItems = true,
+        showReputation = true,
     },
     expansions = {
         ["Shadowlands"] = {
@@ -1558,9 +1559,52 @@ ns.data = {
     },
     renownLevels = {
         {
-            level = 32,
+            level = 6,
+            year = 2020,
+            month = 12,
+            day = 1,
+        },
+        {
+            level = 9,
+            day = 8,
+        },
+        {
+            level = 12,
+            day = 15,
+        },
+        {
+            level = 15,
+            day = 22,
+        },
+        {
+            level = 18,
+            day = 29,
+        },
+        {
+            level = 21,
             year = 2021,
+            month = 1,
+            day = 5,
+        },
+        {
+            level = 24,
+            day = 12,
+        },
+        {
+            level = 26,
+            day = 19,
+        },
+        {
+            level = 28,
+            day = 26,
+        },
+        {
+            level = 30,
             month = 2,
+            day = 2,
+        },
+        {
+            level = 32,
             day = 9,
         },
         {
