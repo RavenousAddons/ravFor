@@ -119,15 +119,61 @@ function ns:CreateLabel(cfg)
 
     local label = cfg.parent:CreateFontString(cfg.name, "ARTWORK", cfg.fontObject)
     label:SetPoint(cfg.initialPoint, cfg.relativeTo, cfg.relativePoint, cfg.offsetX, cfg.offsetY)
+    label:SetJustifyH("LEFT")
     label:SetText(cfg.label)
     if cfg.width then
         label:SetWidth(cfg.width)
+    else
+        label:SetWidth(ns.Window:GetWidth() - (medium * 2) - 18)
     end
 
     if not cfg.ignorePlacement then
         prevControl = label
     end
     return label
+end
+
+function ns:CreateRenown()
+    local heading = ns.Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+
+    local label = ns.Content:CreateFontString(name .. "RenownLevel", "ARTWORK", "GameFontNormal")
+    label:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    label:SetJustifyH("LEFT")
+
+    ns:PushRenown(heading, label)
+
+    ns:RegisterRenown({
+        heading = heading,
+        label = label,
+    }, ns.Content)
+
+    prevControl = heading
+    return heading
+end
+
+function ns:PushRenown(heading, label)
+    local covenant = C_Covenants.GetActiveCovenantID()
+    if not covenant then
+        return
+    end
+    local renown = C_CovenantSanctumUI.GetRenownLevel()
+    local maxRenown = ns:GetMaxRenown()
+
+    heading:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color) .. TextColor(" Renown", "ffffff"))
+    label:SetText(TextColor("Level ", "ffffff") .. (renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")))
+end
+
+function ns:RegisterRenown(data, parentFrame)
+    if (not parentFrame) or (not data) then
+        return
+    end
+    parentFrame.renown = data
+end
+
+function ns:RefreshRenown(data)
+    ns:PushRenown(data.heading, data.label)
 end
 
 function ns:CreateRare(i, zone, rare, items, covenant)
@@ -153,6 +199,8 @@ function ns:CreateRare(i, zone, rare, items, covenant)
 
     local label = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     label:SetPoint("TOPLEFT", 0, 0)
+    label:SetWidth(button:GetWidth())
+    label:SetJustifyH("LEFT")
     label:SetText(dead .. " " .. TextColor(i .. ". ") .. rare.name .. covenantRequired .. drops)
 
     label.rare = rare
@@ -184,6 +232,8 @@ function ns:CreateItem(zone, rare, item, covenant)
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
 
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
+    local itemMeta = (itemType == "Armor" or itemType == "Weapon") and TextColor(" (" .. itemSubType .. ")") or ""
+    itemLink = string.gsub(itemLink, "]", itemMeta .. "]")
     local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
     local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
     local covenantOnly = item.covenantOnly and TextColor(" only for ") .. TextIcon(zoneIcon) .. "  " .. TextColor(zoneCovenant, zoneColor) or ""
@@ -200,6 +250,8 @@ function ns:CreateItem(zone, rare, item, covenant)
 
     local label = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     label:SetPoint("TOPLEFT", 0, 0)
+    label:SetWidth(button:GetWidth())
+    label:SetJustifyH("LEFT")
     label:SetText("    " .. TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned)
 
     label.item = item
@@ -265,11 +317,16 @@ function ns:IsItemOwned(item)
     if item.mount then
         local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
         return isCollected
+    elseif item.pet then
+        local isCollected, _, _ = C_PetJournal.GetPetSummonInfo(item.pet)
+        return isCollected
+    -- elseif item.toy then
+    --
+    elseif item.quest then
+        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
     elseif item.achievement then
         local _, _, _, isCompleted = GetAchievementInfo(item.achievement)
         return isCompleted
-    elseif item.quest then
-        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
     end
     return false
 end

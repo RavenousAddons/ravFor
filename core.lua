@@ -12,6 +12,7 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("CHAT_MSG_ADDON")
     self:RegisterEvent("WORLD_QUEST_COMPLETED_BY_SPELL")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
+    self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
 end
 
 function ravFor_OnEvent(self, event, arg, ...)
@@ -57,6 +58,10 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then
         if ns.Content and ns.Content.items then
             ns:RefreshItems(ns.Content.items)
+        end
+    elseif event == "COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED" then
+        if ns.Content and ns.Content.renown then
+            ns:RefreshRenown(ns.Content.renown)
         end
     end
 end

@@ -126,41 +126,7 @@ Window:SetScript("OnShow", function()
         offsetY = 0,
     })
     -- Renown
-    local covenant = C_Covenants.GetActiveCovenantID()
-    if covenant ~= 0 then
-        local renown = C_CovenantSanctumUI.GetRenownLevel()
-        local maxRenown = ns:GetMaxRenown()
-        ns:CreateLabel({
-            name = name .. "Renown",
-            parent = Content,
-            label = TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, covenants[covenant].color) .. TextColor(" Renown", "ffffff"),
-            offsetY = -gigantic,
-            fontObject = "GameFontNormalLarge",
-            -- TODO Button not working
-            -- width = width - (medium * 2) - 18,
-            -- height = 22,
-            -- showRenown = true,
-        })
-        -- Level of Renown
-        ns:CreateLabel({
-            name = name .. "RenownLevel",
-            parent = Content,
-            label = TextColor("Level ", "ffffff") .. (renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")),
-            initialPoint = "LEFT",
-            relativePoint = "RIGHT",
-            offsetX = large,
-            offsetY = 0,
-            ignorePlacement = true,
-        })
-        -- Under Max Renown Note
-        if renown < maxRenown then
-            ns:CreateLabel({
-                name = name .. "RenownWarning",
-                parent = Content,
-                label = TextColor("Try to work increasing your Renown to the current maximum!", "ff3333"),
-            })
-        end
-    end
+    ns:CreateRenown()
     -- For each Zone
     for i, zone in ipairs(zones) do
         local mapName = C_Map.GetMapInfo(zone.id).name

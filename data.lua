@@ -1176,11 +1176,11 @@ ns.data = {
                                 },
                                 {
                                     id = 184401,
-                                    pet = true, -- todo
+                                    -- pet = true, -- todo
                                 },
                                 {
                                     id = 184397,
-                                    pet = true, -- todo
+                                    -- pet = true, -- todo
                                 },
                             },
                         },
@@ -1742,9 +1742,8 @@ ns.data = {
                 },
             },
             notes = {
-                "This is very much a work-in-progress!",
-                "Message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
-                "And make sure you're in the RUIN Discord! |cff0099ffdiscord.gg/ruin|r"
+                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r or message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
+                "And make sure you're in the RUIN Discord!\n|cff0099ffhttps://discord.gg/ruin|r",
             },
         },
     },
