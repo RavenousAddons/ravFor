@@ -1743,6 +1743,7 @@ ns.data = {
             },
             notes = {
                 "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r or message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help.",
+                "What isn't working (yet):\n- tracking learned appearances (transmog)\n- tracking learned toys\n- tracking when certain world quests/world bosses are available\n- ability to reorder lists and list items\n- some rares still missing coordinates",
                 "And make sure you're in the RUIN Discord!\n|cff0099ffhttps://discord.gg/ruin|r",
             },
         },
