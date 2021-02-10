@@ -109,6 +109,50 @@ function ns:SetDefaultOptions()
     end
 end
 
+function ns:RegisterControl(control, parentFrame)
+    if (not parentFrame) or (not control) then
+        return
+    end
+    parentFrame.controls = parentFrame.controls or {}
+    table.insert(parentFrame.controls, control)
+end
+
+function ns:RefreshControls(controls)
+    for _, control in pairs(controls) do
+        control:SetValue(control)
+        control.oldValue = control:GetValue()
+    end
+end
+
+function ns:CreateCheckbox(cfg)
+    local checkbox = CreateFrame("CheckButton", name .. "OptionsCheckbox" .. cfg.var, ns.Options, "InterfaceOptionsCheckButtonTemplate")
+    checkbox:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -16)
+    checkbox.var = cfg.var
+    checkbox.label = cfg.label
+    checkbox.Text:SetJustifyH("LEFT")
+    checkbox.Text:SetText(cfg.label)
+    checkbox.tooltipText = cfg.tooltip .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+    checkbox.restart = false
+
+    checkbox.GetValue = function()
+        return checkbox:GetChecked()
+    end
+    checkbox.SetValue = function()
+        checkbox:SetChecked(RAVFOR_data.options[cfg.var])
+    end
+
+    checkbox:SetScript("OnClick", function(self)
+        checkbox.value = self:GetChecked()
+        checkbox.restart = not checkbox.restart
+        RAVFOR_data.options[checkbox.var] = checkbox:GetChecked()
+        ns:RefreshControls(ns.Options.controls)
+    end)
+
+    ns:RegisterControl(checkbox, ns.Options)
+    prevControl = checkbox
+    return checkbox
+end
+
 function ns:CreateLabel(cfg)
     cfg.initialPoint = cfg.initialPoint or "TOPLEFT"
     cfg.relativePoint = cfg.relativePoint or "BOTTOMLEFT"
@@ -116,10 +160,11 @@ function ns:CreateLabel(cfg)
     cfg.offsetY = cfg.offsetY or -16
     cfg.relativeTo = cfg.relativeTo or prevControl
     cfg.fontObject = cfg.fontObject or "GameFontNormal"
+    cfg.justify = cfg.justify or "LEFT"
 
     local label = cfg.parent:CreateFontString(cfg.name, "ARTWORK", cfg.fontObject)
     label:SetPoint(cfg.initialPoint, cfg.relativeTo, cfg.relativePoint, cfg.offsetX, cfg.offsetY)
-    label:SetJustifyH("LEFT")
+    label:SetJustifyH(cfg.justify)
     label:SetText(cfg.label)
     if cfg.width then
         label:SetWidth(cfg.width)
@@ -222,7 +267,6 @@ function ns:RefreshRares(rares)
     for _, label in ipairs(rares) do
         local withoutDead = string.gsub(string.gsub(label:GetText(), skull, ""), checkmark, "")
         label:SetText((ns:IsRareDead(label.rare) and checkmark or skull) .. withoutDead)
-        label.oldValue = label:GetText()
     end
 end
 
@@ -273,7 +317,6 @@ function ns:RefreshItems(items)
     for _, label in ipairs(items) do
         local withoutOwned = string.gsub(label:GetText(), checkmark, "")
         label:SetText(withoutOwned .. (ns:IsItemOwned(label.item) and checkmark or ""))
-        label.oldValue = label:GetText()
     end
 end
 

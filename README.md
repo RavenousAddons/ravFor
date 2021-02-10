@@ -32,7 +32,7 @@ It's also set up to provide some light quality-of-life tooling to people on Rare
 1. Clicking on a Rare's name will:
     1. Generate a Map Pin Location and automatically track it for you
     2. Print details of the Rare and its location in your default chat window, including the shareable Map Pin Location.
-    3. *If you're the leader of your group, it will ping the details of the Rare over to your other group members, triggering (i) and (ii) for them if they have the Addon as well.*
+    3. *If you're the leader of your group, it will silently ping the details of the Rare over to your other group members, triggering (i) and (ii) for them if they have the Addon as well.*
     4. *If the leader of your group pinged a Rare's location, there will also be a Raid Warning repeating the details of what was printed in your default chat window*
 
 ## Get in touch

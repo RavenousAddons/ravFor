@@ -63,6 +63,18 @@ Close:SetScript("OnMouseUp", function(self)
     Window:SetHeight(height)
 end)
 
+local Settings = CreateFrame("Button", name .. "WindowSettings", Window, "UIPanelButtonTemplate")
+Settings:SetText("Settings")
+Settings:SetWidth(large*4)
+Settings:SetPoint("RIGHT", Close, "LEFT")
+Settings:RegisterForClicks("AnyUp")
+Settings:SetScript("OnMouseUp", function(self)
+    Window:StopMovingOrSizing()
+    Window:Hide()
+    InterfaceOptionsFrame_OpenToCategory(ns.Options)
+    InterfaceOptionsFrame_OpenToCategory(ns.Options)
+end)
+
 local Resize = CreateFrame("Button", name .. "WindowResize", Window)
 Resize:SetWidth(10)
 Resize:SetHeight(10)
@@ -111,10 +123,14 @@ Window:SetScript("OnShow", function()
         name = name .. "Version",
         parent = Window,
         label = TextColor("v" .. ns.version),
-        relativeTo = Window,
-        relativePoint = "TOPRIGHT",
-        offsetX = -large*4,
-        offsetY = -12,
+        relativeTo = Settings,
+        initialPoint = "RIGHT",
+        relativePoint = "LEFT",
+        offsetX = -small,
+        offsetY = 0,
+        width = large*3,
+        justify = "RIGHT",
+        ignorePlacement = true,
     })
     -- Introduction
     ns:CreateLabel({
