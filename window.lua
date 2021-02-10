@@ -192,7 +192,7 @@ Window:SetScript("OnShow", function()
         local j = 0
         for _, rare in ipairs(zone.rares) do
             if rare.hidden then
-            elseif RAVFOR_data.options.showDead == false and ns:IsRareDead(rare) then
+            -- elseif RAVFOR_data.options.showDead == false and ns:IsRareDead(rare) then
             elseif rare.waypoint[1] > 99 and rare.waypoint[2] > 99 then
             else
                 local items = {}
@@ -217,7 +217,7 @@ Window:SetScript("OnShow", function()
                         end
                     end
                 end
-                if RAVFOR_data.options.showNoDrops == false and #items == 0 then
+                if RAVFOR_data.options.showNoDrops == false and #items == 0 and not rare.reptuation then
                 else
                     -- Rare
                     j = j + 1-- Build a list of items matching user options
@@ -227,6 +227,7 @@ Window:SetScript("OnShow", function()
                             name = name .. "Rare" .. rare.id .. "Reputation",
                             parent = Content,
                             label = "    " .. TextColor("+ " .. rare.reputation .. " reputation with Ve'nari", "8080ff"),
+                            offsetY = -small,
                         })
                     end
                     if #items > 0 then

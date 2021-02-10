@@ -27,8 +27,8 @@ local _, ns = ...
 
 ns.data = {
     defaults = {
-        showDead = true,
-        showNoDrops = true,
+        -- showDead = true,
+        showNoDrops = false,
         showOwned = true,
         showGear = true,
         showTransmog = true,
@@ -41,6 +41,270 @@ ns.data = {
     expansions = {
         ["Shadowlands"] = {
             zones = {
+                {
+                    -- The Maw
+                    id = 1543,
+                    color = "e5cc80",
+                    icon = "3743739",
+                    rares = {
+                        {
+                            hidden = true,
+                            name = "Gorged Shadehound",
+                            id = 174827,
+                            -- quest = 61124,
+                            waypoint = {53.6, 78.6},
+                            items = {
+                                {
+                                    id = 184167,
+                                    mount = 1304,
+                                },
+                            },
+                        },
+                        {
+                            name = "Morguliax <Lord of Decapitation>",
+                            id = 162849,
+                            quest = 60987,
+                            waypoint = {16.6, 50.6},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184292,
+                                    toy = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Orophea",
+                            id = 172577,
+                            quest = 61519,
+                            waypoint = {23.8, 21.6},
+                            reputation = 80,
+                            items = {
+                                {
+                                    id = 181794,
+                                    toy = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Borr-Geth",
+                            id = 157833,
+                            quest = 57469,
+                            waypoint = {39.6, 40.8},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184312,
+                                    toy = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Adjutant Dekaris",
+                            id = 157964,
+                            quest = 57482,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                        {
+                            name = "Apholeias, Herald of Loss",
+                            id = 170301,
+                            quest = 60788,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184106,
+                                    item = true,
+                                },
+                                {
+                                    id = 182327,
+                                    item = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Conjured Death",
+                            id = 171317,
+                            quest = 61106,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                            items = {
+                                {
+                                    id = 183887,
+                                },
+                            },
+                        },
+                        {
+                            name = "Darithis the Bleak",
+                            id = 160770,
+                            quest = 62281,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                        },
+                        {
+                            name = "Darklord Taraxis",
+                            id = 158025,
+                            quest = 62282,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                        {
+                            name = "Dolos <Death's Knife>",
+                            id = 170711,
+                            quest = 60909,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                        },
+                        {
+                            name = "Eketra <The Impaler>",
+                            id = 170774,
+                            quest = 60915,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                        },
+                        {
+                            name = "Ekphoras, Herald of Grief",
+                            id = 169827,
+                            quest = 60666,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184105,
+                                    item = true,
+                                },
+                                {
+                                    id = 182328,
+                                    item = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Eternas the Tormentor",
+                            id = 154330,
+                            quest = 57509,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                            items = {
+                                {
+                                    id = 183407,
+                                    pet = 3037,
+                                },
+                            },
+                        },
+                        {
+                            name = "Exos, Herald of Domination",
+                            id = 170303,
+                            quest = 62260,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184108,
+                                    item = true,
+                                },
+                                {
+                                    id = 183066,
+                                    item = true,
+                                    quest = 63160,
+                                },
+                                {
+                                    id = 183067,
+                                    item = true,
+                                    quest = 63161,
+                                },
+                                {
+                                    id = 183068,
+                                    item = true,
+                                    quest = 63162,
+                                },
+                            },
+                        },
+                        {
+                            name = "Ikras the Devourer",
+                            id = 175012,
+                            quest = 62788,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                        },
+                        {
+                            name = "Nascent Devourer",
+                            id = 158278,
+                            quest = 57573,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                        {
+                            name = "Obolos <Prime Adjutant>",
+                            id = 164064,
+                            quest = 60667,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                        {
+                            name = "Shadeweaver Zeris",
+                            id = 170634,
+                            quest = 60884,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 183066,
+                                    item = true,
+                                    quest = 63160,
+                                },
+                                {
+                                    id = 183067,
+                                    item = true,
+                                    quest = 63161,
+                                },
+                                {
+                                    id = 183068,
+                                    item = true,
+                                    quest = 63162,
+                                },
+                            },
+                        },
+                        {
+                            name = "Soulforger Rhovus",
+                            id = 166398,
+                            quest = 60834,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                        {
+                            name = "Talaporas, Herald of Pain",
+                            id = 170302,
+                            quest = 60789,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184107,
+                                },
+                                {
+                                    id = 182326,
+                                    item = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Thanassos <Death's Voice>",
+                            id = 170731,
+                            quest = 60914,
+                            waypoint = {99.9, 99.9},
+                            reputation = 100,
+                        },
+                        {
+                            name = "Yero the Skittish",
+                            id = 172862,
+                            quest = 61568,
+                            waypoint = {99.9, 99.9},
+                            reputation = 80,
+                        },
+                    },
+                },
                 {
                     -- Maldraxxus
                     id = 1536,
@@ -158,6 +422,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 184155,
+                                    item = true,
                                     quest = 62804,
                                 },
                             },
@@ -200,6 +465,7 @@ ns.data = {
                             items = {
                                 -- {
                                 --     id = 184174,
+                                --     item = true,
                                 -- },
                                 {
                                     id = 181810,
@@ -569,6 +835,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 179927,
+                                    item = true,
                                 },
                             },
                         },
@@ -640,6 +907,7 @@ ns.data = {
                                 },
                                 {
                                     id = 180688,
+                                    item = true,
                                 },
                             },
                         },
@@ -718,6 +986,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 180705,
+                                    item = true,
                                 },
                             },
                         },
@@ -819,66 +1088,6 @@ ns.data = {
                     },
                 },
                 {
-                    -- The Maw
-                    id = 1543,
-                    color = "e5cc80",
-                    icon = "3743739",
-                    rares = {
-                        {
-                            hidden = true,
-                            name = "Gorged Shadehound",
-                            id = 174827,
-                            -- quest = 61124,
-                            waypoint = {53.6, 78.6},
-                            items = {
-                                {
-                                    id = 184167,
-                                    mount = 1304,
-                                },
-                            },
-                        },
-                        {
-                            name = "Morguliax",
-                            id = 162849,
-                            quest = 60987,
-                            waypoint = {16.6, 50.6},
-                            reputation = 100,
-                            items = {
-                                {
-                                    id = 184292,
-                                    toy = true,
-                                },
-                            },
-                        },
-                        {
-                            name = "Orophea",
-                            id = 172577,
-                            quest = 61519,
-                            waypoint = {23.8, 21.6},
-                            reputation = 80,
-                            items = {
-                                {
-                                    id = 181794,
-                                    toy = true,
-                                },
-                            },
-                        },
-                        {
-                            name = "Borr-Geth",
-                            id = 157833,
-                            quest = 57469,
-                            waypoint = {39.6, 40.8},
-                            reputation = 100,
-                            items = {
-                                {
-                                    id = 184312,
-                                    toy = true,
-                                },
-                            },
-                        },
-                    },
-                },
-                {
                     -- Bastion
                     id = 1533,
                     covenant = 1,
@@ -940,6 +1149,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 182749,
+                                    item = true,
                                 },
                             },
                         },
@@ -1067,6 +1277,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 182682,
+                                    item = true,
                                 },
                             },
                         },
@@ -1149,13 +1360,14 @@ ns.data = {
                             },
                         },
                         {
-                            name = "Echo of Aella",
+                            name = "Echo of Aella <Hand of Courage>",
                             id = 171255,
                             quest = {61082, 61091, 62251},
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
                                     id = 180062,
+                                    item = true,
                                 },
                             },
                         },
@@ -1232,7 +1444,7 @@ ns.data = {
                     covenant = 3,
                     rares = {
                         {
-                            hidden = true,
+                            -- hidden = true,
                             name = "Oranomonos the Everbranching",
                             id = 167527,
                             quest = 61815,
@@ -1297,6 +1509,7 @@ ns.data = {
                                 },
                                 {
                                     id = 182176,
+                                    item = true,
                                     quest = 62431,
                                     covenantOnly = true,
                                 },
@@ -1341,6 +1554,7 @@ ns.data = {
                                 },
                                 {
                                     id = 183091,
+                                    item = true,
                                     quest = 62246,
                                 },
                             },
@@ -1431,6 +1645,7 @@ ns.data = {
                                 },
                                 {
                                     id = 182179,
+                                    item = true,
                                     quest = 62434,
                                     covenantOnly = true,
                                 },
@@ -1467,6 +1682,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 175729,
+                                    item = true,
                                 },
                             },
                         },
@@ -1493,6 +1709,7 @@ ns.data = {
                                 },
                                 {
                                     id = 182183,
+                                    item = true,
                                     quest = 62439,
                                     covenantOnly = true,
                                 },
@@ -1506,6 +1723,7 @@ ns.data = {
                             items = {
                                 {
                                     id = 175711,
+                                    item = true,
                                 },
                             },
                         },
