@@ -390,12 +390,11 @@ ns.data = {
                         {
                             name = "Pool of Mixed Monstrosities",
                             id = 157226,
-                            quest = {61718, 61719, 61720, 61721, 61722, 61723, 61724},
+                            achievement = 14721,
                             waypoint = {61.9, 76.8},
                             items = {
                                 {
                                     id = 183903,
-                                    achievement = 14721,
                                 },
                             },
                         },
@@ -421,10 +420,53 @@ ns.data = {
                             waypoint = {61.9, 76.8},
                             items = {
                                 {
-                                    id = 184155,
-                                    item = true,
-                                    quest = 62804,
+                                    id = 184300,
                                 },
+                                {
+                                    id = 184155,
+                                    quest = 62804,
+                                    transmog = true,
+                                },
+                                {
+                                    id = 181270,
+                                    pet = 2960,
+                                }
+                            },
+                        },
+                        {
+                            name = "Gelloh",
+                            id = 157309,
+                            quest = 61720,
+                            waypoint = {61.9, 76.8},
+                        },
+                        {
+                            name = "Corrupted Sediment",
+                            id = 48863,
+                            quest = 61719,
+                            waypoint = {61.9, 76.8},
+                            items = {
+                                id = 184302,
+                            },
+                        },
+                        {
+                            name = "Pulsing Leech",
+                            id = 48854,
+                            quest = 61718,
+                            waypoint = {61.9, 76.8},
+                        },
+                        {
+                            name = "Boneslurp",
+                            id = 48860,
+                            quest = 61722,
+                            waypoint = {61.9, 76.8},
+                        },
+                        {
+                            name = "Burnblister",
+                            id = 48862,
+                            quest = 61723,
+                            waypoint = {61.9, 76.8},
+                            items = {
+                                id = 184175,
                             },
                         },
                         {

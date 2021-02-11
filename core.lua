@@ -56,9 +56,8 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local timestamp, subtype, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2 = CombatLogGetCurrentEventInfo()
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
-            local _, _, _, _, _, id = strsplit("-", destGUID)
-            if id and ns.Content and ns.Content.rares then
-                ns:RefreshRares(ns.Content.rares, id)
+            if ns.Content and ns.Content.rares then
+                ns:RefreshRares(ns.Content.rares)
             end
         end
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then

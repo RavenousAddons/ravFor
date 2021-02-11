@@ -173,7 +173,6 @@ Window:SetScript("OnShow", function()
         local j = 0
         for _, rare in ipairs(zone.rares) do
             if rare.hidden then
-            -- elseif RAVFOR_data.options.showDead == false and ns:IsRareDead(rare) then
             elseif rare.waypoint[1] > 99 and rare.waypoint[2] > 99 then
             else
                 local items = {}

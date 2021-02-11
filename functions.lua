@@ -264,12 +264,9 @@ function ns:RegisterRare(rare, parentFrame)
 end
 
 function ns:RefreshRares(rares, id)
-    for _, rare in ipairs(rares) do
-        if rare.rare.id == math.floor(id) then
-            local withoutDead = string.gsub(string.gsub(rare:GetText(), skull, ""), checkmark, "")
-            rare:SetText((ns:IsRareDead(rare.rare) and checkmark or skull) .. withoutDead)
-            break
-        end
+    for _, label in ipairs(rares) do
+        local withoutDead = string.gsub(string.gsub(label:GetText(), skull, ""), checkmark, "")
+        label:SetText((ns:IsRareDead(label.rare) and checkmark or skull) .. withoutDead)
     end
 end
 
@@ -351,8 +348,8 @@ function ns:IsRareDead(rare)
     if type(rare.quest) == "table" then
         for _, quest in ipairs(rare.quest) do
             if not C_QuestLog.IsQuestFlaggedCompleted(quest) then break end
-            return true
         end
+        return true
     elseif rare.quest then
         return C_QuestLog.IsQuestFlaggedCompleted(rare.quest)
     end
