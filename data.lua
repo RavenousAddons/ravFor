@@ -51,38 +51,11 @@ ns.data = {
                             hidden = true,
                             name = "Gorged Shadehound",
                             id = 174827,
-                            -- quest = 61124,
                             waypoint = {53.6, 78.6},
                             items = {
                                 {
                                     id = 184167,
                                     mount = 1304,
-                                },
-                            },
-                        },
-                        {
-                            name = "Morguliax <Lord of Decapitation>",
-                            id = 162849,
-                            quest = 60987,
-                            waypoint = {16.6, 50.6},
-                            reputation = 100,
-                            items = {
-                                {
-                                    id = 184292,
-                                    toy = true,
-                                },
-                            },
-                        },
-                        {
-                            name = "Orophea",
-                            id = 172577,
-                            quest = 61519,
-                            waypoint = {23.8, 21.6},
-                            reputation = 80,
-                            items = {
-                                {
-                                    id = 181794,
-                                    toy = true,
                                 },
                             },
                         },
@@ -100,11 +73,30 @@ ns.data = {
                             },
                         },
                         {
-                            name = "Adjutant Dekaris",
-                            id = 157964,
-                            quest = 57482,
-                            waypoint = {25.8, 31.2},
+                            name = "Eternas the Tormentor",
+                            id = 154330,
+                            quest = 57509,
+                            waypoint = {19.2, 46.0},
                             reputation = 80,
+                            items = {
+                                {
+                                    id = 183407,
+                                    pet = 3037,
+                                },
+                            },
+                        },
+                        {
+                            name = "Morguliax <Lord of Decapitation>",
+                            id = 162849,
+                            quest = 60987,
+                            waypoint = {16.6, 50.6},
+                            reputation = 100,
+                            items = {
+                                {
+                                    id = 184292,
+                                    toy = true,
+                                },
+                            },
                         },
                         {
                             name = "Apholeias, Herald of Loss",
@@ -122,6 +114,26 @@ ns.data = {
                                     item = true,
                                 },
                             },
+                        },
+                        {
+                            name = "Orophea",
+                            id = 172577,
+                            quest = 61519,
+                            waypoint = {23.8, 21.6},
+                            reputation = 80,
+                            items = {
+                                {
+                                    id = 181794,
+                                    toy = true,
+                                },
+                            },
+                        },
+                        {
+                            name = "Adjutant Dekaris",
+                            id = 157964,
+                            quest = 57482,
+                            waypoint = {25.8, 31.2},
+                            reputation = 80,
                         },
                         {
                             name = "Conjured Death",
@@ -177,19 +189,6 @@ ns.data = {
                                 {
                                     id = 182328,
                                     item = true,
-                                },
-                            },
-                        },
-                        {
-                            name = "Eternas the Tormentor",
-                            id = 154330,
-                            quest = 57509,
-                            waypoint = {19.2, 46.0},
-                            reputation = 80,
-                            items = {
-                                {
-                                    id = 183407,
-                                    pet = 3037,
                                 },
                             },
                         },
@@ -851,6 +850,18 @@ ns.data = {
                             },
                         },
                         {
+                            name = "Scrivener Lenua",
+                            id = 160675,
+                            quest = 58213,
+                            waypoint = {38.1, 69.0},
+                            items = {
+                                {
+                                    id = 180587,
+                                    pet = 2893,
+                                },
+                            },
+                        },
+                        {
                             name = "Hopecrusher",
                             id = 166679,
                             quest = 59900,
@@ -1078,18 +1089,6 @@ ns.data = {
                                 {
                                     id = 180585,
                                     pet = 2897,
-                                },
-                            },
-                        },
-                        {
-                            name = "Scrivener Lenua",
-                            id = 160675,
-                            quest = 58213,
-                            waypoint = {99.9, 99.9},
-                            items = {
-                                {
-                                    id = 180587,
-                                    pet = 2893,
                                 },
                             },
                         },
@@ -1884,5 +1883,8 @@ ns.data = {
             level = 40,
             day = 9,
         },
+    },
+    gorgedShadehoundDates = {
+
     },
 }

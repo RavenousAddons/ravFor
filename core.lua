@@ -54,7 +54,6 @@ function ravFor_OnEvent(self, event, arg, ...)
         ns:EnsureMacro()
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        local timestamp, subtype, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2 = CombatLogGetCurrentEventInfo()
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
             if ns.Content and ns.Content.rares then
                 ns:RefreshRares(ns.Content.rares)
