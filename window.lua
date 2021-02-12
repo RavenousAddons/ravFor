@@ -140,6 +140,8 @@ Window:SetScript("OnShow", function()
         relativePoint = "TOPLEFT",
         offsetY = 0,
     })
+    -- Great Vault
+    ns:CreateGreatVault()
     -- Covenant
     ns:CreateCovenant()
     -- PVP

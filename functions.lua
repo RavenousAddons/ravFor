@@ -28,6 +28,17 @@ end
 local skull = TextIcon(137025)
 local checkmark = TextIcon(628564)
 
+local function commaValue(amount)
+    local formatted = amount
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then
+            break
+        end
+    end
+    return formatted
+end
+
 function ns:PrettyPrint(message)
     DEFAULT_CHAT_FRAME:AddMessage("|cffffffff" .. ns.name .. "|r |cff" .. ns.color .. ns.expansion .. "|r|cffffffff:|r " .. message)
 end
@@ -195,6 +206,7 @@ function ns:CreateCovenant()
     anima:SetPoint("LEFT", renown, "RIGHT", medium, 0)
     anima:SetJustifyH("LEFT")
     anima.currency = 1813
+    anima.currencyColor = "95c3e1"
     ns:RegisterCurrency(anima, ns.Content)
     ns:RefreshCurrencies(ns.Content.currencies)
 
@@ -211,7 +223,7 @@ function ns:PushRenown(heading, label)
     local maxRenown = ns:GetMaxRenown()
 
     heading:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
-    label:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")) .. TextColor(" Renown", "ffffff"))
+    label:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff6666") or TextColor(renown, "ffffff")) .. TextColor(" Renown", ns.data.covenants[covenant].color))
 end
 
 function ns:RegisterRenown(data, parentFrame)
@@ -225,18 +237,38 @@ function ns:RefreshRenown(data)
     ns:PushRenown(data.heading, data.label)
 end
 
+function ns:CreateGreatVault()
+    if not C_WeeklyRewards.CanClaimRewards() then
+        return
+    end
+
+    local heading = ns.Content:CreateFontString(name .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(3847780) .. "  " .. TextColor("Great Vault", "8899c6"))
+
+    local Notice = ns.Content:CreateFontString(name .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
+    Notice:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    Notice:SetJustifyH("LEFT")
+    Notice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
+
+    prevControl = heading
+    return heading
+end
+
 function ns:CreateTorghast()
     local heading = ns.Content:CreateFontString(name .. "Torghast", "ARTWORK", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
     heading:SetJustifyH("LEFT")
-    heading:SetText(TextIcon(3642306) .. "  " .. TextColor("Torghast", "ffffff"))
+    heading:SetText(TextIcon(3642306) .. "  " .. TextColor("Torghast", "b0ccd8"))
 
-    local label = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
-    label:SetPoint("LEFT", heading, "RIGHT", large, 0)
-    label:SetJustifyH("LEFT")
+    local soulAsh = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
+    soulAsh:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    soulAsh:SetJustifyH("LEFT")
 
-    label.currency = 1828
-    ns:RegisterCurrency(label, ns.Content)
+    soulAsh.currency = 1828
+    soulAsh.currencyColor = "b0ccd8"
+    ns:RegisterCurrency(soulAsh, ns.Content)
     ns:RefreshCurrencies(ns.Content.currencies)
 
     prevControl = heading
@@ -247,37 +279,26 @@ function ns:CreatePVP()
     local heading = ns.Content:CreateFontString(name .. "PVP", "ARTWORK", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
     heading:SetJustifyH("LEFT")
-    heading:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "ffffff"))
+    heading:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "f5c87a"))
 
     local honor = ns.Content:CreateFontString(name .. "Honor", "ARTWORK", "GameFontNormal")
     honor:SetPoint("LEFT", heading, "RIGHT", large, 0)
     honor:SetJustifyH("LEFT")
     honor.currency = 1792
+    honor.currencyColor = "f5c87a"
     ns:RegisterCurrency(honor, ns.Content)
 
     local conquest = ns.Content:CreateFontString(name .. "Conquest", "ARTWORK", "GameFontNormal")
     conquest:SetPoint("LEFT", honor, "RIGHT", medium, 0)
     conquest:SetJustifyH("LEFT")
     conquest.currency = 1602
+    conquest.currencyColor = "f5c87a"
     ns:RegisterCurrency(conquest, ns.Content)
 
     ns:RefreshCurrencies(ns.Content.currencies)
 
     prevControl = heading
     return heading
-end
-
-function ns:RegisterSoulAsh(label, parentFrame)
-    if (not parentFrame) or (not data) then
-        return
-    end
-    parentFrame.soulAsh = label
-end
-
-function ns:RefreshSoulAsh(label)
-    local soulAsh = C_CurrencyInfo.GetCurrencyInfo(1828)
-
-    label:SetText(TextColor(soulAsh.quantity .. " Soul Ash", "ffffff"))
 end
 
 function ns:CreateZone(zone)
@@ -302,6 +323,7 @@ function ns:CreateZone(zone)
         label:SetPoint("LEFT", heading, "RIGHT", large, 0)
         label:SetJustifyH("LEFT")
         label.currency = zone.currency
+        label.currencyColor = zoneColor
         ns:RegisterCurrency(label, ns.Content)
         ns:RefreshCurrencies(ns.Content.currencies)
     end
@@ -321,7 +343,9 @@ end
 function ns:RefreshCurrencies(currencies)
     for _, label in ipairs(currencies) do
         local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
-        label:SetText(TextColor(currency.quantity .. (currency.maxQuantity > 0 and "/" .. currency.maxQuantity or "") .. " " .. string.gsub(currency.name, "Reservoir ", ""), "ffffff"))
+        local quantity = commaValue(currency.quantity)
+        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned) or commaValue(currency.maxQuantity)
+        label:SetText(TextColor(quantity .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(string.gsub(currency.name, "Reservoir ", ""), (label.currencyColor and label.currencyColor or "ffffff")))
     end
 end
 
