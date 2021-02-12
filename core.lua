@@ -59,6 +59,7 @@ function ravFor_OnEvent(self, event, arg, ...)
             ns:RefreshCurrencies(ns.Content.currencies)
         end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        local _, subtype = CombatLogGetCurrentEventInfo()
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
             if ns.Content and ns.Content.rares then
                 ns:RefreshRares(ns.Content.rares)
