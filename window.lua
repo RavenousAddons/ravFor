@@ -140,35 +140,16 @@ Window:SetScript("OnShow", function()
         relativePoint = "TOPLEFT",
         offsetY = 0,
     })
-    -- Renown
-    ns:CreateRenown()
+    -- Covenant
+    ns:CreateCovenant()
+    -- PVP
+    ns:CreatePVP()
+    -- Torghast
+    ns:CreateTorghast()
     -- For each Zone
     for i, zone in ipairs(zones) do
-        local mapName = C_Map.GetMapInfo(zone.id).name
-        local zoneCovenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
-        local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-        local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
         -- Zone
-        ns:CreateLabel({
-            name = name .. "Zone" .. zone.id,
-            parent = Content,
-            label = TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor),
-            offsetY = -gigantic,
-            fontObject = "GameFontNormalLarge",
-        })
-        if zoneCovenant then
-            -- Covenant for Zone
-            ns:CreateLabel({
-                name = name .. "Zone" .. zone.id .. "Covenant" .. zone.covenant,
-                parent = Content,
-                label = TextColor("(" .. zoneCovenant .. ")", zoneColor),
-                initialPoint = "LEFT",
-                relativePoint = "RIGHT",
-                offsetX = small,
-                offsetY = 0,
-                ignorePlacement = true,
-            })
-        end
+        ns:CreateZone(zone)
         -- For each Rare in the Zone
         local j = 0
         for _, rare in ipairs(zone.rares) do

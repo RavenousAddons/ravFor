@@ -10,6 +10,7 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
+    self:RegisterEvent("CHAT_MSG_CURRENCY")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
     self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
@@ -53,6 +54,10 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:EnsureMacro()
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    elseif event == "CHAT_MSG_CURRENCY" then
+        if ns.Content and ns.Content.currencies then
+            ns:RefreshCurrencies(ns.Content.currencies)
+        end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
             if ns.Content and ns.Content.rares then

@@ -168,8 +168,6 @@ function ns:CreateLabel(cfg)
     label:SetText(cfg.label)
     if cfg.width then
         label:SetWidth(cfg.width)
-    else
-        label:SetWidth(ns.Window:GetWidth() - (medium * 2) - 18)
     end
 
     if not cfg.ignorePlacement then
@@ -178,21 +176,27 @@ function ns:CreateLabel(cfg)
     return label
 end
 
-function ns:CreateRenown()
-    local heading = ns.Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormalLarge")
+function ns:CreateCovenant()
+    local heading = ns.Content:CreateFontString(name .. "Covenant", "ARTWORK", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
     heading:SetJustifyH("LEFT")
 
-    local label = ns.Content:CreateFontString(name .. "RenownLevel", "ARTWORK", "GameFontNormal")
-    label:SetPoint("LEFT", heading, "RIGHT", large, 0)
-    label:SetJustifyH("LEFT")
+    local renown = ns.Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormal")
+    renown:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    renown:SetJustifyH("LEFT")
 
-    ns:PushRenown(heading, label)
-
+    ns:PushRenown(heading, renown)
     ns:RegisterRenown({
         heading = heading,
-        label = label,
+        label = renown,
     }, ns.Content)
+
+    local anima = ns.Content:CreateFontString(name .. "Anima", "ARTWORK", "GameFontNormal")
+    anima:SetPoint("LEFT", renown, "RIGHT", medium, 0)
+    anima:SetJustifyH("LEFT")
+    anima.currency = 1813
+    ns:RegisterCurrency(anima, ns.Content)
+    ns:RefreshCurrencies(ns.Content.currencies)
 
     prevControl = heading
     return heading
@@ -206,8 +210,8 @@ function ns:PushRenown(heading, label)
     local renown = C_CovenantSanctumUI.GetRenownLevel()
     local maxRenown = ns:GetMaxRenown()
 
-    heading:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color) .. TextColor(" Renown", "ffffff"))
-    label:SetText(TextColor("Level ", "ffffff") .. (renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")))
+    heading:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
+    label:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff3333") or TextColor(renown, "ffffff")) .. TextColor(" Renown", "ffffff"))
 end
 
 function ns:RegisterRenown(data, parentFrame)
@@ -219,6 +223,106 @@ end
 
 function ns:RefreshRenown(data)
     ns:PushRenown(data.heading, data.label)
+end
+
+function ns:CreateTorghast()
+    local heading = ns.Content:CreateFontString(name .. "Torghast", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(3642306) .. "  " .. TextColor("Torghast", "ffffff"))
+
+    local label = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
+    label:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    label:SetJustifyH("LEFT")
+
+    label.currency = 1828
+    ns:RegisterCurrency(label, ns.Content)
+    ns:RefreshCurrencies(ns.Content.currencies)
+
+    prevControl = heading
+    return heading
+end
+
+function ns:CreatePVP()
+    local heading = ns.Content:CreateFontString(name .. "PVP", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "ffffff"))
+
+    local honor = ns.Content:CreateFontString(name .. "Honor", "ARTWORK", "GameFontNormal")
+    honor:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    honor:SetJustifyH("LEFT")
+    honor.currency = 1792
+    ns:RegisterCurrency(honor, ns.Content)
+
+    local conquest = ns.Content:CreateFontString(name .. "Conquest", "ARTWORK", "GameFontNormal")
+    conquest:SetPoint("LEFT", honor, "RIGHT", medium, 0)
+    conquest:SetJustifyH("LEFT")
+    conquest.currency = 1602
+    ns:RegisterCurrency(conquest, ns.Content)
+
+    ns:RefreshCurrencies(ns.Content.currencies)
+
+    prevControl = heading
+    return heading
+end
+
+function ns:RegisterSoulAsh(label, parentFrame)
+    if (not parentFrame) or (not data) then
+        return
+    end
+    parentFrame.soulAsh = label
+end
+
+function ns:RefreshSoulAsh(label)
+    local soulAsh = C_CurrencyInfo.GetCurrencyInfo(1828)
+
+    label:SetText(TextColor(soulAsh.quantity .. " Soul Ash", "ffffff"))
+end
+
+function ns:CreateZone(zone)
+    local mapName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
+
+    local heading = ns.Content:CreateFontString(name .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor))
+
+    if zone.covenant then
+        local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Covenant" .. zone.covenant, "ARTWORK", "GameFontNormal")
+        label:SetPoint("LEFT", heading, "RIGHT", large, 0)
+        label:SetJustifyH("LEFT")
+        label:SetText(TextColor("(" .. C_Covenants.GetCovenantData(zone.covenant).name .. ")", zoneColor))
+    end
+
+    if zone.currency then
+        local label = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
+        label:SetPoint("LEFT", heading, "RIGHT", large, 0)
+        label:SetJustifyH("LEFT")
+        label.currency = zone.currency
+        ns:RegisterCurrency(label, ns.Content)
+        ns:RefreshCurrencies(ns.Content.currencies)
+    end
+
+    prevControl = heading
+    return heading
+end
+
+function ns:RegisterCurrency(currency, parentFrame)
+    if (not parentFrame) or (not currency) then
+        return
+    end
+    parentFrame.currencies = parentFrame.currencies or {}
+    table.insert(parentFrame.currencies, currency)
+end
+
+function ns:RefreshCurrencies(currencies)
+    for _, label in ipairs(currencies) do
+        local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
+        label:SetText(TextColor(currency.quantity .. (currency.maxQuantity > 0 and "/" .. currency.maxQuantity or "") .. " " .. string.gsub(currency.name, "Reservoir ", ""), "ffffff"))
+    end
 end
 
 function ns:CreateRare(i, zone, rare, items, covenant)

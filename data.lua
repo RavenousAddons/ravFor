@@ -46,6 +46,7 @@ ns.data = {
                     id = 1543,
                     color = "e5cc80",
                     icon = "3743739",
+                    currency = 1767,
                     rares = {
                         {
                             hidden = true,
