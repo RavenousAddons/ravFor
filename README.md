@@ -2,7 +2,7 @@
 
 *Keep track of your progress through the expansion!*
 
-![The Addon's Interface](https://github.com/RavenousAddons/assets/raw/main/ravFor0.2.0.gif)
+![The Addon's Interface](https://github.com/RavenousAddons/assets/raw/main/ravFor0.6.0.png)
 
 # What is Ravenous For … for?
 
