@@ -204,6 +204,7 @@ Window:SetScript("OnShow", function()
             name = name .. "Notes",
             parent = Content,
             label = TextIcon(1506451) .. "  " .. TextColor("Notes", "ffffff"),
+            width = Window:GetWidth() - (medium * 2) - 18,
             offsetY = -gigantic,
             fontObject = "GameFontNormalLarge",
         })
@@ -212,6 +213,7 @@ Window:SetScript("OnShow", function()
                 name = name .. "Note" .. i,
                 parent = Content,
                 label = TextColor(note, "ffffff"),
+                width = Window:GetWidth() - (medium * 2) - 18,
                 offsetY = -medium,
             })
         end

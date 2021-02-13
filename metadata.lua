@@ -6,5 +6,5 @@ ns.notes = GetAddOnMetadata(name, "Notes")
 ns.version = GetAddOnMetadata(name, "Version")
 ns.color = "ffc478"
 ns.command = "ravfor"
-ns.icon = "3752121"
+ns.icon = "3257863"
 ns.expansion = "Shadowlands"

@@ -319,7 +319,7 @@ function ns:CreateZone(zone)
     end
 
     if zone.currency then
-        local label = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
+        local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
         label:SetPoint("LEFT", heading, "RIGHT", large, 0)
         label:SetJustifyH("LEFT")
         label.currency = zone.currency
@@ -344,7 +344,7 @@ function ns:RefreshCurrencies(currencies)
     for _, label in ipairs(currencies) do
         local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
         local quantity = commaValue(currency.quantity)
-        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned) or commaValue(currency.maxQuantity)
+        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
         label:SetText(TextColor(quantity .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(string.gsub(currency.name, "Reservoir ", ""), (label.currencyColor and label.currencyColor or "ffffff")))
     end
 end
