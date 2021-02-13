@@ -75,8 +75,8 @@ function ravFor_OnEvent(self, event, arg, ...)
             ns:RefreshItems(ns.Content.items)
         end
     elseif event == "COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED" then
-        if ns.Content and ns.Content.renown then
-            ns:RefreshRenown(ns.Content.renown)
+        if ns.Content and ns.Content.covenant and ns.Content.renown then
+            ns:RefreshCovenant(ns.Content.covenant, ns.Content.renown)
         end
     end
 end
