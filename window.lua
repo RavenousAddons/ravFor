@@ -39,7 +39,7 @@ Window:SetMovable(true)
 Window:SetClampedToScreen(true)
 Window:SetResizable(true)
 Window:SetMinResize(width, height)
-Window:SetMinResize(width, height)
+Window:SetMaxResize(width*1.5, height*2)
 Window:RegisterForDrag("LeftButton")
 Window:SetScript("OnMouseDown", function(self, button)
     self:StartMoving()
@@ -59,8 +59,6 @@ Close:RegisterForClicks("AnyUp")
 Close:SetScript("OnMouseUp", function(self)
     Window:StopMovingOrSizing()
     Window:Hide()
-    Window:SetWidth(width)
-    Window:SetHeight(height)
 end)
 
 local Settings = CreateFrame("Button", name .. "WindowSettings", Window, "UIPanelButtonTemplate")
@@ -73,6 +71,11 @@ Settings:SetScript("OnMouseUp", function(self)
     InterfaceOptionsFrame_OpenToCategory(ns.Options)
     InterfaceOptionsFrame_OpenToCategory(ns.Options)
 end)
+
+local Scroller = CreateFrame("ScrollFrame", name .. "WindowScroller", Window, "UIPanelScrollFrameTemplate")
+Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
+Scroller:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, large)
 
 local Resize = CreateFrame("Button", name .. "WindowResize", Window)
 Resize:SetWidth(10)
@@ -87,17 +90,12 @@ end)
 Resize:SetScript("OnMouseUp", function(self)
     if self.isMoving then
         Window:StopMovingOrSizing()
-        -- Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-        -- Scroller:SetHeight(Window:GetHeight() - small - (medium * 2) - (large * 2))
+        Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+        Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
         self.isMoving = false
         self.hasMoved = true
     end
 end)
-
-local Scroller = CreateFrame("ScrollFrame", name .. "WindowScroller", Window, "UIPanelScrollFrameTemplate")
-Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
-Scroller:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, large)
 
 local Content = CreateFrame("Frame", name .. "WindowScrollerContent", Scroller)
 Content:SetWidth(1)
@@ -106,6 +104,8 @@ Scroller:SetScrollChild(Content)
 
 Window:Hide()
 Window:SetScript("OnShow", function()
+    Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+    Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
     -- Window Title
     ns:CreateLabel({
         name = name .. "Heading",
@@ -142,84 +142,24 @@ Window:SetScript("OnShow", function()
     })
     -- Great Vault
     ns:CreateGreatVault()
-    -- Covenant
-    ns:CreateCovenant()
     -- PVP
     ns:CreatePVP()
+    -- Covenant
+    ns:CreateCovenant()
     -- Torghast
     ns:CreateTorghast()
     -- For each Zone
     for i, zone in ipairs(zones) do
         -- Zone
         ns:CreateZone(zone)
-        -- For each Rare in the Zone
-        local j = 0
-        for _, rare in ipairs(zone.rares) do
-            if rare.hidden then
-            elseif rare.waypoint[1] > 99 and rare.waypoint[2] > 99 then
-            else
-                local items = {}
-                if rare.items then
-                    -- For each Item dropped by the Rare in the Zone
-                    for _, item in ipairs(rare.items) do
-                        if not GetItemInfo(item.id) then
-                        elseif RAVFOR_data.options.showTransmog == false and item.transmog then
-                        elseif RAVFOR_data.options.showMounts == false and item.mount then
-                        elseif RAVFOR_data.options.showPets == false and item.pet then
-                        elseif RAVFOR_data.options.showToys == false and item.toy then
-                        elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
-                        elseif RAVFOR_data.options.showOtherCovenantItems == false and item.covenantOnly and (covenant ~= zone.covenant) then
-                        elseif RAVFOR_data.options.showOwned == false and ns:IsItemOwned(item) then
-                        else
-                            -- Insert Item into Items
-                            table.insert(items, item)
-                        end
-                    end
-                end
-                if RAVFOR_data.options.showNoDrops == false and #items == 0 and not rare.reptuation then
-                else
-                    -- Rare
-                    j = j + 1-- Build a list of items matching user options
-                    ns:CreateRare(j, zone, rare, items, covenant)
-                    if RAVFOR_data.options.showReputation == true and rare.reputation then
-                        ns:CreateLabel({
-                            name = name .. "Rare" .. rare.id .. "Reputation",
-                            parent = Content,
-                            label = "    " .. TextColor("+ " .. rare.reputation .. " reputation with Ve'nari", "8080ff"),
-                            offsetY = -small,
-                        })
-                    end
-                    if #items > 0 then
-                        for _, item in ipairs(items) do
-                            ns:CreateItem(zone, rare, item, covenant)
-                        end
-                    end
-                end
-            end
-        end
     end
     -- Notes
-    if notes then
-        ns:CreateLabel({
-            name = name .. "Notes",
-            parent = Content,
-            label = TextIcon(1506451) .. "  " .. TextColor("Notes", "ffffff"),
-            width = Window:GetWidth() - (medium * 2) - 18,
-            offsetY = -gigantic,
-            fontObject = "GameFontNormalLarge",
-        })
-        for i, note in ipairs(notes) do
-            ns:CreateLabel({
-                name = name .. "Note" .. i,
-                parent = Content,
-                label = TextColor(note, "ffffff"),
-                width = Window:GetWidth() - (medium * 2) - 18,
-                offsetY = -medium,
-            })
-        end
-    end
+    ns:CreateNotes(notes)
 
-    Window:SetScript("OnShow", nil)
+    Window:SetScript("OnShow", function()
+        Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
+        Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
+    end)
 end)
 ns.Window = Window
 ns.Content = Content

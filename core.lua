@@ -11,6 +11,7 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
     self:RegisterEvent("CHAT_MSG_CURRENCY")
+    self:RegisterEvent("PLAYER_FLAGS_CHANGED")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
     self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
@@ -57,6 +58,10 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "CHAT_MSG_CURRENCY" then
         if ns.Content and ns.Content.currencies then
             ns:RefreshCurrencies(ns.Content.currencies)
+        end
+    elseif event == "PLAYER_FLAGS_CHANGED" then
+        if ns.Content and ns.Content.warmode then
+            ns:RefreshWarmode(ns.Content.warmode)
         end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local _, subtype = CombatLogGetCurrentEventInfo()

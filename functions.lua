@@ -15,6 +15,9 @@ local medium = 12
 local large = 16
 local gigantic = 24
 
+local faction, _ = UnitFactionGroup("player")
+local factionCity = (faction == "Alliance" and "Stormwind" or "Orgrimmar")
+
 local function TextColor(text, color)
     color = color and color or "bbbbbb"
     return "|cff" .. color .. text .. "|r"
@@ -189,7 +192,7 @@ end
 
 function ns:CreateCovenant()
     local heading = ns.Content:CreateFontString(name .. "Covenant", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-medium)
     heading:SetJustifyH("LEFT")
 
     local renown = ns.Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormal")
@@ -297,8 +300,43 @@ function ns:CreatePVP()
 
     ns:RefreshCurrencies(ns.Content.currencies)
 
+    local warmode = CreateFrame("Button", name .. "Warmode", ns.Content)
+    warmode:SetWidth(width/2)
+    warmode:SetHeight(large)
+    warmode:SetPoint("TOPLEFT", honor, "BOTTOMLEFT", 0, -medium)
+
+    local label = warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    label:SetPoint("TOPLEFT", 0, 0)
+    label:SetWidth(warmode:GetWidth())
+    label:SetJustifyH("LEFT")
+
+    ns:RegisterWarmode(label, ns.Content)
+    ns:RefreshWarmode(ns.Content.warmode)
+    warmode:EnableMouse(true)
+    warmode:SetScript("OnClick", function()
+        if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
+            C_PvP.ToggleWarMode()
+        elseif C_PvP.IsWarModeDesired() then
+            RaidNotice_AddMessage(RaidBossEmoteFrame, "You must go to a rested area to disable War Mode.", ChatTypeInfo["RAID_WARNING"])
+        else
+            RaidNotice_AddMessage(RaidBossEmoteFrame, "You must go to " .. factionCity .. " to enable War Mode.", ChatTypeInfo["RAID_WARNING"])
+        end
+    end)
+
     prevControl = heading
     return heading
+end
+
+function ns:RegisterWarmode(warmode, parentFrame)
+    if (not parentFrame) or (not warmode) then
+        return
+    end
+    parentFrame.warmode = warmode
+end
+
+function ns:RefreshWarmode(label)
+    local warmode = C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r"
+    label:SetText(TextColor("Warmode is " .. warmode .. ".", "ffffff"))
 end
 
 function ns:CreateZone(zone)
@@ -310,6 +348,7 @@ function ns:CreateZone(zone)
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor))
+    prevControl = heading
 
     if zone.covenant then
         local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Covenant" .. zone.covenant, "ARTWORK", "GameFontNormal")
@@ -328,7 +367,39 @@ function ns:CreateZone(zone)
         ns:RefreshCurrencies(ns.Content.currencies)
     end
 
-    prevControl = heading
+    -- For each Rare in the Zone
+    local j = 0
+    for _, rare in ipairs(zone.rares) do
+        if rare.hidden then
+        elseif rare.waypoint[1] > 99 and rare.waypoint[2] > 99 then
+        else
+            local items = {}
+            if rare.items then
+                -- For each Item dropped by the Rare in the Zone
+                for _, item in ipairs(rare.items) do
+                    if not GetItemInfo(item.id) then
+                    elseif RAVFOR_data.options.showTransmog == false and item.transmog then
+                    elseif RAVFOR_data.options.showMounts == false and item.mount then
+                    elseif RAVFOR_data.options.showPets == false and item.pet then
+                    elseif RAVFOR_data.options.showToys == false and item.toy then
+                    elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
+                    elseif RAVFOR_data.options.showOtherCovenantItems == false and item.covenantOnly and (covenant ~= zone.covenant) then
+                    elseif RAVFOR_data.options.showOwned == false and ns:IsItemOwned(item) then
+                    else
+                        -- Insert Item into Items
+                        table.insert(items, item)
+                    end
+                end
+            end
+            if RAVFOR_data.options.showNoDrops == false and #items == 0 and not rare.reptuation then
+            else
+                -- Rare
+                j = j + 1
+                ns:CreateRare(j, zone, rare, items, covenant)
+            end
+        end
+    end
+
     return heading
 end
 
@@ -361,6 +432,7 @@ function ns:CreateRare(i, zone, rare, items, covenant)
         -- Send the Rare to Party/Raid Members
         ns:SendTarget(zone, rare)
     end)
+    prevControl = button
 
     local zoneCovenant = zone.covenant and C_Covenants.GetCovenantData(zone.covenant).name or nil
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
@@ -379,7 +451,21 @@ function ns:CreateRare(i, zone, rare, items, covenant)
     label.rare = rare
     ns:RegisterRare(label, ns.Content)
 
-    prevControl = button
+    if RAVFOR_data.options.showReputation == true and rare.reputation then
+        ns:CreateLabel({
+            name = name .. "Rare" .. rare.id .. "Reputation",
+            parent = ns.Content,
+            label = "    " .. TextColor("+ " .. rare.reputation .. " reputation with Ve'nari", "8080ff"),
+            offsetY = -small,
+        })
+    end
+
+    if #items > 0 then
+        for _, item in ipairs(items) do
+            ns:CreateItem(zone, rare, item, covenant)
+        end
+    end
+
     return button
 end
 
@@ -500,4 +586,28 @@ function ns:IsItemOwned(item)
         return isCompleted
     end
     return false
+end
+
+function ns:CreateNotes(notes)
+    if not #notes then
+        return
+    end
+
+    local heading = ns.Content:CreateFontString(name .. "Notes", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "ffffff"))
+    prevControl = heading
+
+    for i, note in ipairs(notes) do
+        ns:CreateLabel({
+            name = name .. "Note" .. i,
+            parent = ns.Content,
+            label = TextColor(note, "ffffff"),
+            width = ns.Window:GetWidth() - (medium * 2) - 18,
+            offsetY = -medium,
+        })
+    end
+
+    return heading
 end
