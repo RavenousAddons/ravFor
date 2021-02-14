@@ -84,18 +84,17 @@ end
 
 local function IsItemOwned(item)
     if item.mount then
-        local _, _, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(item.mount)
-        return isCollected
+        return select(11, C_MountJournal.GetMountInfoByID(item.mount))
     elseif item.pet then
-        local isCollected, _, _ = C_PetJournal.GetPetSummonInfo(item.pet)
-        return isCollected
-    -- elseif item.toy then
-    --
+        return C_PetJournal.GetNumCollectedInfo(item.pet) > 0
+    elseif item.toy then
+        return PlayerHasToy(item.id)
     elseif item.quest then
         return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
     elseif item.achievement then
-        local _, _, _, isCompleted = GetAchievementInfo(item.achievement)
-        return isCompleted
+        return select(4, GetAchievementInfo(item.achievement))
+    else
+        return C_TransmogCollection.PlayerHasTransmog(item.id)
     end
     return false
 end

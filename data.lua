@@ -900,6 +900,9 @@ ns.data = {
                             waypoint = {62.2, 47.0},
                             items = {
                                 {
+                                    id = 183739,
+                                },
+                                {
                                     id = 180582,
                                     mount = 1379,
                                 },
@@ -1789,11 +1792,94 @@ ns.data = {
                 "What isn't working (yet):\n- tracking learned appearances (transmog)\n- tracking learned toys\n- tracking when certain world quests/world bosses are available\n- ability to reorder lists and list items\n- some rares still missing coordinates",
             },
         },
+        ["Battle for Azeroth"] = {
+            zones = {
+                {
+                    -- Mechagon
+                    id = 1462,
+                    color = "d8d3cc",
+                    icon = "2620862",
+                    rares = {
+                        {
+                            name = "Arachnoid Harvester",
+                            id = 151934,
+                            quest = 55512,
+                            waypoint = {51.6, 41.6},
+                            items = {
+                                {
+                                    id = 168823,
+                                    mount = 1229,
+                                },
+                            },
+                        },
+                        {
+                            name = "Rustfeather",
+                            id = 152182,
+                            quest = 55811,
+                            waypoint = {63.8, 78.0},
+                            items = {
+                                {
+                                    id = 168370,
+                                    mount = 1248,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    -- Nazjatar
+                    id = 1355,
+                    color = "4db3ea",
+                    icon = "3012068",
+                    currency = 1721,
+                    rares = {
+                        {
+                            name = "Soundless",
+                            id = 152290,
+                            quest = 56298,
+                            waypoint = {57.6, 52.2},
+                            items = {
+                                {
+                                    id = 169163,
+                                    mount = 1257,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
     targetMessages = {
         "Moving out to",
         "Let's go and delete",
         "We ride for",
+    },
+    currencies = {
+        {
+            id = 1792, -- Honor
+            color = "f5c87a",
+        },
+        {
+            id = 1602, -- Conquest
+            color = "f5c87a",
+        },
+        {
+            id = 1721, -- Prismatic Manapearl
+            color = "4db3ea",
+        },
+        {
+            id = 1813, -- Anima
+            color = "95c3e1",
+        },
+        {
+            id = 1828, -- Soul Ash
+            color = "b0ccd8",
+        },
+        {
+            id = 1767, -- Stygia
+            color = "e5cc80",
+        },
     },
     covenants = {
         -- Kyrian

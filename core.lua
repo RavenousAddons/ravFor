@@ -11,9 +11,12 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
     self:RegisterEvent("CHAT_MSG_CURRENCY")
+    self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:RegisterEvent("PLAYER_FLAGS_CHANGED")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
+    self:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
+    self:RegisterEvent("NEW_TOY_ADDED")
     self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
 end
 
@@ -55,7 +58,7 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:EnsureMacro()
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    elseif event == "CHAT_MSG_CURRENCY" then
+    elseif event == "CHAT_MSG_CURRENCY" or event == "CURRENCY_DISPLAY_UPDATE" then
         if ns.Content and ns.Content.currencies then
             ns:RefreshCurrencies(ns.Content.currencies)
         end
@@ -70,7 +73,7 @@ function ravFor_OnEvent(self, event, arg, ...)
                 ns:RefreshRares(ns.Content.rares)
             end
         end
-    elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" then
+    elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" or event == "PET_JOURNAL_LIST_UPDATE" or event == "NEW_TOY_ADDED" then
         if ns.Content and ns.Content.items then
             ns:RefreshItems(ns.Content.items)
         end

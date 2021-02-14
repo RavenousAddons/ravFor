@@ -47,6 +47,7 @@ end)
 Window:SetScript("OnMouseUp", function(self)
     self:StopMovingOrSizing()
 end)
+tinsert(UISpecialFrames, Window:GetName())
 
 local WindowBackground = Window:CreateTexture(nil, "BACKGROUND")
 WindowBackground:SetColorTexture(0, 0, 0, 0.85)
