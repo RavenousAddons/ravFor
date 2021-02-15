@@ -71,14 +71,14 @@ Options:SetScript("OnShow", function()
         {
             type = "Checkbox",
             parent = Options,
-            label = L.Macro,
+            label = L.MacroLabel,
             tooltip = string.format(L.MacroTooltip, ns.name),
             var = "macro",
         },
         {
             type = "Checkbox",
             parent = Options,
-            label = L.Reputation,
+            label = L.ReputationLabel,
             tooltip = L.ReputationTooltip,
             var = "showReputation",
             needsRestart = true,
@@ -86,7 +86,7 @@ Options:SetScript("OnShow", function()
         {
             type = "Checkbox",
             parent = Options,
-            label = L.NoDrops,
+            label = L.NoDropsLabel,
             tooltip = L.NoDropsTooltip,
             var = "showNoDrops",
             needsRestart = true,
@@ -94,7 +94,7 @@ Options:SetScript("OnShow", function()
         {
             type = "Checkbox",
             parent = Options,
-            label = L.CannotUse,
+            label = L.CannotUseLabel,
             tooltip = L.CannotUseTooltip,
             var = "showCannotUse",
             needsRestart = true,
@@ -102,7 +102,7 @@ Options:SetScript("OnShow", function()
         -- {
         --     type = "Checkbox",
         --     parent = Options,
-        --     label = L.Collected,
+        --     label = L.CollectedLabel,
         --     tooltip = L.CollectedTooltip,
         --     var = "showOwned",
         -- },

@@ -203,31 +203,27 @@ function ns:CreateCheckbox(cfg)
     return checkbox
 end
 
-function ns:RegisterControl(control, parentFrame)
-    if (not parentFrame) or (not control) then
-        return
-    end
-    parentFrame.controls = parentFrame.controls or {}
-    table.insert(parentFrame.controls, control)
+function ns:RegisterControl(control)
+    if not control then return end
+    ns.controls = ns.controls or {}
+    table.insert(ns.controls, control)
 end
 
-function ns:RefreshControls(controls)
-    for _, control in pairs(controls) do
+function ns:RefreshControls()
+    for _, control in pairs(ns.controls) do
         control:SetValue(control)
         control.oldValue = control:GetValue()
     end
 end
 
-function ns:RegisterCurrency(currency, parentFrame)
-    if (not parentFrame) or (not currency) then
-        return
-    end
-    parentFrame.currencies = parentFrame.currencies or {}
-    table.insert(parentFrame.currencies, currency)
+function ns:RegisterCurrency(currency)
+    if not currency then return end
+    ns.currencies = ns.currencies or {}
+    table.insert(ns.currencies, currency)
 end
 
-function ns:RefreshCurrencies(currencies)
-    for _, label in ipairs(currencies) do
+function ns:RefreshCurrencies()
+    for _, label in ipairs(ns.currencies) do
         local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
         local quantity = currency.discovered and currency.quantity or 0
         local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
@@ -235,16 +231,14 @@ function ns:RefreshCurrencies(currencies)
     end
 end
 
-function ns:RegisterFaction(faction, parentFrame)
-    if (not parentFrame) or (not faction) then
-        return
-    end
-    parentFrame.factions = parentFrame.factions or {}
-    table.insert(parentFrame.factions, faction)
+function ns:RegisterFaction(faction)
+    if not faction then return end
+    ns.factions = ns.factions or {}
+    table.insert(ns.factions, faction)
 end
 
-function ns:RefreshFactions(factions)
-    for _, label in ipairs(factions) do
+function ns:RefreshFactions()
+    for _, label in ipairs(ns.factions) do
         local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, _, _ = GetFactionInfoByID(label.faction)
         local quantity = commaValue(reputation - reputationMin)
         label:SetText(TextColor(string.format(L.ReputationWith, reputation < reputationMax and quantity .. "/" .. commaValue(reputationMin) or quantity, TextColor(factionName, label.color and label.color or "ffffff")), "ffffff"))
@@ -255,29 +249,29 @@ end
 -- PVP
 ---
 
-function ns:CreatePVP()
-    local heading = ns.Content:CreateFontString(name .. "PVP", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+function ns:CreatePVP(Content)
+    local heading = Content:CreateFontString(name .. "PVP", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", Content, "TOPLEFT", 0, -small)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "f5c87a"))
 
-    local honor = ns.Content:CreateFontString(name .. "Honor", "ARTWORK", "GameFontNormal")
+    local honor = Content:CreateFontString(name .. "Honor", "ARTWORK", "GameFontNormal")
     honor:SetPoint("LEFT", heading, "RIGHT", large, 0)
     honor:SetJustifyH("LEFT")
     honor.currency = 1792
     honor.color = "f5c87a"
-    ns:RegisterCurrency(honor, ns.Content)
+    ns:RegisterCurrency(honor)
 
-    local conquest = ns.Content:CreateFontString(name .. "Conquest", "ARTWORK", "GameFontNormal")
+    local conquest = Content:CreateFontString(name .. "Conquest", "ARTWORK", "GameFontNormal")
     conquest:SetPoint("LEFT", honor, "RIGHT", medium, 0)
     conquest:SetJustifyH("LEFT")
     conquest.currency = 1602
     conquest.color = "f5c87a"
-    ns:RegisterCurrency(conquest, ns.Content)
+    ns:RegisterCurrency(conquest)
 
-    ns:RefreshCurrencies(ns.Content.currencies)
+    ns:RefreshCurrencies()
 
-    local warmode = CreateFrame("Button", name .. "Warmode", ns.Content)
+    local warmode = CreateFrame("Button", name .. "Warmode", Content)
     warmode:SetWidth(width/2)
     warmode:SetHeight(large)
     warmode:SetPoint("TOPLEFT", honor, "BOTTOMLEFT", 0, -medium)
@@ -287,8 +281,8 @@ function ns:CreatePVP()
     label:SetWidth(warmode:GetWidth())
     label:SetJustifyH("LEFT")
 
-    ns:RegisterWarmode(label, ns.Content)
-    ns:RefreshWarmode(ns.Content.warmode)
+    ns:RegisterWarmode(label)
+    ns:RefreshWarmode()
     warmode:EnableMouse(true)
     warmode:SetScript("OnClick", function()
         if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
@@ -304,29 +298,28 @@ function ns:CreatePVP()
     return heading
 end
 
-function ns:RegisterWarmode(warmode, parentFrame)
-    if (not parentFrame) or (not warmode) then
-        return
-    end
-    parentFrame.warmode = warmode
+function ns:RegisterWarmode(warmode)
+    if not warmode then return end
+    ns.warmode = warmode
 end
 
-function ns:RefreshWarmode(label)
+function ns:RefreshWarmode()
     local warmode = C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r"
-    label:SetText(TextColor("Warmode is " .. warmode .. ".", "ffffff"))
+    ns.warmode:SetText(TextColor("Warmode is " .. warmode .. ".", "ffffff"))
 end
 
 ---
 -- Zone
 ---
 
-function ns:CreateZone(zone)
+function ns:CreateZone(Content, offset, zone)
+    offset = offset and offset or 0
     local mapName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
 
-    local heading = ns.Content:CreateFontString(name .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    local heading = Content:CreateFontString(name .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor))
     prevControl = heading
@@ -335,7 +328,7 @@ function ns:CreateZone(zone)
         local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
         local zoneCovenant = TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
         local zonePhrase = TextColor(string.format(covenants[zone.covenant].phrase, zoneCovenant))
-        local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
+        local label = Content:CreateFontString(name .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
         label:SetPoint("LEFT", heading, "RIGHT", large, 0)
         label:SetJustifyH("LEFT")
         label:SetText(zonePhrase)
@@ -343,24 +336,24 @@ function ns:CreateZone(zone)
 
     local faction
     if zone.faction then
-        faction = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
+        faction = Content:CreateFontString(name .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
         faction:SetPoint("LEFT", heading, "RIGHT", large, 0)
         faction:SetJustifyH("LEFT")
         faction.faction = zone.faction
         faction.color = zoneColor
-        ns:RegisterFaction(faction, ns.Content)
-        ns:RefreshFactions(ns.Content.factions)
+        ns:RegisterFaction(faction)
+        ns:RefreshFactions()
     end
 
     local currency
     if zone.currency then
-        currency = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
+        currency = Content:CreateFontString(name .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
         currency:SetPoint("LEFT", (zone.faction and faction or heading), "RIGHT", large, 0)
         currency:SetJustifyH("LEFT")
         currency.currency = zone.currency
         currency.color = zoneColor
-        ns:RegisterCurrency(currency, ns.Content)
-        ns:RefreshCurrencies(ns.Content.currencies)
+        ns:RegisterCurrency(currency)
+        ns:RefreshCurrencies()
     end
 
     -- For each Rare in the Zone
@@ -389,7 +382,7 @@ function ns:CreateZone(zone)
             else
                 -- Rare
                 j = j + 1
-                ns:CreateRare(j, zone, rare, items, covenant)
+                ns:CreateRare(Content, j, zone, rare, items, covenant)
             end
         end
     end
@@ -401,9 +394,9 @@ end
 -- Rare
 ---
 
-function ns:CreateRare(i, zone, rare, items, covenant)
-    local button = CreateFrame("Button", name .. "Rare" .. rare.id, ns.Content)
-    button:SetWidth(ns.Window:GetWidth() - (medium * 2) - 18)
+function ns:CreateRare(Content, i, zone, rare, items, covenant)
+    local button = CreateFrame("Button", name .. "Rare" .. rare.id, Content)
+    button:SetWidth(ns.Window:GetWidth() - 42)
     button:SetHeight(large)
     button:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -large)
     button:EnableMouse(true)
@@ -430,12 +423,12 @@ function ns:CreateRare(i, zone, rare, items, covenant)
     label:SetText(dead .. " " .. TextColor(i .. ". ") .. rare.name .. covenantRequired .. drops)
 
     label.rare = rare
-    ns:RegisterRare(label, ns.Content)
+    ns:RegisterRare(label)
 
     if RAVFOR_data.options.showReputation == true and rare.reputation then
         ns:CreateLabel({
             name = name .. "Rare" .. rare.id .. "Reputation",
-            parent = ns.Content,
+            parent = Content,
             label = "    " .. TextColor("+ " .. rare.reputation .. " " .. L.Reputation, "8080ff"),
             offsetY = -small,
         })
@@ -443,29 +436,27 @@ function ns:CreateRare(i, zone, rare, items, covenant)
 
     if #items > 0 then
         for _, item in ipairs(items) do
-            ns:CreateItem(zone, rare, item, covenant)
+            ns:CreateItem(Content, zone, rare, item, covenant)
         end
     end
 
     return button
 end
 
-function ns:RegisterRare(rare, parentFrame)
-    if (not parentFrame) or (not rare) then
-        return
-    end
-    parentFrame.rares = parentFrame.rares or {}
-    table.insert(parentFrame.rares, rare)
+function ns:RegisterRare(rare)
+    if not rare then return end
+    ns.rares = ns.rares or {}
+    table.insert(ns.rares, rare)
 end
 
-function ns:RefreshRares(rares, id)
-    for _, label in ipairs(rares) do
+function ns:RefreshRares()
+    for _, label in ipairs(ns.rares) do
         local withoutDead = string.gsub(string.gsub(label:GetText(), skull, ""), checkmark, "")
         label:SetText((IsRareDead(label.rare) and checkmark or skull) .. withoutDead)
     end
 end
 
-function ns:CreateItem(zone, rare, item, covenant)
+function ns:CreateItem(Content, zone, rare, item, covenant)
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
     local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
@@ -478,8 +469,8 @@ function ns:CreateItem(zone, rare, item, covenant)
     local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor) .. zoneCovenant or ""
     local owned = IsItemOwned(item) and " " .. checkmark or ""
 
-    local button = CreateFrame("Button", name .. "Item" .. item.id, ns.Content)
-    button:SetWidth(ns.Window:GetWidth() - (medium * 2) - 18)
+    local button = CreateFrame("Button", name .. "Item" .. item.id, Content)
+    button:SetWidth(ns.Window:GetWidth() - 42)
     button:SetHeight(large)
     button:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -small)
     button:EnableMouse(true)
@@ -494,22 +485,20 @@ function ns:CreateItem(zone, rare, item, covenant)
     label:SetText("    " .. TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. covenantOnly .. owned)
 
     label.item = item
-    ns:RegisterItem(label, ns.Content)
+    ns:RegisterItem(label, Content)
 
     prevControl = button
     return button
 end
 
-function ns:RegisterItem(item, parentFrame)
-    if (not parentFrame) or (not item) then
-        return
-    end
-    parentFrame.items = parentFrame.items or {}
-    table.insert(parentFrame.items, item)
+function ns:RegisterItem(item)
+    if not item then return end
+    ns.items = ns.items or {}
+    table.insert(ns.items, item)
 end
 
-function ns:RefreshItems(items)
-    for _, label in ipairs(items) do
+function ns:RefreshItems()
+    for _, label in ipairs(ns.items) do
         local withoutOwned = string.gsub(label:GetText(), checkmark, "")
         label:SetText(withoutOwned .. (IsItemOwned(label.item) and checkmark or ""))
     end
@@ -519,13 +508,14 @@ end
 -- Notes
 ---
 
-function ns:CreateNotes(notes)
+function ns:CreateNotes(Content, offset, notes)
     if not #notes then
         return
     end
 
-    local heading = ns.Content:CreateFontString(name .. "Notes", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    offset = offset and offset or 0
+    local heading = Content:CreateFontString(name .. "Notes", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "ffffff"))
     prevControl = heading
@@ -533,9 +523,9 @@ function ns:CreateNotes(notes)
     for i, note in ipairs(notes) do
         ns:CreateLabel({
             name = name .. "Note" .. i,
-            parent = ns.Content,
+            parent = Content,
             label = TextColor(note, "ffffff"),
-            width = ns.Window:GetWidth() - (medium * 2) - 18,
+            width = ns.Window:GetWidth() - 42,
             offsetY = -medium,
         })
     end
@@ -594,17 +584,18 @@ end
 -- Great Vault (Shadowlands)
 ---
 
-function ns:CreateGreatVault()
+function ns:CreateGreatVault(Content, offset)
     if not C_WeeklyRewards.CanClaimRewards() then
         return
     end
 
-    local heading = ns.Content:CreateFontString(name .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+    offset = offset and offset or 0
+    local heading = Content:CreateFontString(name .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(3847780) .. "  " .. TextColor("Great Vault", "8899c6"))
 
-    local Notice = ns.Content:CreateFontString(name .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
+    local Notice = Content:CreateFontString(name .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
     Notice:SetPoint("LEFT", heading, "RIGHT", large, 0)
     Notice:SetJustifyH("LEFT")
     Notice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
@@ -617,39 +608,38 @@ end
 -- Covenant and Renown (Shadowlands)
 ---
 
-function ns:CreateCovenant()
-    local heading = ns.Content:CreateFontString(name .. "Covenant", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-medium)
+function ns:CreateCovenant(Content, offset)
+    offset = offset and offset or 0
+    local heading = Content:CreateFontString(name .. "Covenant", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
     heading:SetJustifyH("LEFT")
 
-    local label = ns.Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormal")
+    local label = Content:CreateFontString(name .. "Renown", "ARTWORK", "GameFontNormal")
     label:SetPoint("LEFT", heading, "RIGHT", large, 0)
     label:SetJustifyH("LEFT")
 
-    ns:RegisterCovenant(heading, label, ns.Content)
-    ns:RefreshCovenant(heading, label)
+    ns:RegisterCovenant(heading, label)
+    ns:RefreshCovenant()
 
-    local anima = ns.Content:CreateFontString(name .. "Anima", "ARTWORK", "GameFontNormal")
+    local anima = Content:CreateFontString(name .. "Anima", "ARTWORK", "GameFontNormal")
     anima:SetPoint("LEFT", label, "RIGHT", medium, 0)
     anima:SetJustifyH("LEFT")
     anima.currency = 1813
     anima.color = "95c3e1"
-    ns:RegisterCurrency(anima, ns.Content)
-    ns:RefreshCurrencies(ns.Content.currencies)
+    ns:RegisterCurrency(anima)
+    ns:RefreshCurrencies()
 
     prevControl = heading
     return heading
 end
 
-function ns:RegisterCovenant(heading, label, parentFrame)
-    if (not parentFrame) or (not heading) or (not label) then
-        return
-    end
-    parentFrame.covenant = heading
-    parentFrame.renown = label
+function ns:RegisterCovenant(heading, label)
+    if (not heading) or (not label) then return end
+    ns.covenant = heading
+    ns.renown = label
 end
 
-function ns:RefreshCovenant(heading, label)
+function ns:RefreshCovenant()
     local covenant = C_Covenants.GetActiveCovenantID()
     if not covenant then
         return
@@ -657,28 +647,29 @@ function ns:RefreshCovenant(heading, label)
     local renown = C_CovenantSanctumUI.GetRenownLevel()
     local maxRenown = GetMaxRenown()
 
-    heading:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
-    label:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff6666") or TextColor(renown, "ffffff")) .. TextColor(" Renown", ns.data.covenants[covenant].color))
+    ns.covenant:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
+    ns.renown:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff6666") or TextColor(renown, "ffffff")) .. TextColor(" Renown", ns.data.covenants[covenant].color))
 end
 
 ---
 -- Torghast (Shadowlands)
 ---
 
-function ns:CreateTorghast()
-    local heading = ns.Content:CreateFontString(name .. "Torghast", "ARTWORK", "GameFontNormalLarge")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic)
+function ns:CreateTorghast(Content, offset)
+    offset = offset and offset or 0
+    local heading = Content:CreateFontString(name .. "Torghast", "ARTWORK", "GameFontNormalLarge")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(3642306) .. "  " .. TextColor("Torghast", "b0ccd8"))
 
-    local soulAsh = ns.Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
+    local soulAsh = Content:CreateFontString(name .. "SoulAsh", "ARTWORK", "GameFontNormal")
     soulAsh:SetPoint("LEFT", heading, "RIGHT", large, 0)
     soulAsh:SetJustifyH("LEFT")
 
     soulAsh.currency = 1828
     soulAsh.color = "b0ccd8"
-    ns:RegisterCurrency(soulAsh, ns.Content)
-    ns:RefreshCurrencies(ns.Content.currencies)
+    ns:RegisterCurrency(soulAsh)
+    ns:RefreshCurrencies()
 
     prevControl = heading
     return heading

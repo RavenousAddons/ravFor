@@ -58,31 +58,31 @@ function ravFor_OnEvent(self, event, arg, ...)
         ns:EnsureMacro()
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     elseif event == "CHAT_MSG_CURRENCY" or event == "CURRENCY_DISPLAY_UPDATE" then
-        if ns.Content and ns.Content.currencies then
-            ns:RefreshCurrencies(ns.Content.currencies)
+        if ns.currencies then
+            ns:RefreshCurrencies()
         end
     elseif event == "UPDATE_FACTION" then
-        if ns.Content and ns.Content.factions then
-            ns:RefreshFactions(ns.Content.factions)
+        if ns.factions then
+            ns:RefreshFactions()
         end
     elseif event == "PLAYER_FLAGS_CHANGED" then
-        if ns.Content and ns.Content.warmode then
-            ns:RefreshWarmode(ns.Content.warmode)
+        if ns.warmode then
+            ns:RefreshWarmode()
         end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local _, subtype = CombatLogGetCurrentEventInfo()
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
-            if ns.Content and ns.Content.rares then
-                ns:RefreshRares(ns.Content.rares)
+            if ns.rares then
+                ns:RefreshRares()
             end
         end
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" or event == "PET_JOURNAL_LIST_UPDATE" or event == "NEW_TOY_ADDED" then
-        if ns.Content and ns.Content.items then
-            ns:RefreshItems(ns.Content.items)
+        if ns.items then
+            ns:RefreshItems()
         end
     elseif event == "COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED" then
-        if ns.Content and ns.Content.covenant and ns.Content.renown then
-            ns:RefreshCovenant(ns.Content.covenant, ns.Content.renown)
+        if ns.covenant and ns.renown then
+            ns:RefreshCovenant()
         end
     end
 end

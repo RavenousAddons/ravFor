@@ -1,7 +1,8 @@
 local name, ns = ...
 local L = ns.L
 
-local expansion = ns.data.expansions[ns.expansion]
+local expansions = ns.data.expansions
+local expansion = expansions[ns.expansion]
 local notes = expansion.notes
 local zones = expansion.zones
 
@@ -28,11 +29,10 @@ end
 local skull = TextIcon(137025)
 local checkmark = TextIcon(628564)
 
-local Window = CreateFrame("Frame", name .. "Window", UIScroller)
+local Window = CreateFrame("Frame", name .. "Window", UIParent, "UIPanelDialogTemplate")
 Window:SetFrameStrata("MEDIUM")
 Window:SetWidth(width)
 Window:SetHeight(height)
-Window:SetScale(0.85)
 Window:SetPoint("CENTER", 0, 0)
 Window:EnableMouse(true)
 Window:SetMovable(true)
@@ -49,11 +49,6 @@ Window:SetScript("OnMouseUp", function(self)
 end)
 tinsert(UISpecialFrames, Window:GetName())
 
-local WindowBackground = Window:CreateTexture(nil, "BACKGROUND")
-WindowBackground:SetColorTexture(0, 0, 0, 0.85)
-WindowBackground:SetAllPoints(Window)
-Window.texture = WindowBackground
-
 local Close = CreateFrame("Button", name .. "WindowClose", Window, "UIPanelCloseButton")
 Close:SetPoint("TOPRIGHT", Window, "TOPRIGHT")
 Close:RegisterForClicks("AnyUp")
@@ -65,24 +60,59 @@ end)
 local Settings = CreateFrame("Button", name .. "WindowSettings", Window, "UIPanelButtonTemplate")
 Settings:SetText("Settings")
 Settings:SetWidth(large*4)
-Settings:SetPoint("RIGHT", Close, "LEFT")
+Settings:SetPoint("RIGHT", Close, "LEFT", small, 1)
 Settings:RegisterForClicks("AnyUp")
 Settings:SetScript("OnMouseUp", function(self)
     Window:StopMovingOrSizing()
-    Window:Hide()
+    -- Window:Hide()
     InterfaceOptionsFrame_OpenToCategory(ns.Options)
     InterfaceOptionsFrame_OpenToCategory(ns.Options)
 end)
 
-local Scroller = CreateFrame("ScrollFrame", name .. "WindowScroller", Window, "UIPanelScrollFrameTemplate")
-Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
-Scroller:SetPoint("BOTTOMLEFT", Window, "BOTTOMLEFT", medium, large)
+local i = 0
+local Scroller = {}
+local Content = {}
+local prevTab
+for title, expansion in pairs(expansions) do
+    i = i + 1
+
+    local scroller = CreateFrame("ScrollFrame", name .. "Scroller" .. i, Window, "UIPanelScrollFrameTemplate")
+    scroller:SetWidth(Window:GetWidth() - 42)
+    scroller:SetHeight(Window:GetHeight() - 36)
+    scroller:SetPoint("BOTTOMRIGHT", Window, "BOTTOMRIGHT", -28, 8)
+    scroller:Hide()
+    tinsert(Scroller, scroller)
+
+    local content = CreateFrame("Frame", name .. "Content" .. i, scroller)
+    content:SetWidth(1)
+    content:SetHeight(1)
+    tinsert(Content, content)
+
+    scroller:SetScrollChild(content)
+    scroller:SetScript("OnShow", function()
+        scroller:SetScrollChild(content)
+    end)
+
+    local tab = CreateFrame("Button", name .. "Tab" .. i, Window, "CharacterFrameTabButtonTemplate")
+    tab:SetFrameStrata("LOW")
+    tab:SetText(title)
+    tab:SetPoint("TOPLEFT", prevTab and prevTab or Window, prevTab and "TOPRIGHT" or "BOTTOMLEFT", prevTab and -medium or 0, prevTab and 0 or small)
+    tab:RegisterForClicks("AnyUp")
+    tab:SetScript("OnMouseUp", function(self)
+        for _, frame in pairs(Scroller) do
+            frame:Hide()
+        end
+        scroller:Show()
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+    end)
+
+    prevTab = tab
+end
 
 local Resize = CreateFrame("Button", name .. "WindowResize", Window)
 Resize:SetWidth(10)
 Resize:SetHeight(10)
-Resize:SetPoint("BOTTOMRIGHT", Window, "BOTTOMRIGHT")
+Resize:SetPoint("TOPLEFT", Window, "BOTTOMRIGHT")
 Resize:RegisterForClicks("AnyUp")
 Resize:SetScript("OnMouseDown", function(self, button)
     Window:StartSizing()
@@ -92,76 +122,80 @@ end)
 Resize:SetScript("OnMouseUp", function(self)
     if self.isMoving then
         Window:StopMovingOrSizing()
-        Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-        Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
+        for _, frame in pairs(Scroller) do
+            frame:SetWidth(Window:GetWidth() - 42)
+            frame:SetHeight(Window:GetHeight() - 36)
+        end
         self.isMoving = false
         self.hasMoved = true
     end
 end)
 
-local Content = CreateFrame("Frame", name .. "WindowScrollerContent", Scroller)
-Content:SetWidth(1)
-Content:SetHeight(1)
-Scroller:SetScrollChild(Content)
-
 Window:Hide()
 Window:SetScript("OnShow", function()
-    Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-    Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
+    PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
+    for _, frame in pairs(Scroller) do
+        frame:SetWidth(Window:GetWidth() - 42)
+        frame:SetHeight(Window:GetHeight() - 36)
+    end
+    -- Begin by highlighting the latest expansion
+    ns.Scroller[1]:Show()
     -- Window Title
-    ns:CreateLabel({
-        name = name .. "Heading",
-        parent = Window,
-        label = TextColor(ns.name, "ffffff") .. " " .. TextColor(ns.expansion, ns.color),
-        relativeTo = Window,
-        relativePoint = "TOPLEFT",
-        fontObject = "GameFontNormalLarge",
-        offsetX = medium,
-        offsetY = -12,
-    })
+    local Heading = Window:CreateFontString(name .. "Heading", "ARTWORK", "GameFontNormal")
+    Heading:SetHeight(20)
+    Heading:SetPoint("TOPLEFT", Window, "TOPLEFT", medium+small, -small)
+    Heading:SetJustifyH("LEFT")
+    Heading:SetText(TextColor(ns.name, "ffffff") .. " " .. TextColor(ns.expansion, ns.color))
     -- Version
     ns:CreateLabel({
         name = name .. "Version",
         parent = Window,
         label = TextColor("v" .. ns.version),
-        relativeTo = Settings,
-        initialPoint = "RIGHT",
-        relativePoint = "LEFT",
-        offsetX = -small,
+        relativeTo = Heading,
+        initialPoint = "LEFT",
+        relativePoint = "RIGHT",
+        offsetX = small,
         offsetY = 0,
-        width = large*3,
-        justify = "RIGHT",
         ignorePlacement = true,
     })
-    -- Introduction
-    ns:CreateLabel({
-        name = name .. "Introduction",
-        parent = Content,
-        label = TextColor(ns.notes, "ffffff"),
-        relativeTo = Content,
-        relativePoint = "TOPLEFT",
-        offsetY = 0,
-    })
-    -- Great Vault
-    ns:CreateGreatVault()
-    -- PVP
-    ns:CreatePVP()
-    -- Covenant
-    ns:CreateCovenant()
-    -- Torghast
-    ns:CreateTorghast()
-    -- For each Zone
-    for i, zone in ipairs(zones) do
-        -- Zone
-        ns:CreateZone(zone)
+    local i = 0
+    for title, expansion in pairs(expansions) do
+        i = i + 1
+        prevControl = Heading
+        -- PVP
+        ns:CreatePVP(Content[i])
+        if title == "Shadowlands" then
+            -- Covenant
+            ns:CreateCovenant(Content[i], medium)
+            -- Torghast
+            ns:CreateTorghast(Content[i])
+            -- Great Vault
+            ns:CreateGreatVault(Content[i])
+        end
+        -- For each Zone
+        for j, zone in ipairs(expansion.zones) do
+            -- Zone
+            ns:CreateZone(Content[i], ((i > 1 and j == 1) and medium or 0), zone)
+        end
+        -- Notes
+        if expansion.notes then
+            ns:CreateNotes(Content[i], 0, expansion.notes)
+        end
     end
-    -- Notes
-    ns:CreateNotes(notes)
 
     Window:SetScript("OnShow", function()
-        Scroller:SetWidth(Window:GetWidth() - (medium * 2) - 18) -- 18 seems to be width of the scrollbar
-        Scroller:SetHeight(Window:GetHeight() - (medium * 2) - (large * 2))
+        for _, frame in pairs(Scroller) do
+            frame:SetWidth(Window:GetWidth() - 42)
+            frame:SetHeight(Window:GetHeight() - 36)
+        end
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
+    end)
+
+    Window:SetScript("OnHide", function()
+        PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
     end)
 end)
-ns.Window = Window
+
+ns.Scroller = Scroller
 ns.Content = Content
+ns.Window = Window
