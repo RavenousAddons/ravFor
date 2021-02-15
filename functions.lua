@@ -109,7 +109,7 @@ end
 
 local hasSeenNoSpaceMessage = false
 function ns:EnsureMacro()
-    if not UnitAffectingCombat("player") then
+    if not UnitAffectingCombat("player") and RAV_data.options.macro then
         local body = "/" .. ns.command
         local numberOfMacros, _ = GetNumMacros()
         if GetMacroIndexByName(ns.name) > 0 then
@@ -170,13 +170,16 @@ end
 
 function ns:CreateCheckbox(cfg)
     local checkbox = CreateFrame("CheckButton", name .. "OptionsCheckbox" .. cfg.var, ns.Options, "InterfaceOptionsCheckButtonTemplate")
-    checkbox:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -16)
+    checkbox:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -12)
     checkbox.var = cfg.var
     checkbox.label = cfg.label
     checkbox.Text:SetJustifyH("LEFT")
     checkbox.Text:SetText(cfg.label)
-    checkbox.tooltipText = cfg.tooltip .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+    checkbox.tooltipText = cfg.tooltip
     checkbox.restart = false
+    if cfg.needsRestart then
+        checkbox.tooltipText = checkbox.tooltipText .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+    end
 
     checkbox.GetValue = function()
         return checkbox:GetChecked()
@@ -187,7 +190,10 @@ function ns:CreateCheckbox(cfg)
 
     checkbox:SetScript("OnClick", function(self)
         checkbox.value = self:GetChecked()
-        checkbox.restart = not checkbox.restart
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+        if cfg.needsRestart then
+            checkbox.restart = not checkbox.restart
+        end
         RAVFOR_data.options[checkbox.var] = checkbox:GetChecked()
         ns:RefreshControls(ns.Options.controls)
     end)
@@ -223,9 +229,25 @@ end
 function ns:RefreshCurrencies(currencies)
     for _, label in ipairs(currencies) do
         local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
-        local quantity = commaValue(currency.quantity)
+        local quantity = currency.discovered and currency.quantity or 0
         local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
-        label:SetText(TextColor(quantity .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(string.gsub(currency.name, "Reservoir ", ""), (label.currencyColor and label.currencyColor or "ffffff")))
+        label:SetText(TextColor(commaValue(quantity) .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, label.color and label.color or "ffffff"))
+    end
+end
+
+function ns:RegisterFaction(faction, parentFrame)
+    if (not parentFrame) or (not faction) then
+        return
+    end
+    parentFrame.factions = parentFrame.factions or {}
+    table.insert(parentFrame.factions, faction)
+end
+
+function ns:RefreshFactions(factions)
+    for _, label in ipairs(factions) do
+        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, _, _ = GetFactionInfoByID(label.faction)
+        local quantity = commaValue(reputation - reputationMin)
+        label:SetText(TextColor(string.format(L.ReputationWith, reputation < reputationMax and quantity .. "/" .. commaValue(reputationMin) or quantity, TextColor(factionName, label.color and label.color or "ffffff")), "ffffff"))
     end
 end
 
@@ -243,14 +265,14 @@ function ns:CreatePVP()
     honor:SetPoint("LEFT", heading, "RIGHT", large, 0)
     honor:SetJustifyH("LEFT")
     honor.currency = 1792
-    honor.currencyColor = "f5c87a"
+    honor.color = "f5c87a"
     ns:RegisterCurrency(honor, ns.Content)
 
     local conquest = ns.Content:CreateFontString(name .. "Conquest", "ARTWORK", "GameFontNormal")
     conquest:SetPoint("LEFT", honor, "RIGHT", medium, 0)
     conquest:SetJustifyH("LEFT")
     conquest.currency = 1602
-    conquest.currencyColor = "f5c87a"
+    conquest.color = "f5c87a"
     ns:RegisterCurrency(conquest, ns.Content)
 
     ns:RefreshCurrencies(ns.Content.currencies)
@@ -312,28 +334,39 @@ function ns:CreateZone(zone)
     if zone.covenant then
         local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
         local zoneCovenant = TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
+        local zonePhrase = TextColor(string.format(covenants[zone.covenant].phrase, zoneCovenant))
         local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
         label:SetPoint("LEFT", heading, "RIGHT", large, 0)
         label:SetJustifyH("LEFT")
-        label:SetText(TextColor("Home of the ", "ffffff") .. zoneCovenant)
+        label:SetText(zonePhrase)
     end
 
+    local faction
+    if zone.faction then
+        faction = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
+        faction:SetPoint("LEFT", heading, "RIGHT", large, 0)
+        faction:SetJustifyH("LEFT")
+        faction.faction = zone.faction
+        faction.color = zoneColor
+        ns:RegisterFaction(faction, ns.Content)
+        ns:RefreshFactions(ns.Content.factions)
+    end
+
+    local currency
     if zone.currency then
-        local label = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
-        label:SetPoint("LEFT", heading, "RIGHT", large, 0)
-        label:SetJustifyH("LEFT")
-        label.currency = zone.currency
-        label.currencyColor = zoneColor
-        ns:RegisterCurrency(label, ns.Content)
+        currency = ns.Content:CreateFontString(name .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
+        currency:SetPoint("LEFT", (zone.faction and faction or heading), "RIGHT", large, 0)
+        currency:SetJustifyH("LEFT")
+        currency.currency = zone.currency
+        currency.color = zoneColor
+        ns:RegisterCurrency(currency, ns.Content)
         ns:RefreshCurrencies(ns.Content.currencies)
     end
 
     -- For each Rare in the Zone
     local j = 0
     for _, rare in ipairs(zone.rares) do
-        if rare.hidden then
-        elseif rare.waypoint[1] > 99 and rare.waypoint[2] > 99 then
-        else
+        if rare.hidden ~= true then
             local items = {}
             if rare.items then
                 -- For each Item dropped by the Rare in the Zone
@@ -344,7 +377,7 @@ function ns:CreateZone(zone)
                     elseif RAVFOR_data.options.showPets == false and item.pet then
                     elseif RAVFOR_data.options.showToys == false and item.toy then
                     elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
-                    elseif RAVFOR_data.options.showOtherCovenantItems == false and item.covenantOnly and (covenant ~= zone.covenant) then
+                    elseif RAVFOR_data.options.showCannotUse == false and item.covenantOnly and (covenant ~= zone.covenant) then
                     elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
                     else
                         -- Insert Item into Items
@@ -352,7 +385,7 @@ function ns:CreateZone(zone)
                     end
                 end
             end
-            if RAVFOR_data.options.showNoDrops == false and #items == 0 and not rare.reptuation then
+            if RAVFOR_data.options.showNoDrops == false and #items == 0 and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
             else
                 -- Rare
                 j = j + 1
@@ -387,8 +420,8 @@ function ns:CreateRare(i, zone, rare, items, covenant)
     local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
 
     local dead = IsRareDead(rare) and checkmark or skull
-    local covenantRequired = rare.covenantRequired and TextColor(", summoned by ") .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
-    local drops = #items > 0 and  " " .. TextColor("drops:") or ""
+    local covenantRequired = rare.covenantRequired and TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
+    local drops = #items > 0 and  " " .. TextColor(L.Drops) or ""
 
     local label = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     label:SetPoint("TOPLEFT", 0, 0)
@@ -403,7 +436,7 @@ function ns:CreateRare(i, zone, rare, items, covenant)
         ns:CreateLabel({
             name = name .. "Rare" .. rare.id .. "Reputation",
             parent = ns.Content,
-            label = "    " .. TextColor("+ " .. rare.reputation .. " reputation with Ve'nari", "8080ff"),
+            label = "    " .. TextColor("+ " .. rare.reputation .. " " .. L.Reputation, "8080ff"),
             offsetY = -small,
         })
     end
@@ -442,7 +475,7 @@ function ns:CreateItem(zone, rare, item, covenant)
     -- itemLink = string.gsub(itemLink, "]", itemMeta .. "]")
     local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
     local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
-    local covenantOnly = item.covenantOnly and TextColor(" only for ") .. zoneCovenant or ""
+    local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor) .. zoneCovenant or ""
     local owned = IsItemOwned(item) and " " .. checkmark or ""
 
     local button = CreateFrame("Button", name .. "Item" .. item.id, ns.Content)
@@ -600,7 +633,7 @@ function ns:CreateCovenant()
     anima:SetPoint("LEFT", label, "RIGHT", medium, 0)
     anima:SetJustifyH("LEFT")
     anima.currency = 1813
-    anima.currencyColor = "95c3e1"
+    anima.color = "95c3e1"
     ns:RegisterCurrency(anima, ns.Content)
     ns:RefreshCurrencies(ns.Content.currencies)
 
@@ -643,7 +676,7 @@ function ns:CreateTorghast()
     soulAsh:SetJustifyH("LEFT")
 
     soulAsh.currency = 1828
-    soulAsh.currencyColor = "b0ccd8"
+    soulAsh.color = "b0ccd8"
     ns:RegisterCurrency(soulAsh, ns.Content)
     ns:RefreshCurrencies(ns.Content.currencies)
 

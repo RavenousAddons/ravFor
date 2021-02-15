@@ -27,7 +27,7 @@ local _, ns = ...
 
 ns.data = {
     defaults = {
-        -- showDead = true,
+        macro = true,
         showNoDrops = false,
         showOwned = true,
         showGear = true,
@@ -35,7 +35,7 @@ ns.data = {
         showMounts = true,
         showPets = true,
         showToys = true,
-        showOtherCovenantItems = true,
+        showCannotUse = true,
         showReputation = true,
     },
     expansions = {
@@ -47,6 +47,7 @@ ns.data = {
                     color = "e5cc80",
                     icon = "3743739",
                     currency = 1767,
+                    faction = 2432,
                     rares = {
                         {
                             hidden = true,
@@ -647,6 +648,7 @@ ns.data = {
                             id = 162586,
                             quest = 58783,
                             waypoint = {44.0, 51.1},
+                            covenantRequired = true,
                             items = {
                                 {
                                     id = 182190,
@@ -662,6 +664,7 @@ ns.data = {
                             name = "Deepscar",
                             id = 162797,
                             quest = 58878,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -673,6 +676,7 @@ ns.data = {
                             name = "Gristlebeak",
                             id = 162588,
                             quest = 58837,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -684,6 +688,7 @@ ns.data = {
                             name = "Indomitable Schmitd",
                             id = 161105,
                             quest = 58332,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -695,6 +700,7 @@ ns.data = {
                             name = "Nirvaska the Summoner",
                             id = 161857,
                             quest = 58629,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -706,6 +712,7 @@ ns.data = {
                             name = "Pesticide",
                             id = 162767,
                             quest = 58875,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -717,6 +724,7 @@ ns.data = {
                             name = "Ravenomous",
                             id = 159753,
                             quest = 58004,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -732,6 +740,7 @@ ns.data = {
                             name = "Smorgas the Feaster",
                             id = 162528,
                             quest = 58768,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -751,6 +760,7 @@ ns.data = {
                             name = "Taskmaster Xox",
                             id = 160059,
                             quest = 58091,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -768,6 +778,7 @@ ns.data = {
                             name = "Thread Mistress Leeda",
                             id = 162180,
                             quest = 58678,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -937,6 +948,7 @@ ns.data = {
                             name = "Amalgamation of Filth",
                             id = 166393,
                             quest = 59854,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -948,6 +960,7 @@ ns.data = {
                             name = "Amalgamation of Light",
                             id = 164388,
                             quest = 59584,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -972,6 +985,7 @@ ns.data = {
                             name = "Amalgamation of Sin",
                             id = 170434,
                             quest = 60836,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -983,6 +997,7 @@ ns.data = {
                             name = "Azgar",
                             id = 166576,
                             quest = 59893,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -994,6 +1009,7 @@ ns.data = {
                             name = "Bog Beast",
                             id = 166292,
                             quest = 59823,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1006,6 +1022,7 @@ ns.data = {
                             name = "Executioner Aatron",
                             id = 166710,
                             quest = 59913,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1017,6 +1034,7 @@ ns.data = {
                             name = "Executioner Adrastia",
                             id = 161310,
                             quest = 58441,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1028,6 +1046,7 @@ ns.data = {
                             name = "Grand Arcanist Dimitri",
                             id = 167464,
                             quest = 60173,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1039,6 +1058,7 @@ ns.data = {
                             name = "Huntmaster Petrus",
                             id = 166993,
                             quest = 60022,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1051,6 +1071,7 @@ ns.data = {
                             name = "Innervus",
                             id = 160640,
                             quest = 58210,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1062,6 +1083,7 @@ ns.data = {
                             name = "Leeched Soul",
                             id = 165152,
                             quest = 59580,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1077,6 +1099,7 @@ ns.data = {
                             name = "Lord Mortegore",
                             id = 161891,
                             quest = 58633,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1088,6 +1111,7 @@ ns.data = {
                             name = "Manifestation of Wrath",
                             id = 170048,
                             quest = 60729,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1100,6 +1124,7 @@ ns.data = {
                             name = "Sinstone Hoarder",
                             id = 162481,
                             quest = 62252,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1111,6 +1136,7 @@ ns.data = {
                             name = "Stonefist",
                             id = 159503,
                             quest = 62220,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1122,6 +1148,7 @@ ns.data = {
                             name = "Tomb Burster",
                             id = 155779,
                             quest = 56877,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1269,6 +1296,7 @@ ns.data = {
                             name = "Aspirant Eolis",
                             id = 171211,
                             quest = 61083,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1280,12 +1308,14 @@ ns.data = {
                             name = "Baedos",
                             id = 160629,
                             quest = {58648, 62192},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                         },
                         {
                             name = "Basilofos",
                             id = 170659,
                             quest = {60897, 62158},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             -- items = {
                             --     {
@@ -1298,6 +1328,7 @@ ns.data = {
                             name = "Beasts of Bastion",
                             id = 161527,
                             quest = {60570, 60571, 60569, 58526},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1318,6 +1349,7 @@ ns.data = {
                             name = "Bookkeeper Mnemis",
                             id = 171189,
                             quest = 59022,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1330,6 +1362,7 @@ ns.data = {
                             name = "Cloudfeather Guardian",
                             id = 170932,
                             quest = {60978, 62191},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1342,6 +1375,7 @@ ns.data = {
                             name = "Collector Astorestes",
                             id = 171014,
                             quest = 61002,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1353,12 +1387,14 @@ ns.data = {
                             name = "Corrupted Clawguard",
                             id = 171010,
                             quest = 60999,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                         },
                         {
                             name = "Collector Astorestes",
                             id = 171014,
                             quest = 61002,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1370,6 +1406,7 @@ ns.data = {
                             name = "Demi the Relic Hoarder",
                             id = 171011,
                             quest = {61069, 61000},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1396,6 +1433,7 @@ ns.data = {
                             name = "Dionae",
                             id = 163460,
                             quest = 62650,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1408,6 +1446,7 @@ ns.data = {
                             name = "Echo of Aella <Hand of Courage>",
                             id = 171255,
                             quest = {61082, 61091, 62251},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1420,6 +1459,7 @@ ns.data = {
                             name = "Fallen Acolyte Erisne",
                             id = 160721,
                             quest = 58222,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1431,6 +1471,7 @@ ns.data = {
                             name = "Herculon",
                             id = 158659,
                             quest = {57705, 57708},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             -- items = {
                             --     {
@@ -1442,6 +1483,7 @@ ns.data = {
                             name = "Nikara Blackheart",
                             id = 160882,
                             quest = 58319,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1452,13 +1494,14 @@ ns.data = {
                         -- {
                         --     name = "Reekmonger",
                         --     id = 171327,
-                        --     -- quest = ?????,
+                        --     hidden = true,
                         --     waypoint = {99.9, 99.9},
                         -- },
                         {
                             name = "Selena the Reborn",
                             id = 160985,
                             quest = 58320,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1470,6 +1513,7 @@ ns.data = {
                             name = "Swelling Tear",
                             id = 171012,
                             quest = {61001, 61046, 61047},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1608,6 +1652,7 @@ ns.data = {
                             name = "Deifir the Untamed",
                             id = 164238,
                             quest = {59201, 62271},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1620,12 +1665,14 @@ ns.data = {
                             name = "Dustbrawl",
                             id = 163229,
                             quest = 58987,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                         },
                         {
                             name = "Egg-Tender Leh'go",
                             id = 167851,
                             quest = 60266,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1637,6 +1684,7 @@ ns.data = {
                             name = "Faeflayer",
                             id = 171688,
                             quest = 61184,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1648,6 +1696,7 @@ ns.data = {
                             name = "Gormbore",
                             id = 163370,
                             quest = 59006,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1660,6 +1709,7 @@ ns.data = {
                             name = "Macabre",
                             id = 164093,
                             quest = 59140,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1672,6 +1722,7 @@ ns.data = {
                             name = "Mymaen",
                             id = 165053,
                             quest = 59431,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1683,6 +1734,7 @@ ns.data = {
                             name = "Mystic Rainbowhorn",
                             id = 164547,
                             quest = 59235,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1700,6 +1752,7 @@ ns.data = {
                             name = "Old Ardeite",
                             id = 164391,
                             quest = {59208, 62270},
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1712,6 +1765,7 @@ ns.data = {
                             name = "Rootwrithe",
                             id = 167726,
                             quest = 60273,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1723,6 +1777,7 @@ ns.data = {
                             name = "Rotbriar Boggart",
                             id = 167724,
                             quest = 60258,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1735,6 +1790,7 @@ ns.data = {
                             name = "Soultwister Cero",
                             id = 171451,
                             quest = 61177,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1746,6 +1802,7 @@ ns.data = {
                             name = "Skuld Vit",
                             id = 164415,
                             quest = 59220,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             covenantRequired = true,
                             items = {
@@ -1764,6 +1821,7 @@ ns.data = {
                             name = "The Slumbering Emperor",
                             id = 167721,
                             quest = 60290,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1776,6 +1834,7 @@ ns.data = {
                             name = "Wrigglemortis",
                             id = 164147,
                             quest = 59170,
+                            hidden = true,
                             waypoint = {99.9, 99.9},
                             items = {
                                 {
@@ -1787,9 +1846,9 @@ ns.data = {
                 },
             },
             notes = {
-                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help!",
+                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
                 "I'm also very much interested in getting the UX of this Addon correct and steering players in the direction of catching up, gearing up, and exceeding past our opponents!",
-                "What isn't working (yet):\n- tracking when certain world quests/world bosses are available\n- some rares still missing coordinates\n- your brilliant idea? Get in touch!",
+                "Still to come:\n- tracking when certain world quests/world bosses are available\n- some rares still missing coordinates\n- tabs per expansion and per zone\n- your brilliant idea? Get in touch!",
             },
         },
         ["Battle for Azeroth"] = {
@@ -1850,11 +1909,6 @@ ns.data = {
             },
         },
     },
-    targetMessages = {
-        "Moving out to",
-        "Let's go and delete",
-        "We ride for",
-    },
     currencies = {
         {
             id = 1792, -- Honor
@@ -1886,21 +1940,25 @@ ns.data = {
         [1] = {
             color = "68ccef",
             icon = 3257748,
+            phrase = "Home of the %s",
         },
         -- Venthyr
         [2] = {
             color = "ff4040",
             icon = 3257751,
+            phrase = "Court of the %s",
         },
         -- Night Fae
         [3] = {
             color = "8b55d7",
             icon = 3257750,
+            phrase = "Forest of the %s",
         },
         -- Necrolord
         [4] = {
             color = "40bf40",
             icon = 3257749,
+            phrase = "Citadel of the %s",
         },
     },
     renownLevels = {

@@ -4,14 +4,13 @@ local L = ns.L
 local expansion = ns.data.expansions[ns.expansion]
 local zones = expansion.zones
 
-local targetMessages = ns.data.targetMessages
-
 function ravFor_OnLoad(self)
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
     self:RegisterEvent("CHAT_MSG_CURRENCY")
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+    self:RegisterEvent("UPDATE_FACTION")
     self:RegisterEvent("PLAYER_FLAGS_CHANGED")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
@@ -43,9 +42,9 @@ function ravFor_OnEvent(self, event, arg, ...)
                     if zone.id == zoneID then
                         for _, rare in ipairs(zone.rares) do
                             if rare.id == rareID then
-                                local n = random(#targetMessages)
+                                local n = random(#L.TargetMessages)
                                 local zoneName = C_Map.GetMapInfo(zoneID).name
-                                RaidNotice_AddMessage(RaidBossEmoteFrame, targetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. string.format("%.1f", rare.waypoint[1]) .. ", " .. string.format("%.1f", rare.waypoint[2]) .. "!", ChatTypeInfo["RAID_WARNING"])
+                                RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. string.format("%.1f", rare.waypoint[1]) .. ", " .. string.format("%.1f", rare.waypoint[2]) .. "!", ChatTypeInfo["RAID_WARNING"])
                                 ns:NewTarget(zone, rare)
                                 break
                             end
@@ -61,6 +60,10 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "CHAT_MSG_CURRENCY" or event == "CURRENCY_DISPLAY_UPDATE" then
         if ns.Content and ns.Content.currencies then
             ns:RefreshCurrencies(ns.Content.currencies)
+        end
+    elseif event == "UPDATE_FACTION" then
+        if ns.Content and ns.Content.factions then
+            ns:RefreshFactions(ns.Content.factions)
         end
     elseif event == "PLAYER_FLAGS_CHANGED" then
         if ns.Content and ns.Content.warmode then
