@@ -1787,7 +1787,7 @@ ns.data = {
                 },
             },
             notes = {
-                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r, message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help, and make sure you're in the RUIN Discord! |cff0099ffhttps://discord.gg/ruin|r",
+                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff9b59b6WaldenPond#0001|r on Discord for feedback or help!",
                 "I'm also very much interested in getting the UX of this Addon correct and steering players in the direction of catching up, gearing up, and exceeding past our opponents!",
                 "What isn't working (yet):\n- tracking learned appearances (transmog)\n- tracking learned toys\n- tracking when certain world quests/world bosses are available\n- ability to reorder lists and list items\n- some rares still missing coordinates",
             },
