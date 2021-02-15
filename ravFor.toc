@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: 0.6.2
+## Version: 0.6.3
 
 ## Name: Ravenous For Shadowlands
 ## Title: Ravenous For |cffffc478Shadowlands|r
@@ -11,5 +11,7 @@
 
 ## X-License: Public Domain
 ## X-Website: https://github.com/RavenousAddons/ravFor
+## X-Curse-Project-ID: 446419
+## X-WoWI-ID: 25889
 
 ravFor.xml

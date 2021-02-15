@@ -35,6 +35,12 @@ It's also set up to provide some light quality-of-life tooling to people on Rare
     3. *If you're the leader of your group, it will silently ping the details of the Rare over to your other group members, triggering (i) and (ii) for them if they have the Addon as well.*
     4. *If the leader of your group pinged a Rare's location, there will also be a Raid Warning repeating the details of what was printed in your default chat window*
 
+## Usage
+
+As mentioned above, Ravenous For *Shadowlands* will automatically create a General Macro for you called "Ravenous For". This macro simply opens and closes the main window of the Addon, but if you like, you can also use the following slash-command:
+
+`/ravfor`
+
 ## Get in touch
 
 If you wish to get in touch with me, please get in touch through the [RUIN Discord](https://discord.gg/ruin).

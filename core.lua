@@ -96,3 +96,4 @@ SlashCmdList["RAVFOR"] = function(message, editbox)
     end
 end
 SLASH_RAVFOR1 = "/" .. ns.command
+SLASH_RAVFOR2 = "/r4"
