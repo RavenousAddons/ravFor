@@ -66,8 +66,8 @@ function ravFor_OnEvent(self, event, arg, ...)
             ns:RefreshFactions()
         end
     elseif event == "PLAYER_FLAGS_CHANGED" then
-        if ns.warmode then
-            ns:RefreshWarmode()
+        if ns.warmodes then
+            ns:RefreshWarmodes()
         end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local _, subtype = CombatLogGetCurrentEventInfo()

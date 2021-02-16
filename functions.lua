@@ -282,7 +282,7 @@ function ns:CreatePVP(Content)
     label:SetJustifyH("LEFT")
 
     ns:RegisterWarmode(label)
-    ns:RefreshWarmode()
+    ns:RefreshWarmodes()
     warmode:EnableMouse(true)
     warmode:SetScript("OnClick", function()
         if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
@@ -300,12 +300,15 @@ end
 
 function ns:RegisterWarmode(warmode)
     if not warmode then return end
-    ns.warmode = warmode
+    ns.warmodes = ns.warmodes or {}
+    table.insert(ns.warmodes, warmode)
 end
 
-function ns:RefreshWarmode()
-    local warmode = C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r"
-    ns.warmode:SetText(TextColor("Warmode is " .. warmode .. ".", "ffffff"))
+function ns:RefreshWarmodes()
+    for _, label in ipairs(ns.warmodes) do
+        local warmode = C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r"
+        label:SetText(TextColor("Warmode is " .. warmode .. ".", "ffffff"))
+    end
 end
 
 ---
