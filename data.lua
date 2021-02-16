@@ -439,6 +439,11 @@ ns.data = {
                             id = 157309,
                             quest = 61720,
                             waypoint = {61.9, 76.8},
+                            items = {
+                                {
+                                    id = 182287,
+                                },
+                            }
                         },
                         {
                             name = "Corrupted Sediment",

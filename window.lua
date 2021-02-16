@@ -171,11 +171,13 @@ Window:SetScript("OnShow", function()
             ns:CreateTorghast(Content[i])
             -- Great Vault
             ns:CreateGreatVault(Content[i])
+            -- Sp-eye-glass
+            ns:CreateSpeyeglass(Content[i])
         end
         -- For each Zone
         for j, zone in ipairs(expansion.zones) do
             -- Zone
-            ns:CreateZone(Content[i], ((i > 1 and j == 1) and medium or 0), zone)
+            ns:CreateZone(Content[i], ((title ~= "Shadowlands" and j == 1) and medium or 0), zone)
         end
         -- Notes
         if expansion.notes then

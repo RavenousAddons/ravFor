@@ -598,10 +598,26 @@ function ns:CreateGreatVault(Content, offset)
     heading:SetJustifyH("LEFT")
     heading:SetText(TextIcon(3847780) .. "  " .. TextColor("Great Vault", "8899c6"))
 
-    local Notice = Content:CreateFontString(name .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
-    Notice:SetPoint("LEFT", heading, "RIGHT", large, 0)
-    Notice:SetJustifyH("LEFT")
-    Notice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
+    local notice = Content:CreateFontString(name .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
+    notice:SetPoint("LEFT", heading, "RIGHT", large, 0)
+    notice:SetJustifyH("LEFT")
+    notice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
+
+    prevControl = heading
+    return heading
+end
+
+---
+-- Sp-eye-glass (Shadowlands)
+---
+
+function ns:CreateSpeyeglass(Content, offset)
+    offset = offset and offset or 0
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(183696)
+    local heading = Content:CreateFontString(name .. "Sp-eye-glass", "ARTWORK", "GameFontNormal")
+    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
+    heading:SetJustifyH("LEFT")
+    heading:SetText(TextIcon(134441) .. "  " .. TextColor("Have you picked up your " .. itemLink .. " in " .. TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
 
     prevControl = heading
     return heading
