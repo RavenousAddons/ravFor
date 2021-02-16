@@ -227,7 +227,7 @@ function ns:RefreshCurrencies()
         local currency = C_CurrencyInfo.GetCurrencyInfo(label.currency)
         local quantity = currency.discovered and currency.quantity or 0
         local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
-        label:SetText(TextColor(commaValue(quantity) .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, label.color and label.color or "ffffff"))
+        label:SetText(TextColor(commaValue(currency.quantity) .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, label.color and label.color or "ffffff"))
     end
 end
 
@@ -339,13 +339,15 @@ function ns:CreateZone(Content, offset, zone)
 
     local faction
     if zone.faction then
-        faction = Content:CreateFontString(name .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
-        faction:SetPoint("LEFT", heading, "RIGHT", large, 0)
-        faction:SetJustifyH("LEFT")
-        faction.faction = zone.faction
-        faction.color = zoneColor
-        ns:RegisterFaction(faction)
-        ns:RefreshFactions()
+        if select(4, GetFactionInfoByID(zone.faction)) > 0 then
+            faction = Content:CreateFontString(name .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
+            faction:SetPoint("LEFT", heading, "RIGHT", large, 0)
+            faction:SetJustifyH("LEFT")
+            faction.faction = zone.faction
+            faction.color = zoneColor
+            ns:RegisterFaction(faction)
+            ns:RefreshFactions()
+        end
     end
 
     local currency
@@ -639,6 +641,9 @@ end
 ---
 
 function ns:CreateCovenant(Content, offset)
+    if C_Covenants.GetActiveCovenantID() == 0 then
+        return
+    end
     offset = offset and offset or 0
     local heading = Content:CreateFontString(name .. "Covenant", "ARTWORK", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
@@ -671,9 +676,6 @@ end
 
 function ns:RefreshCovenant()
     local covenant = C_Covenants.GetActiveCovenantID()
-    if not covenant then
-        return
-    end
     local renown = C_CovenantSanctumUI.GetRenownLevel()
     local maxRenown = GetMaxRenown()
 
@@ -686,6 +688,9 @@ end
 ---
 
 function ns:CreateTorghast(Content, offset)
+    if UnitLevel("player") < 50 then
+        return
+    end
     offset = offset and offset or 0
     local heading = Content:CreateFontString(name .. "Torghast", "ARTWORK", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
