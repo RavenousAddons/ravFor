@@ -799,7 +799,7 @@ ns.data = {
                     covenant = 2,
                     rares = {
                         {
-                            hidden = true,
+                            -- hidden = true,
                             name = "Nurgash Muckformed",
                             id = 167526,
                             -- quest = 61816,
@@ -1538,7 +1538,7 @@ ns.data = {
                     covenant = 3,
                     rares = {
                         {
-                            -- hidden = true,
+                            hidden = true,
                             name = "Oranomonos the Everbranching",
                             id = 167527,
                             quest = 61815,
