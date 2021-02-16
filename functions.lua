@@ -109,7 +109,7 @@ end
 
 local hasSeenNoSpaceMessage = false
 function ns:EnsureMacro()
-    if not UnitAffectingCombat("player") and RAV_data.options.macro then
+    if not UnitAffectingCombat("player") and RAVFOR_data.options.macro then
         local body = "/" .. ns.command
         local numberOfMacros, _ = GetNumMacros()
         if GetMacroIndexByName(ns.name) > 0 then
@@ -613,7 +613,6 @@ end
 
 function ns:CreateSpeyeglass(Content, offset)
     offset = offset and offset or 0
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(183696)
 
     local button = CreateFrame("Button", name .. "Sp-eye-glass", Content)
     button:SetWidth(width)
@@ -629,7 +628,7 @@ function ns:CreateSpeyeglass(Content, offset)
     label:SetPoint("TOPLEFT", 0, 0)
     label:SetWidth(button:GetWidth())
     label:SetJustifyH("LEFT")
-    label:SetText(TextIcon(134441) .. "  " .. TextColor("Have you found your " .. itemLink .. " in " .. TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
+    label:SetText(TextIcon(134441) .. "  " .. TextColor("Have you found your |cff0070dd|Hitem:183696::::::::60:63:::::::|h[Sp-eye-glass]|h|r in " .. TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
 
     prevControl = button
     return button
