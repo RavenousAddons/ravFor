@@ -614,13 +614,25 @@ end
 function ns:CreateSpeyeglass(Content, offset)
     offset = offset and offset or 0
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(183696)
-    local heading = Content:CreateFontString(name .. "Sp-eye-glass", "ARTWORK", "GameFontNormal")
-    heading:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
-    heading:SetJustifyH("LEFT")
-    heading:SetText(TextIcon(134441) .. "  " .. TextColor("Have you picked up your " .. itemLink .. " in " .. TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
 
-    prevControl = heading
-    return heading
+    local button = CreateFrame("Button", name .. "Sp-eye-glass", Content)
+    button:SetWidth(width)
+    button:SetHeight(large)
+    button:SetPoint("TOPLEFT", prevControl, "BOTTOMLEFT", 0, -gigantic-offset)
+    button:SetScript("OnClick", function()
+        RaidNotice_AddMessage(RaidBossEmoteFrame, "Look for a treasure chest in Maldraxxus at 48.33, 16.35", ChatTypeInfo["RAID_WARNING"])
+        C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1536, 0.4833, 0.1635))
+        C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+    end)
+
+    local label = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    label:SetPoint("TOPLEFT", 0, 0)
+    label:SetWidth(button:GetWidth())
+    label:SetJustifyH("LEFT")
+    label:SetText(TextIcon(134441) .. "  " .. TextColor("Have you found your " .. itemLink .. " in " .. TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
+
+    prevControl = button
+    return button
 end
 
 ---
