@@ -6,7 +6,6 @@ local notes = expansion.notes
 local zones = expansion.zones
 local covenants = ns.data.covenants
 
-
 ---
 -- Local Bits and Bobs
 ---
@@ -43,6 +42,7 @@ local function TextIcon(icon, size)
     return "|T" .. icon .. ":" .. size .. "|t"
 end
 
+local quest = TextIcon(132049)
 local skull = TextIcon(137025)
 local checkmark = TextIcon(628564)
 
@@ -364,7 +364,16 @@ function ns:CreateZone(Content, offset, zone)
     -- For each Rare in the Zone
     local j = 0
     for _, rare in ipairs(zone.rares) do
-        if rare.hidden ~= true then
+        -- if type(rare.quest) == "number" then
+        --     if C_QuestLog.IsWorldQuest(rare.quest) then
+        --         print(rare.name, (C_QuestLog.AddWorldQuestWatch(rare.quest) and "CAN be watched" or "cannot be watched"))
+        --         print(rare.name, (C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and "IS complete" or "is not yet complete"))
+        --         print("---")
+        --     end
+        -- end
+        if rare.hidden then
+        elseif type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        else
             local items = {}
             if rare.items then
                 -- For each Item dropped by the Rare in the Zone
@@ -417,7 +426,7 @@ function ns:CreateRare(Content, i, zone, rare, items, covenant)
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
     local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
 
-    local dead = IsRareDead(rare) and checkmark or skull
+    local dead = IsRareDead(rare) and checkmark or rare.worldboss and quest or skull
     local covenantRequired = rare.covenantRequired and TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
     local drops = #items > 0 and  " " .. TextColor(L.Drops) or ""
 
@@ -456,8 +465,8 @@ end
 
 function ns:RefreshRares()
     for _, label in ipairs(ns.rares) do
-        local withoutDead = string.gsub(string.gsub(label:GetText(), skull, ""), checkmark, "")
-        label:SetText((IsRareDead(label.rare) and checkmark or skull) .. withoutDead)
+        local withoutDead = string.gsub(string.gsub(string.gsub(label:GetText(), quest, ""), skull, ""), checkmark, "")
+        label:SetText((IsRareDead(label.rare) and checkmark or label.rare.worldboss and quest or skull) .. withoutDead)
     end
 end
 
@@ -545,12 +554,14 @@ end
 function ns:NewTarget(zone, rare)
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-    local x = rare.waypoint[1]
-    local y = rare.waypoint[2]
+    local c = {}
+    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+        tinsert(c, d)
+    end
     -- Print message to chat
-    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. x * 100 .. ":" .. y * 100 .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffffffff" .. string.format("%.1f", x) .. ", " .. string.format("%.1f", y) .. "|r]|h|r")
+    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffffffff" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
     -- Add the waypoint to the map and track it
-    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, x / 100, y / 100))
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
     C_SuperTrack.SetSuperTrackedUserWaypoint(true)
 end
 
@@ -637,7 +648,7 @@ function ns:CreateSpeyeglass(Content, offset)
 end
 
 ---
--- Covenant and Renown (Shadowlands)
+-- Covenant: Renown, Reservoir Anima, Redeemed Souls (Shadowlands)
 ---
 
 function ns:CreateCovenant(Content, offset)
@@ -662,6 +673,14 @@ function ns:CreateCovenant(Content, offset)
     anima.currency = 1813
     anima.color = "95c3e1"
     ns:RegisterCurrency(anima)
+
+    local souls = Content:CreateFontString(name .. "RedeemedSouls", "ARTWORK", "GameFontNormal")
+    souls:SetPoint("TOPLEFT", anima, "BOTTOMLEFT", 0, -medium)
+    souls:SetJustifyH("LEFT")
+    souls.currency = 1810
+    souls.color = "f5dcd0"
+    ns:RegisterCurrency(souls)
+
     ns:RefreshCurrencies()
 
     prevControl = heading
@@ -684,7 +703,7 @@ function ns:RefreshCovenant()
 end
 
 ---
--- Torghast (Shadowlands)
+-- Torghast: Soul Ash (Shadowlands)
 ---
 
 function ns:CreateTorghast(Content, offset)

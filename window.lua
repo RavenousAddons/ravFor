@@ -168,7 +168,7 @@ Window:SetScript("OnShow", function()
             -- Covenant
             ns:CreateCovenant(Content[i], medium)
             -- Torghast
-            ns:CreateTorghast(Content[i])
+            ns:CreateTorghast(Content[i], medium)
             -- Great Vault
             ns:CreateGreatVault(Content[i])
             -- Sp-eye-glass
