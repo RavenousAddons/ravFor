@@ -50,9 +50,46 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
+                            name = "Hunt: Death Elementals",
+                            id = 172958, -- 172958, 122960, 172961, 172962
+                            quest = 62593,
+                            weekly = true,
+                            waypoint = 53607860,
+                        },
+                        {
                             hidden = true,
-                            name = "Gorged Shadehound",
+                            name = "Hunt: Winged Soul Eaters",
                             id = 174827,
+                            -- quest = ?????,
+                            weekly = true,
+                            waypoint = 53607860,
+                            items = {
+                                {
+                                    id = 184167,
+                                    mount = 1304,
+                                },
+                            },
+                        },
+                        {
+                            hidden = true,
+                            name = "Hunt: Shadehounds",
+                            id = 174827,
+                            -- quest = ?????,
+                            weekly = true,
+                            waypoint = 53607860,
+                            items = {
+                                {
+                                    id = 184167,
+                                    mount = 1304,
+                                },
+                            },
+                        },
+                        {
+                            hidden = true,
+                            name = "Hunt: Soul Eaters",
+                            id = 174827,
+                            -- quest = ?????,
+                            weekly = true,
                             waypoint = 53607860,
                             items = {
                                 {
@@ -1154,10 +1191,10 @@ ns.data = {
                     covenant = 1,
                     rares = {
                         {
-                            hidden = true,
                             name = "Valinor <The Light of Eons>",
                             id = 167524,
-                            -- quest = 61813, -- BROKEN
+                            worldboss = true,
+                            quest = 61813, -- BROKEN, does not mark as worldboss
                             waypoint = 26602280,
                             items = {
                                 {

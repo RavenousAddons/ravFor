@@ -364,15 +364,10 @@ function ns:CreateZone(Content, offset, zone)
     -- For each Rare in the Zone
     local j = 0
     for _, rare in ipairs(zone.rares) do
-        -- if type(rare.quest) == "number" then
-        --     if C_QuestLog.IsWorldQuest(rare.quest) then
-        --         print(rare.name, (C_QuestLog.AddWorldQuestWatch(rare.quest) and "CAN be watched" or "cannot be watched"))
-        --         print(rare.name, (C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and "IS complete" or "is not yet complete"))
-        --         print("---")
-        --     end
-        -- end
         if rare.hidden then
         elseif type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        elseif type(rare.quest) == "number" and (rare.worldboss) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        -- elseif type(rare.quest) == "number" and (rare.biweekly or rare.weekly) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
         else
             local items = {}
             if rare.items then
@@ -426,7 +421,7 @@ function ns:CreateRare(Content, i, zone, rare, items, covenant)
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
     local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
 
-    local dead = IsRareDead(rare) and checkmark or rare.worldboss and quest or skull
+    local dead = IsRareDead(rare) and checkmark or ((type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest)) or rare.biweekly or rare.weekly) and quest or skull
     local covenantRequired = rare.covenantRequired and TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
     local drops = #items > 0 and  " " .. TextColor(L.Drops) or ""
 
@@ -466,7 +461,7 @@ end
 function ns:RefreshRares()
     for _, label in ipairs(ns.rares) do
         local withoutDead = string.gsub(string.gsub(string.gsub(label:GetText(), quest, ""), skull, ""), checkmark, "")
-        label:SetText((IsRareDead(label.rare) and checkmark or label.rare.worldboss and quest or skull) .. withoutDead)
+        label:SetText((IsRareDead(label.rare) and checkmark or ((type(label.rare.quest) == "number" and C_QuestLog.IsWorldQuest(label.rare.quest)) or label.rare.biweekly or label.rare.weekly) and quest or skull) .. withoutDead)
     end
 end
 
