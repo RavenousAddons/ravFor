@@ -44,7 +44,11 @@ function ravFor_OnEvent(self, event, arg, ...)
                             if rare.id == rareID then
                                 local n = random(#L.TargetMessages)
                                 local zoneName = C_Map.GetMapInfo(zoneID).name
-                                RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. string.format("%.1f", rare.waypoint[1]) .. ", " .. string.format("%.1f", rare.waypoint[2]) .. "!", ChatTypeInfo["RAID_WARNING"])
+                                local c = {}
+                                for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+                                    tinsert(c, d)
+                                end
+                                RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "!", ChatTypeInfo["RAID_WARNING"])
                                 ns:NewTarget(zone, rare)
                                 break
                             end
