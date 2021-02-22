@@ -17,7 +17,7 @@ ns.data = {
     notes = {
         "Thanks for using Ravenous For Shadowlands! I love making Addons that people find useful and improves their enjoyment of the game, more than anything else. If you'd like to get involved in any capacity, please reach out!",
         "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
-        "Still to come:\n- tracking when relevant world quests/world bosses are available\n- your brilliant idea? Get in touch!",
+        "Still to come:\n\n- Tracking when relevant world quests/world bosses are available\n- Your brilliant idea? Get in touch!",
     },
     expansions = {
         ["Shadowlands"] = {
@@ -317,6 +317,7 @@ ns.data = {
                     -- Maldraxxus
                     id = 1536,
                     covenant = 4,
+                    faction = 2410,
                     rares = {
                         {
                             name = "Mortanis",
@@ -824,6 +825,7 @@ ns.data = {
                     -- Revendreth
                     id = 1525,
                     covenant = 2,
+                    faction = {2413, 2439},
                     rares = {
                         {
                             name = "Nurgash Muckformed",
@@ -1192,6 +1194,7 @@ ns.data = {
                     -- Bastion
                     id = 1533,
                     covenant = 1,
+                    faction = 2407,
                     rares = {
                         {
                             name = "Valinor <The Light of Eons>",
@@ -1541,6 +1544,7 @@ ns.data = {
                     -- Ardenweald
                     id = 1565,
                     covenant = 3,
+                    faction = {2465, 2464},
                     rares = {
                         {
                             name = "Oranomonos the Everbranching",
@@ -1902,6 +1906,141 @@ ns.data = {
                                 {
                                     id = 169163,
                                     mount = 1257,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    -- Uldum
+                    id = 1527,
+                    color = "f8f1bd",
+                    icon = "409550",
+                    rares = {
+                        {
+                            name = "Corpse Eater",
+                            id = 162147,
+                            quest = 58696,
+                            assault = "AQR",
+                            waypoint = 30854971,
+                            items = {
+                                {
+                                    id = 174769,
+                                    mount = 1319,
+                                },
+                            },
+                        },
+                        {
+                            name = "Rotfeaster",
+                            id = 157146,
+                            quest = 57273,
+                            assault = "AMA",
+                            waypoint = 68593204,
+                            items = {
+                                {
+                                    id = 174753,
+                                    mount = 1317,
+                                },
+                            },
+                        },
+                        {
+                            name = "Ishak of the Four Winds",
+                            id = 157134,
+                            quest = 57259,
+                            waypoint = 73908353,
+                            items = {
+                                {
+                                    id = 174641,
+                                    mount = 1314,
+                                },
+                            },
+                        },
+                        {
+                            name = "Springfur Alpaca",
+                            id = 162765,
+                            quest = 58879,
+                            waypoint = {15006200, 24000900, 27004800, 30002900, 39000800, 41007000, 47004800, 52001900, 55006900, 62705340, 63011446, 70003900, 76636813},
+                            items = {
+                                {
+                                    id = 174859,
+                                    mount = 1329,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    -- Vol'dun
+                    id = 1195,
+                    color = "d28b68",
+                    icon = "2125384",
+                    rares = {
+                        {
+                            name = "Elusive Alpaca",
+                            id = 162681,
+                            waypoint = {26405250, 29006600, 31106730, 42006000, 43006900, 51108590, 52508900, 54008200, 54605320, 55007300},
+                            items = {
+                                {
+                                    id = 174860,
+                                    mount = 1324,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    -- Vale of Eternal Blossoms
+                    id = 1530,
+                    color = "b8dab6",
+                    icon = "618798",
+                    rares = {
+                        {
+                            name = "Anh-De the Loyal",
+                            id = 157466,
+                            quest = 57363,
+                            waypoint = 34156805,
+                            items = {
+                                {
+                                    id = 174840,
+                                    mount = 1328,
+                                },
+                            },
+                        },
+                        {
+                            name = "Ha-Li",
+                            id = 157153,
+                            quest = 57344,
+                            waypoint = {37323630, 33973378, 29053930, 31524387, 37313632, 37323630},
+                            items = {
+                                {
+                                    id = 173887,
+                                    mount = 1297,
+                                },
+                            },
+                        },
+                        {
+                            name = "Houndlord Ren",
+                            id = 157160,
+                            quest = 57345,
+                            assaulut = "MOG",
+                            waypoint = {13132578, 11833049, 08953570},
+                            items = {
+                                {
+                                    id = 174841,
+                                    mount = 1327,
+                                },
+                            },
+                        },
+                        {
+                            name = "Rei Lun",
+                            id = 157162,
+                            quest = 57346,
+                            assault = "MOG",
+                            waypoint = 21901232,
+                            items = {
+                                {
+                                    id = 174649,
+                                    mount = 1313,
                                 },
                             },
                         },

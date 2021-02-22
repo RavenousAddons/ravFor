@@ -109,10 +109,7 @@ function ns:BuildOptions()
         for _, Control in pairs(self.Controls) do
             RAVFOR_data.options[Control.var] = Control:GetValue()
             if Control.restart then
-                print("restart")
                 ReloadUI()
-            else
-                print("nah")
             end
         end
     end

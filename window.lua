@@ -135,10 +135,14 @@ local function CreateTab(cfg)
     TabIcon:SetPoint("LEFT", Tab, "LEFT", 0, 6)
     TabIcon:SetTexture(cfg.icon)
 
-    Tab:SetScript("OnEnter", function()
+    Tab:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_RIGHT", -large-small, -large*2)
+        GameTooltip:SetText(cfg.label)
+        GameTooltip:Show()
         TabBackground:SetDesaturated(nil)
     end)
-    Tab:SetScript("OnLeave", function()
+    Tab:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
         TabBackground:SetDesaturated(1)
     end)
 
@@ -172,9 +176,9 @@ end
 
 function ns:RefreshFactions()
     for _, Faction in ipairs(ns.Factions) do
-        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, _, _ = GetFactionInfoByID(Faction.faction)
+        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, hasBonusRepGain, _ = GetFactionInfoByID(Faction.faction)
         local quantity = commaValue(reputation - reputationMin)
-        Faction:SetText(ns:TextColor(string.format(L.ReputationWith, reputation < reputationMax and quantity .. "/" .. commaValue(reputationMin) or quantity, ns:TextColor(factionName, Faction.color and Faction.color or "ffffff")), "ffffff"))
+        Faction:SetText(ns:TextColor(string.format(L.ReputationWith, standingID == 8 and ns:TextColor(_G.FACTION_STANDING_LABEL8, Faction.color and Faction.color or "ffffff") or reputation < reputationMax and ns:TextColor(quantity .. "/" .. commaValue(reputationMax)) or ns:TextColor(quantity), ns:TextColor(factionName, Faction.color and Faction.color or "ffffff")), "bbbbbb"))
     end
 end
 
@@ -191,26 +195,17 @@ function ns:CreatePVP(Parent, Relative)
     local LittleRelative = PVP
 
     local Honor = Parent:CreateFontString(ADDON_NAME .. "Honor", "ARTWORK", "GameFontNormal")
-    Honor:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+    Honor:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Honor:SetJustifyH("LEFT")
     Honor.currency = 1792
     Honor.color = "f5c87a"
     ns:RegisterCurrency(Honor)
     LittleRelative = Honor
 
-    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
-    Conquest:SetPoint("LEFT", LittleRelative, "RIGHT", medium, 0)
-    Conquest:SetJustifyH("LEFT")
-    Conquest.currency = 1602
-    Conquest.color = "f5c87a"
-    ns:RegisterCurrency(Conquest)
-
-    ns:RefreshCurrencies()
-
     local Warmode = CreateFrame("Button", ADDON_NAME .. "Warmode", Parent)
     local WarmodeLabel = Warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     WarmodeLabel:SetJustifyH("LEFT")
-    WarmodeLabel:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    WarmodeLabel:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Warmode:SetAllPoints(WarmodeLabel)
     ns:RegisterWarmode(WarmodeLabel)
     ns:RefreshWarmodes()
@@ -223,6 +218,16 @@ function ns:CreatePVP(Parent, Relative)
             RaidNotice_AddMessage(RaidBossEmoteFrame, string.format(L.beta, factionCity), ChatTypeInfo["RAID_WARNING"])
         end
     end)
+
+    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
+    Conquest:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    Conquest:SetJustifyH("LEFT")
+    Conquest.currency = 1602
+    Conquest.color = "f5c87a"
+    ns:RegisterCurrency(Conquest)
+    LittleRelative = Conquest
+
+    ns:RefreshCurrencies()
 
     Relative.offset = large
     return Relative
@@ -255,6 +260,7 @@ function ns:CreateZone(Parent, Relative, zone)
     Zone:SetJustifyH("LEFT")
     Zone:SetText(ns:TextIcon(zoneIcon) .. "  " .. ns:TextColor(mapName:upper(), zoneColor))
     Relative = Zone
+    Relative.offset = 0
     local LittleRelative = Zone
 
     if zone.covenant then
@@ -269,11 +275,17 @@ function ns:CreateZone(Parent, Relative, zone)
     end
 
     if zone.faction then
-        if select(4, GetFactionInfoByID(zone.faction)) > 0 then
+        local zoneFactions = type(zone.faction) == "table" and zone.faction or {zone.faction}
+        for _, faction in ipairs(zoneFactions) do
             local Faction = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
-            Faction:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+            if zone.covenant then
+                Faction:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+                Relative.offset = Relative.offset + large
+            else
+                Faction:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+            end
             Faction:SetJustifyH("LEFT")
-            Faction.faction = zone.faction
+            Faction.faction = faction
             Faction.color = zoneColor
             ns:RegisterFaction(Faction)
             ns:RefreshFactions()
@@ -467,6 +479,7 @@ function ns:NewTarget(zone, rare)
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local c = {}
+    local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
     for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
         tinsert(c, d)
     end
@@ -569,14 +582,13 @@ function ns:CreateCovenant(Parent, Relative)
 
     local Renown = Parent:CreateFontString(ADDON_NAME .. "Renown", "ARTWORK", "GameFontNormal")
     Renown:SetJustifyH("LEFT")
-    Renown:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
-    LittleRelative = Renown
+    Renown:SetPoint("TOP", Relative, "BOTTOM", 0, -medium-small)
 
     ns:RegisterCovenant(Covenant, Renown)
     ns:RefreshCovenant()
 
     local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
-    Anima:SetPoint("LEFT", LittleRelative, "RIGHT", medium, 0)
+    Anima:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Anima:SetJustifyH("LEFT")
     Anima.currency = 1813
     Anima.color = "95c3e1"
@@ -666,6 +678,13 @@ function ns:BuildWindow()
     Window:SetMinResize(width, height)
     Window:SetMaxResize(width*1.5, height*2)
     Window:RegisterForDrag("LeftButton")
+    Window:Hide()
+    Window:SetScript("OnShow", function()
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
+    end)
+    Window:SetScript("OnHide", function()
+        PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
+    end)
     Window:SetScript("OnMouseDown", function()
         Window:StartMoving()
     end)
@@ -673,7 +692,7 @@ function ns:BuildWindow()
         Window:StopMovingOrSizing()
     end)
     tinsert(UISpecialFrames, Window:GetName())
-    Window:Hide()
+    ns.Window = Window
 
     local OptionsButton = CreateFrame("Button", ADDON_NAME .. "OptionsButton", Window, "UIPanelButtonTemplate")
     OptionsButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
@@ -782,16 +801,6 @@ function ns:BuildWindow()
             Relative = Notes
         end
     end
-
-    Window:SetScript("OnShow", function()
-        PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
-    end)
-
-    Window:SetScript("OnHide", function()
-        PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
-    end)
-
-    ns.Window = Window
 
     for title, Tab in pairs(Tabs) do
         Tab:SetScript("OnClick", function(self)

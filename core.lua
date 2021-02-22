@@ -33,7 +33,8 @@ function ravFor_OnEvent(self, event, arg, ...)
                             local n = random(#L.TargetMessages)
                             local zoneName = C_Map.GetMapInfo(zoneID).name
                             local c = {}
-                            for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+                            local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
+                            for d in tostring(waypoint):gmatch("[0-9][0-9]") do
                                 tinsert(c, d)
                             end
                             RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "!", ChatTypeInfo["RAID_WARNING"])
@@ -52,6 +53,7 @@ function ravFor_OnEvent(self, event, arg, ...)
         ns:EnsureMacro()
         if not RAVFOR_version then
             ns:PrettyPrint(string.format(L.Install, ns.color, ns.version, ns.command))
+            ns.Window:Show()
         elseif RAVFOR_version ~= ns.version then
             ns:PrettyPrint(string.format(L.Update, ns.color, ns.version, ns.command))
         end
