@@ -1,4 +1,4 @@
-local name, ns = ...
+local ADDON_NAME, ns = ...
 
 local L = {}
 ns.L = L
@@ -13,17 +13,29 @@ end })
 L.Version = "%s is the current version." -- ns.version
 L.Install = "Thanks for installing |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
 L.Update = "Thanks for updating to |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
-L.OptionsHeading = "Configuration:"
-L.MacroLabel = "Automatically create macro"
-L.MacroTooltip = "When enabled, a macro called |cffffffff%s|r will be automatically created and managed for you under |cffffffffGeneral Macros|r." -- ns.name
-L.ReputationLabel = "Show Reputation gains"
-L.ReputationTooltip = "When enabled, the list will show which Rares award reputation upon killing them."
-L.CollectedLabel = "Show Collected Items"
-L.CollectedTooltip = "When enabled, Items which you have already collected will appear in the list."
-L.NoDropsLabel = "Show Rares with no drops/no reputation"
-L.NoDropsTooltip = "When enabled, Rares which neither drop items nor award currency or reputation will appear in the list."
-L.CannotUseLabel = "Show Items you cannot use"
-L.CannotUseTooltip = "When enabled, Items which you cannot use (wrong Spec/Covenant/etc.) will appear in the list."
+L.Configuration = "Configuration"
+L.Defaults = {
+    ["macro"] = {
+        text = "Automatically create macro",
+        tooltip = "When enabled, a macro called |cffffffff" .. ns.name .. "|r will be automatically created and managed for you under |cffffffffGeneral Macros|r.",
+    },
+    ["showNoDrops"] = {
+        text = "Show Rares with no drops/no reputation",
+        tooltip = "When enabled, Rares which neither drop items nor award currency or reputation will appear in the list.",
+    },
+    ["showOwned"] = {
+        text = "Show Collected Items",
+        tooltip = "When enabled, Items which you have already collected will appear in the list.",
+    },
+    ["showCannotUse"] = {
+        text = "Show Items you cannot use",
+        tooltip = "When enabled, Items which you cannot use (wrong Class/Covenant/etc.) will appear in the list.",
+    },
+    ["showReputation"] = {
+        text = "Show Reputation gains",
+        tooltip = "When enabled, the list will show which Rares award reputation upon killing them.",
+    },
+}
 L.SupportHeading = "Help and Support:"
 L.Support1 = "This Addon creates and maintains a macro called |r%s|cffffffff for you under |rGeneral Macros|cffffffff." -- ns.name
 L.Support2 = "Check out the Addon on |rGitHub|cffffffff, |rWoWInterface|cffffffff, or |rCurse|cffffffff for more info and support!"
@@ -38,6 +50,9 @@ L.TargetMessages = {
     "Let's go and delete",
     "We ride for",
 }
+L.NoMacroSpace = "Unfortunately, you don't have enough global macro space for the macro to be created!"
+L.alpha = "You must go to a rested area to disable War Mode."
+L.beta = "You must go to %s to enable War Mode." -- factionCity
 
 -- Check locale and assign appropriate
 local CURRENT_LOCALE = GetLocale()

@@ -1,45 +1,27 @@
-local _, ns = ...
+local ADDON_NAME, ns = ...
 
----
---  Covenants:
---    Covenant IDs:
---      color = Hex Color,
---      icon = Icon Texture ID,
---  Zones:
---    id = Map ID,
---    covenant = Covenant ID *,
---    color = Hex Color *,
---    icon = Icon Texture ID *,
---    rares = Notable Rares,
---    Rares:
---      name = NPC Name (need to figure out how to get this from the Blizzard API),
---      id = NPC ID,
---      quest = Quest ID(s) for completion,
---      waypoint = {X Coordinate, Y Coordinate},
---      covenantRequired = Requires the Zone's Covenant to summon *
---      items = Notable Items Dropped
---    Items:
---      id = Item ID,
---      mount = Mount ID *,
---      achievement = Achievement ID *,
---  * Optional
----
+ns.defaults = {
+    macro = true,
+    showNoDrops = false,
+    showOwned = true,
+    -- showGear = true,
+    -- showTransmog = true,
+    -- showMounts = true,
+    -- showPets = true,
+    -- showToys = true,
+    showCannotUse = true,
+    showReputation = true,
+}
 
 ns.data = {
-    defaults = {
-        macro = true,
-        showNoDrops = false,
-        showOwned = true,
-        showGear = true,
-        showTransmog = true,
-        showMounts = true,
-        showPets = true,
-        showToys = true,
-        showCannotUse = true,
-        showReputation = true,
+    notes = {
+        "Thanks for using Ravenous For Shadowlands! I love making Addons that people find useful and improves their enjoyment of the game, more than anything else. If you'd like to get involved in any capacity, please reach out!",
+        "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
+        "Still to come:\n- tracking when relevant world quests/world bosses are available\n- your brilliant idea? Get in touch!",
     },
     expansions = {
         ["Shadowlands"] = {
+            icon = 3257863,
             zones = {
                 {
                     -- The Maw
@@ -63,12 +45,6 @@ ns.data = {
                             -- quest = ?????,
                             weekly = true,
                             waypoint = 53607860,
-                            items = {
-                                {
-                                    id = 184167,
-                                    mount = 1304,
-                                },
-                            },
                         },
                         {
                             hidden = true,
@@ -91,12 +67,6 @@ ns.data = {
                             -- quest = ?????,
                             weekly = true,
                             waypoint = 53607860,
-                            items = {
-                                {
-                                    id = 184167,
-                                    mount = 1304,
-                                },
-                            },
                         },
                         {
                             name = "Borr-Geth",
@@ -375,14 +345,20 @@ ns.data = {
                                 {
                                     id = 183295,
                                     guaranteed = true,
+                                    class = "Monk",
+                                    specialization = "Windwalker",
                                 },
                                 {
                                     id = 183386,
                                     guaranteed = true,
+                                    class = "Warrior",
+                                    specialization = "Fury",
                                 },
                                 {
                                     id = 183341,
                                     guaranteed = true,
+                                    class = "Rogue",
+                                    specialization = "Outlaw",
                                 },
                             },
                         },
@@ -452,6 +428,9 @@ ns.data = {
                                     mount = 1410,
                                 },
                             },
+                            notes = {
+                                "|cffff6666Red|r = |cff6666ffBlue|r > |cffffff66Yellow|r",
+                            },
                         },
                         {
                             name = "Oily Invertebrate",
@@ -470,7 +449,10 @@ ns.data = {
                                 {
                                     id = 181270,
                                     pet = 2960,
-                                }
+                                },
+                            },
+                            notes = {
+                                "10 |cffff6666Red|r 10 |cff6666ffBlue|r 10 |cffffff66Yellow|r",
                             },
                         },
                         {
@@ -482,7 +464,10 @@ ns.data = {
                                 {
                                     id = 182287,
                                 },
-                            }
+                            },
+                            notes = {
+                                "15+ |cffffff66Yellow|r",
+                            },
                         },
                         {
                             name = "Corrupted Sediment",
@@ -492,18 +477,9 @@ ns.data = {
                             items = {
                                 id = 184302,
                             },
-                        },
-                        {
-                            name = "Pulsing Leech",
-                            id = 48854,
-                            quest = 61718,
-                            waypoint = 58197421,
-                        },
-                        {
-                            name = "Boneslurp",
-                            id = 48860,
-                            quest = 61722,
-                            waypoint = 58197421,
+                            notes = {
+                                "15+ |cff6666ffBlue|r",
+                            },
                         },
                         {
                             name = "Burnblister",
@@ -512,6 +488,27 @@ ns.data = {
                             waypoint = 58197421,
                             items = {
                                 id = 184175,
+                            },
+                            notes = {
+                                "|cffff6666Red|r = |cffffff66Yellow|r > |cff6666ffBlue|r",
+                            },
+                        },
+                        {
+                            name = "Pulsing Leech",
+                            id = 48854,
+                            quest = 61718,
+                            waypoint = 58197421,
+                            notes = {
+                                "15+ |cffff6666Red|r",
+                            },
+                        },
+                        {
+                            name = "Boneslurp",
+                            id = 48860,
+                            quest = 61722,
+                            waypoint = 58197421,
+                            notes = {
+                                "|cff6666ffBlue|r = |cffffff66Yellow|r > |cffff6666Red|r",
                             },
                         },
                         {
@@ -855,14 +852,20 @@ ns.data = {
                                 {
                                     id = 182638,
                                     guaranteed = true,
+                                    class = "Death Knight",
+                                    specialization = "Unholy",
                                 },
                                 {
                                     id = 183215,
                                     guaranteed = true,
+                                    class = "Demon Hunter",
+                                    specialization = "Havoc",
                                 },
                                 {
                                     id = 183376,
                                     guaranteed = true,
+                                    class = "Warlock",
+                                    specialization = "Destruction",
                                 },
                             },
                         },
@@ -1218,14 +1221,20 @@ ns.data = {
                                 {
                                     id = 183311,
                                     guaranteed = true,
+                                    class = "Paladin",
+                                    specialization = "Retribution",
                                 },
                                 {
                                     id = 183325,
                                     guaranteed = true,
+                                    class = "Priest",
+                                    specialization = "Holy",
                                 },
                                 {
                                     id = 183353,
                                     guaranteed = true,
+                                    class = "Shaman",
+                                    specialization = "Elemental",
                                 },
                             },
                         },
@@ -1560,14 +1569,20 @@ ns.data = {
                                 {
                                     id = 183238,
                                     guaranteed = true,
+                                    class = "Druid",
+                                    specialization = "Restoration",
                                 },
                                 {
                                     id = 183261,
                                     guaranteed = true,
+                                    class = "Hunter",
+                                    specialization = "Marksman",
                                 },
                                 {
                                     id = 183274,
                                     guaranteed = true,
+                                    class = "Mage",
+                                    specialization = "Fire",
                                 },
                             },
                         },
@@ -1835,13 +1850,9 @@ ns.data = {
                     },
                 },
             },
-            notes = {
-                "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
-                "I'm also very much interested in getting the UX of this Addon correct and steering players in the direction of catching up, gearing up, and exceeding past our opponents!",
-                "Still to come:\n- tracking when certain world quests/world bosses are available\n- some rares still missing coordinates\n- tabs per expansion and per zone\n- your brilliant idea? Get in touch!",
-            },
         },
         ["Battle for Azeroth"] = {
+            icon = 237383,
             zones = {
                 {
                     -- Mechagon
@@ -1853,7 +1864,7 @@ ns.data = {
                             name = "Arachnoid Harvester",
                             id = 151934,
                             quest = 55512,
-                            waypoint = {51.6, 41.6},
+                            waypoint = 51604160,
                             items = {
                                 {
                                     id = 168823,
@@ -1865,7 +1876,7 @@ ns.data = {
                             name = "Rustfeather",
                             id = 152182,
                             quest = 55811,
-                            waypoint = {63.8, 78.0},
+                            waypoint = 63807800,
                             items = {
                                 {
                                     id = 168370,
@@ -1886,7 +1897,7 @@ ns.data = {
                             name = "Soundless",
                             id = 152290,
                             quest = 56298,
-                            waypoint = {57.6, 52.2},
+                            waypoint = 57605220,
                             items = {
                                 {
                                     id = 169163,
@@ -1915,6 +1926,10 @@ ns.data = {
         {
             id = 1813, -- Anima
             color = "95c3e1",
+        },
+        {
+            id = 1810, -- Redeemed Souls
+            color = "f5dcd0",
         },
         {
             id = 1828, -- Soul Ash

@@ -1,11 +1,7 @@
-local name, ns = ...
+local ADDON_NAME, ns = ...
 local L = ns.L
 
 local expansions = ns.data.expansions
-local expansion = expansions[ns.expansion]
-local notes = expansion.notes
-local zones = expansion.zones
-
 local covenants = ns.data.covenants
 
 local width = 420
@@ -16,188 +12,797 @@ local medium = 12
 local large = 16
 local gigantic = 24
 
-local function TextColor(text, color)
-    color = color and color or "bbbbbb"
-    return "|cff" .. color .. text .. "|r"
+local quest = ns:TextIcon(132049)
+local skull = ns:TextIcon(137025)
+local checkmark = ns:TextIcon(628564)
+
+local _, class = UnitClass("player")
+local faction, _ = UnitFactionGroup("player")
+local factionCity = (faction == "Alliance" and "Stormwind" or "Orgrimmar")
+
+---
+-- Local stuff
+---
+
+local function commaValue(amount)
+    local formatted = amount
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then
+            break
+        end
+    end
+    return formatted
 end
 
-local function TextIcon(icon, size)
-    size = size and size or 16
-    return "|T" .. icon .. ":" .. size .. "|t"
+local function GetMaxRenown()
+    -- if 0, then reset is today but has not yet happened
+    local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
+    local now = C_DateAndTime.GetCurrentCalendarTime()
+    local year, month, day = now.year, now.month, now.monthDay
+    local lookup_year, lookup_month, lookup_day
+    local maxRenown = 3
+    for _, lookup in ipairs(ns.data.renownLevels) do
+        lookup_year = lookup.year and lookup.year or lookup_year
+        lookup_month = lookup.month and lookup.month or lookup_month
+        lookup_day = lookup.day and lookup.day or lookup_day
+        if year > lookup_year then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month > lookup_month then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month == lookup_month and day > lookup_day then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month == lookup_month and day == lookup_day and daysUntilWeeklyReset > 0 then
+            maxRenown = lookup.level
+        end
+    end
+    return maxRenown
 end
 
-local skull = TextIcon(137025)
-local checkmark = TextIcon(628564)
+local function IsRareDead(rare)
+    if type(rare.quest) == "table" then
+        for _, quest in ipairs(rare.quest) do
+            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return false
+            end
+        end
+        return true
+    elseif rare.quest then
+        return C_QuestLog.IsQuestFlaggedCompleted(rare.quest)
+    end
+    return false
+end
 
-local Window = CreateFrame("Frame", name .. "Window", UIParent, "UIPanelDialogTemplate")
-Window:SetFrameStrata("MEDIUM")
-Window:SetWidth(width)
-Window:SetHeight(height)
-Window:SetPoint("CENTER", 0, 0)
-Window:EnableMouse(true)
-Window:SetMovable(true)
-Window:SetClampedToScreen(true)
-Window:SetResizable(true)
-Window:SetMinResize(width, height)
-Window:SetMaxResize(width*1.5, height*2)
-Window:RegisterForDrag("LeftButton")
-Window:SetScript("OnMouseDown", function(self, button)
-    self:StartMoving()
-end)
-Window:SetScript("OnMouseUp", function(self)
-    self:StopMovingOrSizing()
-end)
-tinsert(UISpecialFrames, Window:GetName())
+local function IsItemOwned(item)
+    if item.mount then
+        return select(11, C_MountJournal.GetMountInfoByID(item.mount))
+    elseif item.pet then
+        return C_PetJournal.GetNumCollectedInfo(item.pet) > 0
+    elseif item.toy then
+        return PlayerHasToy(item.id)
+    elseif item.quest then
+        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
+    elseif item.achievement then
+        return select(4, GetAchievementInfo(item.achievement))
+    else
+        return C_TransmogCollection.PlayerHasTransmog(item.id)
+    end
+    return false
+end
 
-local Close = CreateFrame("Button", name .. "WindowClose", Window, "UIPanelCloseButton")
-Close:SetPoint("TOPRIGHT", Window, "TOPRIGHT")
-Close:RegisterForClicks("AnyUp")
-Close:SetScript("OnMouseUp", function(self)
-    Window:StopMovingOrSizing()
-    Window:Hide()
-end)
+---
+-- Global Window Functions
+---
 
-local Settings = CreateFrame("Button", name .. "WindowSettings", Window, "UIPanelButtonTemplate")
-Settings:SetText("Settings")
-Settings:SetWidth(large*4)
-Settings:SetPoint("RIGHT", Close, "LEFT", small, 1)
-Settings:RegisterForClicks("AnyUp")
-Settings:SetScript("OnMouseUp", function(self)
-    Window:StopMovingOrSizing()
-    -- Window:Hide()
-    InterfaceOptionsFrame_OpenToCategory(ns.Options)
-    InterfaceOptionsFrame_OpenToCategory(ns.Options)
-end)
+local function CreateScroller(cfg)
+    local Scroller = CreateFrame("ScrollFrame", ADDON_NAME .. "Scroller" .. string.gsub(cfg.label, "%s+", ""), cfg.parent, "UIPanelScrollFrameTemplate")
+    Scroller:SetPoint("BOTTOMRIGHT", cfg.parent, "BOTTOMRIGHT", -28, 8)
+    Scroller:SetWidth(cfg.width - 24)
+    Scroller:SetHeight(cfg.height)
+    Scroller.title = cfg.label
+    Scroller:Hide()
 
-local i = 0
-local Scroller = {}
-local Content = {}
-local prevTab
-for title, expansion in pairs(expansions) do
-    i = i + 1
+    local Content = CreateFrame("Frame", ADDON_NAME .. "Scroller" .. string.gsub(cfg.label, "%s+", "") .. "Content", Scroller)
+    Content:SetWidth(cfg.width - 24)
+    Content:SetHeight(1)
+    Content.offset = -large
 
-    local scroller = CreateFrame("ScrollFrame", name .. "Scroller" .. i, Window, "UIPanelScrollFrameTemplate")
-    scroller:SetWidth(Window:GetWidth() - 42)
-    scroller:SetHeight(Window:GetHeight() - 36)
-    scroller:SetPoint("BOTTOMRIGHT", Window, "BOTTOMRIGHT", -28, 8)
-    scroller:Hide()
-    tinsert(Scroller, scroller)
-
-    local content = CreateFrame("Frame", name .. "Content" .. i, scroller)
-    content:SetWidth(1)
-    content:SetHeight(1)
-    tinsert(Content, content)
-
-    scroller:SetScrollChild(content)
-    scroller:SetScript("OnShow", function()
-        scroller:SetScrollChild(content)
+    Scroller:SetScrollChild(Content)
+    Scroller:SetScript("OnShow", function()
+        Scroller:SetScrollChild(Content)
     end)
 
-    local tab = CreateFrame("Button", name .. "Tab" .. i, Window, "CharacterFrameTabButtonTemplate")
-    tab:SetFrameStrata("LOW")
-    tab:SetText(title)
-    tab:SetPoint("TOPLEFT", prevTab and prevTab or Window, prevTab and "TOPRIGHT" or "BOTTOMLEFT", prevTab and -medium or 0, prevTab and 0 or small)
-    tab:RegisterForClicks("AnyUp")
-    tab:SetScript("OnMouseUp", function(self)
-        for _, frame in pairs(Scroller) do
-            frame:Hide()
-        end
-        scroller:Show()
-        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-    end)
-
-    prevTab = tab
+    Scroller.Content = Content
+    return Scroller
 end
 
-local Resize = CreateFrame("Button", name .. "WindowResize", Window)
-Resize:SetWidth(10)
-Resize:SetHeight(10)
-Resize:SetPoint("TOPLEFT", Window, "BOTTOMRIGHT")
-Resize:RegisterForClicks("AnyUp")
-Resize:SetScript("OnMouseDown", function(self, button)
-    Window:StartSizing()
-    self.isMoving = true
-    self.hasMoved = false
-end)
-Resize:SetScript("OnMouseUp", function(self)
-    if self.isMoving then
-        Window:StopMovingOrSizing()
-        for _, frame in pairs(Scroller) do
-            frame:SetWidth(Window:GetWidth() - 42)
-            frame:SetHeight(Window:GetHeight() - 36)
-        end
-        self.isMoving = false
-        self.hasMoved = true
-    end
-end)
+local function CreateTab(cfg)
+    local Tab = CreateFrame("Button", ADDON_NAME .. "Tab" .. string.gsub(cfg.label, "%s+", ""), cfg.parent)
+    Tab:SetPoint("TOPLEFT", cfg.relativeTo, cfg.relativePoint, cfg.x, cfg.y)
+    Tab:SetWidth(64)
+    Tab:SetHeight(64)
+    Tab:EnableMouse(true)
+    Tab.title = cfg.label
 
-Window:Hide()
-Window:SetScript("OnShow", function()
-    PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
-    for _, frame in pairs(Scroller) do
-        frame:SetWidth(Window:GetWidth() - 42)
-        frame:SetHeight(Window:GetHeight() - 36)
+    local TabBackground = Tab:CreateTexture(nil, "BACKGROUND")
+    TabBackground:SetAllPoints()
+    TabBackground:SetTexture(132074)
+    TabBackground:SetDesaturated(1)
+
+    local TabIcon = Tab:CreateTexture(nil, "ARTWORK")
+    TabIcon:SetWidth(Tab:GetWidth() * 0.6)
+    TabIcon:SetHeight(Tab:GetHeight() * 0.6)
+    TabIcon:SetPoint("LEFT", Tab, "LEFT", 0, 6)
+    TabIcon:SetTexture(cfg.icon)
+
+    Tab:SetScript("OnEnter", function()
+        TabBackground:SetDesaturated(nil)
+    end)
+    Tab:SetScript("OnLeave", function()
+        TabBackground:SetDesaturated(1)
+    end)
+
+    return Tab
+end
+
+---
+-- Core Stuff
+---
+
+function ns:RegisterCurrency(Currency)
+    if not Currency then return end
+    ns.Currencies = ns.Currencies or {}
+    table.insert(ns.Currencies, Currency)
+end
+
+function ns:RefreshCurrencies()
+    for _, Currency in ipairs(ns.Currencies) do
+        local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency)
+        local quantity = currency.discovered and currency.quantity or 0
+        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
+        Currency:SetText(ns:TextColor(commaValue(currency.quantity) .. (currency.maxQuantity > 0 and "/" .. max or ""), "ffffff") .. " " .. ns:TextColor(currency.name, Currency.color and Currency.color or "ffffff"))
     end
-    -- Begin by highlighting the latest expansion
-    ns.Scroller[1]:Show()
-    -- Window Title
-    local Heading = Window:CreateFontString(name .. "Heading", "ARTWORK", "GameFontNormal")
-    Heading:SetHeight(20)
-    Heading:SetPoint("TOPLEFT", Window, "TOPLEFT", medium+small, -small)
-    Heading:SetJustifyH("LEFT")
-    Heading:SetText(TextColor(ns.name, "ffffff") .. " " .. TextColor(ns.expansion, ns.color))
-    -- Version
-    ns:CreateLabel({
-        name = name .. "Version",
-        parent = Window,
-        label = TextColor("v" .. ns.version),
-        relativeTo = Heading,
-        initialPoint = "LEFT",
-        relativePoint = "RIGHT",
-        offsetX = small,
-        offsetY = 0,
-        ignorePlacement = true,
-    })
+end
+
+function ns:RegisterFaction(Faction)
+    if not Faction then return end
+    ns.Factions = ns.Factions or {}
+    table.insert(ns.Factions, Faction)
+end
+
+function ns:RefreshFactions()
+    for _, Faction in ipairs(ns.Factions) do
+        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, _, _ = GetFactionInfoByID(Faction.faction)
+        local quantity = commaValue(reputation - reputationMin)
+        Faction:SetText(ns:TextColor(string.format(L.ReputationWith, reputation < reputationMax and quantity .. "/" .. commaValue(reputationMin) or quantity, ns:TextColor(factionName, Faction.color and Faction.color or "ffffff")), "ffffff"))
+    end
+end
+
+---
+-- PVP
+---
+
+function ns:CreatePVP(Parent, Relative)
+    local PVP = Parent:CreateFontString(ADDON_NAME .. "PVP", "ARTWORK", "GameFontNormalLarge")
+    PVP:SetPoint("TOPLEFT", Relative, "TOPLEFT", 0, -gigantic-(Relative.offset or 0))
+    PVP:SetJustifyH("LEFT")
+    PVP:SetText(ns:TextIcon(236396) .. "  " .. ns:TextColor("PVP", "f5c87a"))
+    Relative = PVP
+    local LittleRelative = PVP
+
+    local Honor = Parent:CreateFontString(ADDON_NAME .. "Honor", "ARTWORK", "GameFontNormal")
+    Honor:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+    Honor:SetJustifyH("LEFT")
+    Honor.currency = 1792
+    Honor.color = "f5c87a"
+    ns:RegisterCurrency(Honor)
+    LittleRelative = Honor
+
+    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
+    Conquest:SetPoint("LEFT", LittleRelative, "RIGHT", medium, 0)
+    Conquest:SetJustifyH("LEFT")
+    Conquest.currency = 1602
+    Conquest.color = "f5c87a"
+    ns:RegisterCurrency(Conquest)
+
+    ns:RefreshCurrencies()
+
+    local Warmode = CreateFrame("Button", ADDON_NAME .. "Warmode", Parent)
+    local WarmodeLabel = Warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    WarmodeLabel:SetJustifyH("LEFT")
+    WarmodeLabel:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    Warmode:SetAllPoints(WarmodeLabel)
+    ns:RegisterWarmode(WarmodeLabel)
+    ns:RefreshWarmodes()
+    Warmode:SetScript("OnClick", function()
+        if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
+            C_PvP.ToggleWarMode()
+        elseif C_PvP.IsWarModeDesired() then
+            RaidNotice_AddMessage(RaidBossEmoteFrame, L.alpha, ChatTypeInfo["RAID_WARNING"])
+        else
+            RaidNotice_AddMessage(RaidBossEmoteFrame, string.format(L.beta, factionCity), ChatTypeInfo["RAID_WARNING"])
+        end
+    end)
+
+    Relative.offset = large
+    return Relative
+end
+
+function ns:RegisterWarmode(warmode)
+    if not warmode then return end
+    ns.Warmodes = ns.Warmodes or {}
+    table.insert(ns.Warmodes, warmode)
+end
+
+function ns:RefreshWarmodes()
+    for _, label in ipairs(ns.Warmodes) do
+        local warmode = C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r"
+        label:SetText(ns:TextColor("Warmode is " .. warmode .. ".", "ffffff"))
+    end
+end
+
+---
+-- Zone
+---
+
+function ns:CreateZone(Parent, Relative, zone)
+    local mapName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
+
+    local Zone = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
+    Zone:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Zone:SetJustifyH("LEFT")
+    Zone:SetText(ns:TextIcon(zoneIcon) .. "  " .. ns:TextColor(mapName:upper(), zoneColor))
+    Relative = Zone
+    local LittleRelative = Zone
+
+    if zone.covenant then
+        local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+        local zoneCovenant = ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
+        local zonePhrase = ns:TextColor(string.format(covenants[zone.covenant].phrase, zoneCovenant))
+        local Covenant = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
+        Covenant:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+        Covenant:SetJustifyH("LEFT")
+        Covenant:SetText(zonePhrase)
+        LittleRelative = Covenant
+    end
+
+    if zone.faction then
+        if select(4, GetFactionInfoByID(zone.faction)) > 0 then
+            local Faction = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
+            Faction:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+            Faction:SetJustifyH("LEFT")
+            Faction.faction = zone.faction
+            Faction.color = zoneColor
+            ns:RegisterFaction(Faction)
+            ns:RefreshFactions()
+            LittleRelative = Faction
+        end
+    end
+
+    if zone.currency then
+        local Currency = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
+        Currency:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+        Currency:SetJustifyH("LEFT")
+        Currency.currency = zone.currency
+        Currency.color = zoneColor
+        ns:RegisterCurrency(Currency)
+        ns:RefreshCurrencies()
+        LittleRelative = Currency
+    end
+
+    -- For each Rare in the Zone
     local i = 0
+    for _, rare in ipairs(zone.rares) do
+        if rare.hidden then
+        elseif type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        elseif type(rare.quest) == "number" and (rare.worldboss) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        -- elseif type(rare.quest) == "number" and (rare.biweekly or rare.weekly) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        else
+            local items = {}
+            if rare.items then
+                -- For each Item dropped by the Rare in the Zone
+                for _, item in ipairs(rare.items) do
+                    if not GetItemInfo(item.id) then
+                    elseif RAVFOR_data.options.showTransmog == false and item.transmog then
+                    elseif RAVFOR_data.options.showMounts == false and item.mount then
+                    elseif RAVFOR_data.options.showPets == false and item.pet then
+                    elseif RAVFOR_data.options.showToys == false and item.toy then
+                    elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
+                    elseif RAVFOR_data.options.showCannotUse == false and ((item.covenantOnly and covenant ~= zone.covenant) or (item.class and item.class:upper() ~= class)) then
+                    elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
+                    else
+                        -- Insert Item into Items
+                        table.insert(items, item)
+                    end
+                end
+            end
+            if RAVFOR_data.options.showNoDrops == false and #items == 0 and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
+            else
+                -- Rare
+                i = i + 1
+                local Rare = ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
+                Relative = Rare
+            end
+        end
+    end
+
+    return Relative
+end
+
+---
+-- Rare
+---
+
+function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
+    local zoneCovenant = zone.covenant and ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
+
+    local dead = IsRareDead(rare) and checkmark or ((type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest)) or rare.biweekly or rare.weekly) and quest or skull
+    local covenantRequired = rare.covenantRequired and ns:TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and ns:TextColor(",") or "") or ""
+    local drops = #items > 0 and  " " .. ns:TextColor(L.Drops, "bbbbbb") or ""
+
+    local Rare = CreateFrame("Button", ADDON_NAME .. "Rare" .. rare.id, Parent)
+    local RareLabel = Rare:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    RareLabel:SetJustifyH("LEFT")
+    RareLabel:SetText(dead .. " " .. ns:TextColor(i .. ". ") .. rare.name .. covenantRequired .. drops)
+    RareLabel:SetHeight(16)
+    RareLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Rare:SetAllPoints(RareLabel)
+    Rare:SetScript("OnClick", function()
+        -- Mark the Rare
+        ns:NewTarget(zone, rare)
+        -- Send the Rare to Group Members
+        ns:SendTarget(zone, rare)
+    end)
+    RareLabel.rare = rare
+    ns:RegisterRare(RareLabel)
+    Relative = Rare
+
+    if RAVFOR_data.options.showReputation == true and rare.reputation then
+        local Reputation = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Reputation", "ARTWORK", "GameFontNormal")
+        Reputation:SetJustifyH("LEFT")
+        Reputation:SetText("    " .. ns:TextColor("+ " .. rare.reputation .. " " .. L.Reputation, "8080ff"))
+        Reputation:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
+        Relative = Reputation
+    end
+
+    if #items > 0 then
+        for _, item in ipairs(items) do
+            local Item = ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
+            Relative = Item
+        end
+    end
+
+    return Relative
+end
+
+function ns:RegisterRare(Rare)
+    if not Rare then return end
+    ns.Rares = ns.Rares or {}
+    table.insert(ns.Rares, Rare)
+end
+
+function ns:RefreshRares()
+    for _, Rare in ipairs(ns.Rares) do
+        local withoutDead = string.gsub(string.gsub(string.gsub(Rare:GetText(), quest, ""), skull, ""), checkmark, "")
+        Rare:SetText((IsRareDead(Rare.rare) and checkmark or ((type(Rare.rare.quest) == "number" and C_QuestLog.IsWorldQuest(Rare.rare.quest)) or Rare.rare.biweekly or Rare.rare.weekly) and quest or skull) .. withoutDead)
+    end
+end
+
+function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
+    local zoneCovenant = zone.covenant and ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
+
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
+    local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
+    local guaranteed = item.guaranteed and ns:TextColor(" 100% drop!") or ""
+    local achievement = item.achievement and ns:TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
+    local covenantOnly = item.covenantOnly and ns:TextColor(L.OnlyFor, "bbbbbb") .. zoneCovenant or ""
+    local classOnly = item.class and ns:TextColor(L.OnlyFor, "bbbbbb") .. itemClass or ""
+    local owned = IsItemOwned(item) and " " .. checkmark or ""
+
+    local Item = CreateFrame("Button", ADDON_NAME .. "Item" .. item.id, Parent)
+    local ItemLabel = Item:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    ItemLabel:SetJustifyH("LEFT")
+    ItemLabel:SetText("    " .. ns:TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. covenantOnly .. classOnly .. owned)
+    ItemLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
+    ItemLabel:SetWidth(Parent:GetWidth())
+    Item:SetAllPoints(ItemLabel)
+    Item:SetScript("OnClick", function()
+        -- TODO Should open Item Tooltip/Mount Journal/Pet Journal/etc.
+    end)
+    Relative = Item
+
+    ItemLabel.item = item
+    ns:RegisterItem(ItemLabel)
+
+    return Relative
+end
+
+function ns:RegisterItem(Item)
+    if not Item then return end
+    ns.Items = ns.Items or {}
+    table.insert(ns.Items, Item)
+end
+
+function ns:RefreshItems()
+    for _, Item in ipairs(ns.Items) do
+        local withoutOwned = string.gsub(Item:GetText(), checkmark, "")
+        Item:SetText(withoutOwned .. (IsItemOwned(Item.item) and checkmark or ""))
+    end
+end
+
+---
+-- Notes
+---
+
+function ns:CreateNotes(Parent, Relative, notes)
+    local Notes = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    Notes:SetJustifyH("LEFT")
+    Notes:SetText(ns:TextIcon(1506451) .. "  " .. ns:TextColor("Notes", "eeeeee"))
+    Notes:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Relative = Notes
+
+    for i, note in ipairs(notes) do
+        local Note = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        Note:SetJustifyH("LEFT")
+        Note:SetText(ns:TextColor(note, "eeeeee"))
+        Note:SetWidth(Parent:GetWidth())
+        Note:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -medium)
+        Relative = Note
+    end
+
+    return Relative
+end
+
+---
+-- Targets
+---
+
+function ns:NewTarget(zone, rare)
+    local zoneName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local c = {}
+    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+        tinsert(c, d)
+    end
+    -- Print message to chat
+    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    -- Add the waypoint to the map and track it
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
+    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+end
+
+function ns:SendTarget(zone, rare)
+    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
+    local playerName = UnitName("player")
+    local isLead = false
+    for i = 1, MAX_RAID_MEMBERS do
+        local lookup, rank = GetRaidRosterInfo(i)
+        if lookup == playerName then
+            if rank > 1 then isLead = true end
+            break
+        end
+    end
+    if isLead then
+        local inInstance, _ = IsInInstance()
+        if inInstance then
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
+            print("Sending target to Instance members…")
+        elseif IsInGroup() then
+            if GetNumGroupMembers() > 5 then
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
+                print("Sending target to Raid members…")
+            else
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
+                print("Sending target to Party members…")
+            end
+        end
+    -- Enable for testing
+    -- else
+    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
+    end
+end
+
+---
+-- Great Vault (Shadowlands)
+---
+
+function ns:CreateGreatVault(Parent, Relative)
+    if not C_WeeklyRewards.CanClaimRewards() then
+        return Relative
+    end
+
+    local GreatVault = Parent:CreateFontString(ADDON_NAME .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
+    GreatVault:SetJustifyH("LEFT")
+    GreatVault:SetText(ns:TextIcon(3847780) .. "  " .. ns:TextColor("The Great Vault", "8899c6"))
+    GreatVault:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Relative = GreatVault
+
+    local GreatVaultNotice = Parent:CreateFontString(ADDON_NAME .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
+    GreatVaultNotice:SetJustifyH("LEFT")
+    GreatVaultNotice:SetText(ns:TextColor("Go to Oribos to claim your rewards!", "ff6666"))
+    GreatVaultNotice:SetPoint("LEFT", Relative, "RIGHT", large, 0)
+
+    return Relative
+end
+
+---
+-- Sp-eye-glass (Shadowlands)
+---
+
+function ns:CreateSpeyeglass(Parent, Relative)
+
+    local Speyeglass = CreateFrame("Button", ADDON_NAME .. "Speyeglass", Parent)
+    local SpeyeglassLabel = Speyeglass:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    SpeyeglassLabel:SetJustifyH("LEFT")
+    SpeyeglassLabel:SetText(ns:TextIcon(134441) .. "  " .. ns:TextColor("Have you found your |cff0070dd|Hitem:183696::::::::60:63:::::::|h[Sp-eye-glass]|h|r in " .. ns:TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
+    SpeyeglassLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Speyeglass:SetAllPoints(SpeyeglassLabel)
+    Speyeglass:SetScript("OnClick", function()
+        RaidNotice_AddMessage(RaidBossEmoteFrame, "Look for a treasure chest in Maldraxxus at 48.33, 16.35", ChatTypeInfo["RAID_WARNING"])
+        C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1536, 0.4833, 0.1635))
+        C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+    end)
+
+    return Speyeglass
+end
+
+---
+-- Covenant: Renown, Reservoir Anima, Redeemed Souls (Shadowlands)
+---
+
+function ns:CreateCovenant(Parent, Relative)
+    if C_Covenants.GetActiveCovenantID() == 0 then
+        return Relative
+    end
+
+    local Covenant = Parent:CreateFontString(ADDON_NAME .. "Covenant", "ARTWORK", "GameFontNormalLarge")
+    Covenant:SetJustifyH("LEFT")
+    Covenant:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Relative = Covenant
+    local LittleRelative = Covenant
+
+    local Renown = Parent:CreateFontString(ADDON_NAME .. "Renown", "ARTWORK", "GameFontNormal")
+    Renown:SetJustifyH("LEFT")
+    Renown:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
+    LittleRelative = Renown
+
+    ns:RegisterCovenant(Covenant, Renown)
+    ns:RefreshCovenant()
+
+    local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
+    Anima:SetPoint("LEFT", LittleRelative, "RIGHT", medium, 0)
+    Anima:SetJustifyH("LEFT")
+    Anima.currency = 1813
+    Anima.color = "95c3e1"
+    ns:RegisterCurrency(Anima)
+    LittleRelative = Anima
+
+    local RedeemedSouls = Parent:CreateFontString(ADDON_NAME .. "RedeemedSouls", "ARTWORK", "GameFontNormal")
+    RedeemedSouls:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    RedeemedSouls:SetJustifyH("LEFT")
+    RedeemedSouls.currency = 1810
+    RedeemedSouls.color = "f5dcd0"
+    ns:RegisterCurrency(RedeemedSouls)
+    LittleRelative = RedeemedSouls
+
+    local GratefulOfferings = Parent:CreateFontString(ADDON_NAME .. "GratefulOfferings", "ARTWORK", "GameFontNormal")
+    GratefulOfferings:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    GratefulOfferings:SetJustifyH("LEFT")
+    GratefulOfferings.currency = 1885
+    GratefulOfferings.color = "96dc93"
+    ns:RegisterCurrency(GratefulOfferings)
+
+    ns:RefreshCurrencies()
+
+    Relative.offset = large + large + medium
+    return Relative
+end
+
+function ns:RegisterCovenant(Covenant, Renown)
+    if (not Covenant) or (not Renown) then return end
+    ns.Covenant = Covenant
+    ns.Renown = Renown
+end
+
+function ns:RefreshCovenant()
+    local covenant = C_Covenants.GetActiveCovenantID()
+    local renown = C_CovenantSanctumUI.GetRenownLevel()
+    local maxRenown = GetMaxRenown()
+
+    ns.Covenant:SetText(ns:TextIcon(3726261) .. "  " .. ns:TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
+    ns.Renown:SetText((renown < maxRenown and ns:TextColor(renown .. "/" .. maxRenown, "ff6666") or ns:TextColor(renown, "ffffff")) .. ns:TextColor(" Renown", ns.data.covenants[covenant].color))
+end
+
+---
+-- Torghast: Soul Ash (Shadowlands)
+---
+
+function ns:CreateTorghast(Parent, Relative)
+    if UnitLevel("player") < 50 then
+        return Relative
+    end
+
+    local Torghast = Parent:CreateFontString(ADDON_NAME .. "Torghast", "ARTWORK", "GameFontNormalLarge")
+    Torghast:SetJustifyH("LEFT")
+    Torghast:SetText(ns:TextIcon(3642306) .. "  " .. ns:TextColor(("Torghast"):upper(), "b0ccd8"))
+    Torghast:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
+    Relative = Torghast
+
+    local SoulAsh = Parent:CreateFontString(ADDON_NAME .. "SoulAsh", "ARTWORK", "GameFontNormal")
+    SoulAsh:SetJustifyH("LEFT")
+    SoulAsh:SetPoint("LEFT", Relative, "RIGHT", large, 0)
+
+    SoulAsh.currency = 1828
+    SoulAsh.color = "b0ccd8"
+    ns:RegisterCurrency(SoulAsh)
+    ns:RefreshCurrencies()
+
+    return Relative
+end
+
+
+---
+-- Window
+---
+function ns:BuildWindow()
+    local Scrollers = {}
+    local Tabs = {}
+
+    local Window = CreateFrame("Frame", ADDON_NAME .. "Window", UIParent, "UIPanelDialogTemplate")
+    Window:SetFrameStrata("MEDIUM")
+    Window:SetWidth(width)
+    Window:SetHeight(height)
+    Window:SetPoint("CENTER", 0, 0)
+    Window:EnableMouse(true)
+    Window:SetMovable(true)
+    Window:SetClampedToScreen(true)
+    Window:SetResizable(true)
+    Window:SetMinResize(width, height)
+    Window:SetMaxResize(width*1.5, height*2)
+    Window:RegisterForDrag("LeftButton")
+    Window:SetScript("OnMouseDown", function()
+        Window:StartMoving()
+    end)
+    Window:SetScript("OnMouseUp", function()
+        Window:StopMovingOrSizing()
+    end)
+    tinsert(UISpecialFrames, Window:GetName())
+    Window:Hide()
+
+    local OptionsButton = CreateFrame("Button", ADDON_NAME .. "OptionsButton", Window, "UIPanelButtonTemplate")
+    OptionsButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
+    OptionsButton:SetWidth(18)
+    OptionsButton:SetHeight(18)
+    OptionsButton:RegisterForClicks("AnyUp")
+    OptionsButton:SetScript("OnMouseUp", function(self)
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
+        InterfaceOptionsFrame_OpenToCategory(ns.Options)
+        InterfaceOptionsFrame_OpenToCategory(ns.Options)
+    end)
+    local OptionsButtonIcon = OptionsButton:CreateTexture()
+    OptionsButtonIcon:SetAllPoints(OptionsButton)
+    OptionsButtonIcon:SetTexture(134063)
+
+    local Heading = Window:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    Heading:SetPoint("TOP", Window, "TOP")
+    Heading:SetPoint("BOTTOM", Window, "TOP", 0, -30)
+    Heading:SetText(ns:TextColor(ns.name .. " ") .. ns:TextColor(ns.expansion, ns.color) .. ns:TextColor(" v" .. ns.version))
+
+    local Scroller = CreateScroller({
+        label = "General",
+        parent = Window,
+        width = Window:GetWidth() - 20,
+        height = Window:GetHeight() - Heading:GetHeight() - 6,
+        current = true,
+    })
+    Scroller:Show()
+    Scrollers["General"] = Scroller
     for title, expansion in pairs(expansions) do
-        i = i + 1
-        prevControl = Heading
-        -- PVP
-        ns:CreatePVP(Content[i])
+        local Scroller = CreateScroller({
+            label = title,
+            parent = Window,
+            width = Window:GetWidth() - 20,
+            height = Window:GetHeight() - Heading:GetHeight() - 6,
+        })
+        Scrollers[title] = Scroller
+    end
+
+    local Tab = CreateTab({
+        label = "General",
+        icon = 1542860,
+        parent = Window,
+        relativeTo = Window,
+        relativePoint = "TOPRIGHT",
+        x = -3,
+        y = -Heading:GetHeight(),
+        current = true,
+    })
+    Tabs["General"] = Tab
+    local previousTab = Tab
+    for title, expansion in pairs(expansions) do
+        local Tab = CreateTab({
+            label = title,
+            icon = expansion.icon,
+            parent = Window,
+            relativeTo = previousTab,
+            relativePoint = "BOTTOMLEFT",
+            x = 0,
+            y = 0,
+        })
+        Tabs[title] = Tab
+        previousTab = Tab
+    end
+
+    -- Set up where to put content of each Scroller
+    local Parent = Scrollers["General"].Content
+    local Relative = Parent
+
+    -- PVP
+    local PVP = ns:CreatePVP(Parent, Relative)
+    Relative = PVP
+    -- Notes
+    local Notes = ns:CreateNotes(Parent, Relative, ns.data.notes)
+
+    for title, expansion in pairs(expansions) do
+        Parent = Scrollers[title].Content
+        Relative = Parent
         if title == "Shadowlands" then
             -- Covenant
-            ns:CreateCovenant(Content[i], medium)
+            local Covenant = ns:CreateCovenant(Parent, Relative)
+            Relative = Covenant
             -- Torghast
-            ns:CreateTorghast(Content[i], medium)
+            local Torghast = ns:CreateTorghast(Parent, Relative)
+            Relative = Torghast
             -- Great Vault
-            ns:CreateGreatVault(Content[i])
-            -- Sp-eye-glass
-            ns:CreateSpeyeglass(Content[i])
+            local GreatVault = ns:CreateGreatVault(Parent, Relative)
+            Relative = GreatVault
         end
-        -- For each Zone
-        for j, zone in ipairs(expansion.zones) do
+        for i, zone in ipairs(expansion.zones) do
+            if i > 1 then
+                Relative.offset = medium
+            end
             -- Zone
-            ns:CreateZone(Content[i], ((title ~= "Shadowlands" and j == 1) and medium or 0), zone)
+            local Zone = ns:CreateZone(Parent, Relative, zone)
+            Relative = Zone
+        end
+        if title == "Shadowlands" then
+            -- Sp-eye-glass
+            local Speyeglass = ns:CreateSpeyeglass(Parent, Relative)
+            Relative = Speyeglass
         end
         -- Notes
-        if expansion.notes then
-            ns:CreateNotes(Content[i], 0, expansion.notes)
+        if expansion.notes and #expansion.notes > 0 then
+            local Notes = ns:CreateNotes(Parent, Relative, expansion.notes)
+            Relative = Notes
         end
     end
 
     Window:SetScript("OnShow", function()
-        for _, frame in pairs(Scroller) do
-            frame:SetWidth(Window:GetWidth() - 42)
-            frame:SetHeight(Window:GetHeight() - 36)
-        end
         PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
     end)
 
     Window:SetScript("OnHide", function()
         PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
     end)
-end)
 
-ns.Scroller = Scroller
-ns.Content = Content
-ns.Window = Window
+    ns.Window = Window
+
+    for title, Tab in pairs(Tabs) do
+        Tab:SetScript("OnClick", function(self)
+            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+            for lookup, Scroller in pairs(Scrollers) do
+                if title == lookup then
+                    Scroller:Show()
+                else
+                    Scroller:Hide()
+                end
+            end
+        end)
+    end
+end

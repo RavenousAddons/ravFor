@@ -1,182 +1,178 @@
-local name, ns = ...
+local ADDON_NAME, ns = ...
 local L = ns.L
 
 local small = 6
 local medium = 12
 local large = 16
+local gigantic = 24
 
-local Options = CreateFrame("Frame", name .. "Options", InterfaceOptionsFramePanelContainer)
-Options.name = ns.name
-Options.controlTable = {}
-Options.okay = function(self)
-    for _, control in pairs(self.controls) do
-        RAVFOR_data.options[control.var] = control:GetValue()
+---
+-- Options Controls
+---
+
+local OptionsControls = {
+    {
+        type = "Label",
+        name = ADDON_NAME .. "OptionsTitle",
+        label = ns.name .. " " .. ns.expansion .. " v" .. ns.version,
+        relativeTo = ns.Options,
+        relativePoint = "TOPLEFT",
+        offsetY = 0,
+        fontObject = "GameFontNormalLarge",
+    },
+    {
+        type = "Label",
+        name = ADDON_NAME .. "OptionsSubTitle",
+        label = "|cffffffff" .. ns.notes .. "|r",
+    },
+    {
+        type = "Label",
+        name = ADDON_NAME .. "OptionsHeading",
+        label = L.OptionsHeading,
+        fontObject = "GameFontNormalLarge",
+    },
+    {
+        type = "Checkbox",
+        label = L.MacroLabel,
+        tooltip = string.format(L.MacroTooltip, ns.name),
+        var = "macro",
+    },
+    {
+        type = "Label",
+        name = "SupportHeading",
+        label = L.SupportHeading,
+        fontObject = "GameFontNormalLarge",
+    },
+    {
+        type = "Label",
+        name = "SubHeadingSupport1",
+        label = "|cffffffff" .. string.format(L.Support1, ns.name) .. "|r",
+    },
+    {
+        type = "Label",
+        name = "SubHeadingSupport2",
+        label = "|cffffffff" .. L.Support2 .. "|r",
+    },
+    {
+        type = "Label",
+        name = "SubHeadingSupport3",
+        label = "|cffffffff" .. string.format(L.Support3, ns.discord) .. "|r",
+    },
+}
+
+---
+-- Local Options Functions
+---
+
+local function RegisterControl(Control, Parent)
+    if (not Parent) or (not Control) then
+        return
     end
-    for _, control in pairs(self.controls) do
-        if control.restart then
-            ReloadUI()
+    Parent.Controls = Parent.Controls or {}
+    table.insert(Parent.Controls, Control)
+end
+
+local function RefreshControls(Controls)
+    for _, Control in pairs(Controls) do
+        Control:SetValue(Control)
+        Control.oldValue = Control:GetValue()
+    end
+end
+
+---
+-- Global Options Functions
+---
+
+function ns:RegisterDefaultOption(key, value)
+    if RAVFOR_data.options[key] == nil then
+        RAVFOR_data.options[key] = value
+    end
+end
+
+function ns:SetDefaultOptions()
+    if RAVFOR_data == nil then
+        RAVFOR_data = {}
+    end
+    if RAVFOR_data.options == nil then
+        RAVFOR_data.options = {}
+    end
+    for k, v in pairs(ns.defaults) do
+        ns:RegisterDefaultOption(k, v)
+    end
+end
+
+function ns:BuildOptions()
+    local Options = CreateFrame("Frame", ADDON_NAME .. "Options", InterfaceOptionsFramePanelContainer)
+    Options.name = ns.name .. " " .. ns.expansion
+    Options.controlTable = {}
+    Options.okay = function(self)
+        for _, Control in pairs(self.Controls) do
+            RAVFOR_data.options[Control.var] = Control:GetValue()
+            if Control.restart then
+                print("restart")
+                ReloadUI()
+            else
+                print("nah")
+            end
         end
     end
-end
-Options.default = function(self)
-    for _, control in pairs(self.controls) do
-        RAVFOR_data.options[control.var] = true
-    end
-end
-Options.cancel = function(self)
-    for _, control in pairs(self.controls) do
-        if control.oldValue and control.oldValue ~= control.getValue() then
-            control:SetValue()
+    Options.default = function(self)
+        for _, Control in pairs(self.Controls) do
+            RAVFOR_data.options[Control.var] = true
         end
     end
-end
-Options.refresh = function(self)
-    ns:RefreshControls(self.controls)
-end
-
-Options:Hide()
-Options:SetScript("OnShow", function()
-    local width = Options:GetWidth() - (large * 2)
-    local height = Options:GetHeight() - (large * 2)
-
-    local Content = CreateFrame("Frame", name .. "OptionsContent", Options)
-    Content:SetPoint("TOPLEFT", Options, "TOPLEFT", large, -large)
-    Content:SetWidth(width)
-    Content:SetHeight(height)
-
-    local UIControls = {
-        {
-            type = "Label",
-            name = name .. "OptionsTitle",
-            parent = Options,
-            label = ns.name .. " " .. ns.expansion .. " v" .. ns.version,
-            relativeTo = Content,
-            relativePoint = "TOPLEFT",
-            offsetY = 0,
-            fontObject = "GameFontNormalLarge",
-        },
-        {
-            type = "Label",
-            name = name .. "OptionsSubTitle",
-            parent = Options,
-            label = "|cffffffff" .. ns.notes .. "|r",
-        },
-        {
-            type = "Label",
-            name = name .. "OptionsHeading",
-            parent = Options,
-            label = L.OptionsHeading,
-            fontObject = "GameFontNormalLarge",
-        },
-        {
-            type = "Checkbox",
-            parent = Options,
-            label = L.MacroLabel,
-            tooltip = string.format(L.MacroTooltip, ns.name),
-            var = "macro",
-        },
-        {
-            type = "Checkbox",
-            parent = Options,
-            label = L.ReputationLabel,
-            tooltip = L.ReputationTooltip,
-            var = "showReputation",
-            needsRestart = true,
-        },
-        {
-            type = "Checkbox",
-            parent = Options,
-            label = L.NoDropsLabel,
-            tooltip = L.NoDropsTooltip,
-            var = "showNoDrops",
-            needsRestart = true,
-        },
-        {
-            type = "Checkbox",
-            parent = Options,
-            label = L.CannotUseLabel,
-            tooltip = L.CannotUseTooltip,
-            var = "showCannotUse",
-            needsRestart = true,
-        },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = L.CollectedLabel,
-        --     tooltip = L.CollectedTooltip,
-        --     var = "showOwned",
-        -- },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = "Gear Drops",
-        --     tooltip = "Show gear-type Items.",
-        --     var = "showGear",
-        -- },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = "Transmog Drops",
-        --     tooltip = "Show transmog Items.",
-        --     var = "showTransmog",
-        -- },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = "Mounts",
-        --     tooltip = "Show dropped mounts.",
-        --     var = "showMounts",
-        -- },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = "Pets",
-        --     tooltip = "Show dropped Pets.",
-        --     var = "showPets",
-        -- },
-        -- {
-        --     type = "Checkbox",
-        --     parent = Options,
-        --     label = "Toys",
-        --     tooltip = "Show dropped Toys.",
-        --     var = "showToys",
-        -- },
-        {
-            type = "Label",
-            name = "SupportHeading",
-            parent = Options,
-            label = L.SupportHeading,
-            fontObject = "GameFontNormalLarge",
-        },
-        {
-            type = "Label",
-            name = "SubHeadingSupport1",
-            parent = Options,
-            label = "|cffffffff" .. string.format(L.Support1, ns.name) .. "|r",
-        },
-        {
-            type = "Label",
-            name = "SubHeadingSupport2",
-            parent = Options,
-            label = "|cffffffff" .. L.Support2 .. "|r",
-        },
-        {
-            type = "Label",
-            name = "SubHeadingSupport3",
-            parent = Options,
-            label = "|cffffffff" .. string.format(L.Support3, ns.discord) .. "|r",
-        },
-    }
-
-    for _, control in pairs(UIControls) do
-        if control.type == "Label" then
-            ns:CreateLabel(control)
-        elseif control.type == "Checkbox" then
-            ns:CreateCheckbox(control)
+    Options.cancel = function(self)
+        for _, Control in pairs(self.Controls) do
+            if Control.oldValue and Control.oldValue ~= Control.getValue() then
+                Control:SetValue()
+            end
         end
     end
+    Options.refresh = function(self)
+        RefreshControls(self.Controls)
+    end
 
-    ns:RefreshControls(Options.controls)
-    Options:SetScript("OnShow", nil)
-end)
-ns.Options = Options
+    local OptionsHeading = Options:CreateFontString(ADDON_NAME .. "OptionsHeading", "ARTWORK", "GameFontNormalLarge")
+    OptionsHeading:SetPoint("TOPLEFT", Options, "TOPLEFT", large, -large)
+    OptionsHeading:SetJustifyH("LEFT")
+    OptionsHeading:SetText(ns.name .. " " .. ns.expansion .. " v" .. ns.version)
+
+    local OptionsSubHeading = Options:CreateFontString(ADDON_NAME .. "OptionsSubHeading", "ARTWORK", "GameFontNormal")
+    OptionsSubHeading:SetPoint("TOPLEFT", OptionsHeading, "BOTTOMLEFT", 0, -large)
+    OptionsSubHeading:SetJustifyH("LEFT")
+    OptionsSubHeading:SetText("|cffffffff" .. ns.notes .. "|r")
+
+    local OptionsConfiguration = Options:CreateFontString(ADDON_NAME .. "OptionsConfiguration", "ARTWORK", "GameFontNormalLarge")
+    OptionsConfiguration:SetPoint("TOPLEFT", OptionsSubHeading, "BOTTOMLEFT", 0, -gigantic)
+    OptionsConfiguration:SetJustifyH("LEFT")
+    OptionsConfiguration:SetText(L.Configuration .. ":")
+
+    local previous = OptionsConfiguration
+    for k, v in pairs(ns.defaults) do
+        local Checkbox = CreateFrame("CheckButton", ADDON_NAME .. "OptionsCheckbox" .. k, Options, "InterfaceOptionsCheckButtonTemplate")
+        Checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -large)
+        Checkbox.Text:SetText(L.Defaults[k].text)
+        Checkbox.tooltipText = L.Defaults[k].tooltip
+        Checkbox.restart = false
+        Checkbox.tooltipText = Checkbox.tooltipText .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+
+        Checkbox.GetValue = function(self)
+            return self:GetChecked()
+        end
+        Checkbox.SetValue = function(self)
+            self:SetChecked(RAVFOR_data.options[k])
+        end
+
+        Checkbox:SetScript("OnClick", function(self)
+            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+            self.restart = not self.restart
+            RAVFOR_data.options[k] = self:GetChecked()
+            RefreshControls(Options.Controls)
+        end)
+
+        RegisterControl(Checkbox, Options)
+        previous = Checkbox
+    end
+
+    ns.Options = Options
+end
