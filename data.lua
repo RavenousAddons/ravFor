@@ -32,6 +32,7 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
+                            hidden = true,
                             name = "Hunt: Death Elementals",
                             id = 172958, -- 172958, 122960, 172961, 172962
                             quest = 62593,
@@ -323,6 +324,7 @@ ns.data = {
                             name = "Mortanis",
                             id = 173104,
                             quest = 61816,
+                            worldquest = true,
                             waypoint = 32306700,
                             items = {
                                 {
@@ -831,6 +833,7 @@ ns.data = {
                             name = "Nurgash Muckformed",
                             id = 167526,
                             quest = 61814,
+                            worldquest = true,
                             waypoint = 27601460,
                             items = {
                                 {
@@ -1199,8 +1202,8 @@ ns.data = {
                         {
                             name = "Valinor <The Light of Eons>",
                             id = 167524,
-                            worldboss = true,
-                            quest = 61813, -- BROKEN, does not mark as worldboss
+                            quest = 61813,
+                            worldquest = true,
                             waypoint = 26602280,
                             items = {
                                 {
@@ -1550,6 +1553,7 @@ ns.data = {
                             name = "Oranomonos the Everbranching",
                             id = 167527,
                             quest = 61815,
+                            worldquest = true,
                             waypoint = 20606360,
                             items = {
                                 {
@@ -1880,7 +1884,7 @@ ns.data = {
                             name = "Rustfeather",
                             id = 152182,
                             quest = 55811,
-                            waypoint = 63807800,
+                            waypoint = 65637850,
                             items = {
                                 {
                                     id = 168370,

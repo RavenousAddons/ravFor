@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: 1.1.1
+## Version: 1.1.2
 
 ## Name: Ravenous For Shadowlands
 ## Title: Ravenous For |cffffc478Shadowlands|r

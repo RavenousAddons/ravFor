@@ -35,6 +35,15 @@ local function commaValue(amount)
     return formatted
 end
 
+local function contains(table, input)
+    for index, value in ipairs(table) do
+        if value == input then
+            return index
+        end
+    end
+    return false
+end
+
 local function GetMaxRenown()
     -- if 0, then reset is today but has not yet happened
     local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
@@ -250,7 +259,7 @@ end
 -- Zone
 ---
 
-function ns:CreateZone(Parent, Relative, zone)
+function ns:CreateZone(Parent, Relative, zone, worldQuests)
     local mapName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
@@ -308,9 +317,7 @@ function ns:CreateZone(Parent, Relative, zone)
     local i = 0
     for _, rare in ipairs(zone.rares) do
         if rare.hidden then
-        elseif type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
-        elseif type(rare.quest) == "number" and (rare.worldboss) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
-        -- elseif type(rare.quest) == "number" and (rare.biweekly or rare.weekly) and not C_QuestLog.AddQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        elseif type(rare.quest) == "number" and not contains(worldQuests, rare.quest) and (C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
         else
             local items = {}
             if rare.items then
@@ -658,10 +665,10 @@ function ns:CreateTorghast(Parent, Relative)
     return Relative
 end
 
-
 ---
 -- Window
 ---
+
 function ns:BuildWindow()
     local Scrollers = {}
     local Tabs = {}
@@ -758,6 +765,16 @@ function ns:BuildWindow()
         previousTab = Tab
     end
 
+    -- Get "Watched" World Quests
+    -- What is useful is that the weekly WQ Rare is auto-tracked on login, so we
+    -- can use this + quest completion to determine the weekly WQ Rare
+    local worldQuests = {}
+    if C_QuestLog.GetNumWorldQuestWatches() then
+        for i = 1, C_QuestLog.GetNumWorldQuestWatches() do
+            tinsert(worldQuests, C_QuestLog.GetQuestIDForWorldQuestWatchIndex(i))
+        end
+    end
+
     -- Set up where to put content of each Scroller
     local Parent = Scrollers["General"].Content
     local Relative = Parent
@@ -787,7 +804,7 @@ function ns:BuildWindow()
                 Relative.offset = medium
             end
             -- Zone
-            local Zone = ns:CreateZone(Parent, Relative, zone)
+            local Zone = ns:CreateZone(Parent, Relative, zone, worldQuests)
             Relative = Zone
         end
         if title == "Shadowlands" then
