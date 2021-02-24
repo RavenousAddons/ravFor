@@ -4,7 +4,7 @@
 
 ![General Tab](https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-General.png)
 
-![Shadowlands Tab]https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-Shadowlands.png)
+![Shadowlands Tab](https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-Shadowlands.png)
 
 # What is Ravenous For … for?
 
