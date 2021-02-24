@@ -17,7 +17,7 @@ ns.data = {
     notes = {
         "Thanks for using Ravenous For Shadowlands! I love making Addons that people find useful and improves their enjoyment of the game, more than anything else. If you'd like to get involved in any capacity, please reach out!",
         "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
-        "Still to come:\n\n- Tracking when relevant world quests/world bosses are available\n- Your brilliant idea? Get in touch!",
+        "Still to come:\n\n- Correctly tracking all different drop types (particularly items, armor, weapons remain)\n- Investigate Mythic+ and Rated PVP data that can be exposed by the API\n- Your brilliant idea? Please get in touch!",
     },
     expansions = {
         ["Shadowlands"] = {

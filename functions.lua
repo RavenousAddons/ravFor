@@ -47,3 +47,15 @@ function ns:EnsureMacro()
         end
     end
 end
+
+function ns:GetDropChanceData(dropChance, upperBound)
+    dropChance = dropChance / 100
+    upperBound = upperBound and upperBound or 100
+    for i = 1, upperBound do
+        local percentage = 1 - ((1 - dropChance) ^ i)
+        if percentage > 0.99 then
+            return i .. " " .. percentage * 100
+        end
+    end
+    return string.format("%.2f", (1 - ((1 - dropChance) ^ upperBound)) * 100 .. "")
+end
