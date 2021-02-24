@@ -2,9 +2,9 @@
 
 *Keep track of your progress through the expansion!*
 
-![General Tab](https://github.com/RavenousAddons/assets/raw/main/ravFor-1.1.2-General.png)
+![General Tab](https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-General.png)
 
-![Shadowlands Tab](https://github.com/RavenousAddons/assets/raw/main/ravFor-1.1.2-Shadowlands.png)
+![Shadowlands Tab]https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-Shadowlands.png)
 
 # What is Ravenous For … for?
 
