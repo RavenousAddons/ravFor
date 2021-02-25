@@ -11,29 +11,41 @@ end })
 
 -- Default (English)
 L.Version = "%s is the current version." -- ns.version
+L.NotLoaded = "Please wait a moment while data is populated."
+L.Loaded = "Finished loading successfully."
 L.Install = "Thanks for installing |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
 L.Update = "Thanks for updating to |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
 L.Configuration = "Configuration"
 L.Defaults = {
-    ["macro"] = {
+    {
+        var = "macro",
         text = "Automatically create macro",
         tooltip = "When enabled, a macro called |cffffffff" .. ns.name .. "|r will be automatically created and managed for you under |cffffffffGeneral Macros|r.",
     },
-    ["showNoDrops"] = {
-        text = "Show Rares with no drops/no reputation",
-        tooltip = "When enabled, Rares which neither drop items nor award currency or reputation will appear in the list.",
+    {
+        var = "minimapButton",
+        text = "Display Minimap button",
+        tooltip = "When enabled, a button will be attached to your Minimap that can open/close the window.",
     },
-    ["showOwned"] = {
-        text = "Show Collected Items",
-        tooltip = "When enabled, Items which you have already collected will appear in the list.",
-    },
-    ["showCannotUse"] = {
-        text = "Show Items you cannot use",
-        tooltip = "When enabled, Items which you cannot use (wrong Class/Covenant/etc.) will appear in the list.",
-    },
-    ["showReputation"] = {
+    {
+        var = "showReputation",
         text = "Show Reputation gains",
         tooltip = "When enabled, the list will show which Rares award reputation upon killing them.",
+    },
+    {
+        var = "showOwned",
+        text = "Show Collected Items",
+        tooltip = "When enabled, Items which you have already collected will appear in lists.",
+    },
+    {
+        var = "showCannotUse",
+        text = "Show Items you cannot use",
+        tooltip = "When enabled, Items which you cannot use (wrong Class/Covenant/etc.) will appear in lists.",
+    },
+    {
+        var = "showNoDrops",
+        text = "Show Rares with no drops/no reputation",
+        tooltip = "When enabled, Rares which neither drop items nor award currency or reputation will appear in lists.",
     },
 }
 L.SupportHeading = "Help and Support:"

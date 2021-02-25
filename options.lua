@@ -7,60 +7,6 @@ local large = 16
 local gigantic = 24
 
 ---
--- Options Controls
----
-
-local OptionsControls = {
-    {
-        type = "Label",
-        name = ADDON_NAME .. "OptionsTitle",
-        label = ns.name .. " " .. ns.expansion .. " v" .. ns.version,
-        relativeTo = ns.Options,
-        relativePoint = "TOPLEFT",
-        offsetY = 0,
-        fontObject = "GameFontNormalLarge",
-    },
-    {
-        type = "Label",
-        name = ADDON_NAME .. "OptionsSubTitle",
-        label = "|cffffffff" .. ns.notes .. "|r",
-    },
-    {
-        type = "Label",
-        name = ADDON_NAME .. "OptionsHeading",
-        label = L.OptionsHeading,
-        fontObject = "GameFontNormalLarge",
-    },
-    {
-        type = "Checkbox",
-        label = L.MacroLabel,
-        tooltip = string.format(L.MacroTooltip, ns.name),
-        var = "macro",
-    },
-    {
-        type = "Label",
-        name = "SupportHeading",
-        label = L.SupportHeading,
-        fontObject = "GameFontNormalLarge",
-    },
-    {
-        type = "Label",
-        name = "SubHeadingSupport1",
-        label = "|cffffffff" .. string.format(L.Support1, ns.name) .. "|r",
-    },
-    {
-        type = "Label",
-        name = "SubHeadingSupport2",
-        label = "|cffffffff" .. L.Support2 .. "|r",
-    },
-    {
-        type = "Label",
-        name = "SubHeadingSupport3",
-        label = "|cffffffff" .. string.format(L.Support3, ns.discord) .. "|r",
-    },
-}
-
----
 -- Local Options Functions
 ---
 
@@ -115,7 +61,7 @@ function ns:BuildOptions()
     end
     Options.default = function(self)
         for _, Control in pairs(self.Controls) do
-            RAVFOR_data.options[Control.var] = true
+            RAVFOR_data.options[Control.var] = ns.defaults[Control.var]
         end
     end
     Options.cancel = function(self)
@@ -145,30 +91,33 @@ function ns:BuildOptions()
     OptionsConfiguration:SetText(L.Configuration .. ":")
 
     local previous = OptionsConfiguration
-    for k, v in pairs(ns.defaults) do
-        local Checkbox = CreateFrame("CheckButton", ADDON_NAME .. "OptionsCheckbox" .. k, Options, "InterfaceOptionsCheckButtonTemplate")
-        Checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -large)
-        Checkbox.Text:SetText(L.Defaults[k].text)
-        Checkbox.tooltipText = L.Defaults[k].tooltip
-        Checkbox.restart = false
-        Checkbox.tooltipText = Checkbox.tooltipText .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+    for _, Default in pairs(L.Defaults) do
+        local defaultValue = ns.defaults[Default.var]
+        if type(defaultValue) == "boolean" then
+            local Checkbox = CreateFrame("CheckButton", ADDON_NAME .. "OptionsCheckbox" .. Default.var, Options, "InterfaceOptionsCheckButtonTemplate")
+            Checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -large)
+            Checkbox.Text:SetText(Default.text)
+            Checkbox.tooltipText = Default.tooltip
+            Checkbox.restart = false
+            Checkbox.tooltipText = Checkbox.tooltipText .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
 
-        Checkbox.GetValue = function(self)
-            return self:GetChecked()
+            Checkbox.GetValue = function(self)
+                return self:GetChecked()
+            end
+            Checkbox.SetValue = function(self)
+                self:SetChecked(RAVFOR_data.options[Default.var])
+            end
+
+            Checkbox:SetScript("OnClick", function(self)
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+                self.restart = not self.restart
+                RAVFOR_data.options[Default.var] = self:GetChecked()
+                RefreshControls(Options.Controls)
+            end)
+
+            RegisterControl(Checkbox, Options)
+            previous = Checkbox
         end
-        Checkbox.SetValue = function(self)
-            self:SetChecked(RAVFOR_data.options[k])
-        end
-
-        Checkbox:SetScript("OnClick", function(self)
-            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-            self.restart = not self.restart
-            RAVFOR_data.options[k] = self:GetChecked()
-            RefreshControls(Options.Controls)
-        end)
-
-        RegisterControl(Checkbox, Options)
-        previous = Checkbox
     end
 
     ns.Options = Options

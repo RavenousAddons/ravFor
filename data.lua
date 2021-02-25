@@ -2,15 +2,23 @@ local ADDON_NAME, ns = ...
 
 ns.defaults = {
     macro = true,
-    showNoDrops = true,
-    showOwned = true,
-    -- showGear = true,
-    -- showTransmog = true,
-    -- showMounts = true,
-    -- showPets = true,
-    -- showToys = true,
-    showCannotUse = true,
+    minimapButton = true,
     showReputation = true,
+    showOwned = true,
+    showCannotUse = true,
+    showNoDrops = true,
+    showGear = true,
+    showTransmog = true,
+    showMounts = true,
+    showPets = true,
+    showToys = true,
+    scale = 1,
+    windowPosition = "CENTER",
+    windowX = 0,
+    windowY = 0,
+    windowWidth = 420,
+    windowHeight = 360,
+    minimapPosition = 0,
 }
 
 ns.data = {
@@ -21,7 +29,7 @@ ns.data = {
     },
     expansions = {
         ["Shadowlands"] = {
-            icon = 3257863,
+            icon = 3642306,
             zones = {
                 {
                     -- The Maw
@@ -32,27 +40,11 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
-                            hidden = true,
-                            name = "Hunt: Death Elementals",
-                            id = 172958, -- 172958, 122960, 172961, 172962
-                            quest = 62593,
-                            weekly = true,
-                            waypoint = 53607860,
-                        },
-                        {
-                            hidden = true,
-                            name = "Hunt: Winged Soul Eaters",
-                            id = 174827,
-                            -- quest = ?????,
-                            weekly = true,
-                            waypoint = 53607860,
-                        },
-                        {
-                            hidden = true,
+                            -- hidden = true,
                             name = "Hunt: Shadehounds",
                             id = 174827,
                             -- quest = ?????,
-                            weekly = true,
+                            biweekly = true,
                             waypoint = 53607860,
                             items = {
                                 {
@@ -63,10 +55,26 @@ ns.data = {
                         },
                         {
                             hidden = true,
-                            name = "Hunt: Soul Eaters",
-                            id = 174827,
+                            name = "Hunt: Death Elementals",
+                            id = 172958, -- 172958, 122960, 172961, 172962
+                            quest = 62593,
+                            biweekly = true,
+                            waypoint = 53607860,
+                        },
+                        {
+                            hidden = true,
+                            name = "Hunt: Winged Soul Eaters",
+                            id = 999999,
                             -- quest = ?????,
-                            weekly = true,
+                            biweekly = true,
+                            waypoint = 53607860,
+                        },
+                        {
+                            hidden = true,
+                            name = "Hunt: Soul Eaters",
+                            id = 999999,
+                            -- quest = ?????,
+                            biweekly = true,
                             waypoint = 53607860,
                         },
                         {
@@ -460,7 +468,7 @@ ns.data = {
                         },
                         {
                             name = "Gelloh",
-                            id = 157309,
+                            id = 157307,
                             quest = 61720,
                             waypoint = 58197421,
                             items = {
@@ -478,7 +486,9 @@ ns.data = {
                             quest = 61719,
                             waypoint = 58197421,
                             items = {
-                                id = 184302,
+                                {
+                                    id = 184302,
+                                },
                             },
                             notes = {
                                 "15+ |cff6666ffBlue|r",
@@ -490,7 +500,9 @@ ns.data = {
                             quest = 61723,
                             waypoint = 58197421,
                             items = {
-                                id = 184175,
+                                {
+                                    id = 184175,
+                                },
                             },
                             notes = {
                                 "|cffff6666Red|r = |cffffff66Yellow|r > |cff6666ffBlue|r",
@@ -2176,8 +2188,5 @@ ns.data = {
             level = 40,
             day = 9,
         },
-    },
-    gorgedShadehoundDates = {
-
     },
 }

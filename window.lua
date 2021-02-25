@@ -4,9 +4,6 @@ local L = ns.L
 local expansions = ns.data.expansions
 local covenants = ns.data.covenants
 
-local width = 420
-local height = 360
-
 local small = 6
 local medium = 12
 local large = 16
@@ -106,13 +103,13 @@ end
 local function CreateScroller(cfg)
     local Scroller = CreateFrame("ScrollFrame", ADDON_NAME .. "Scroller" .. string.gsub(cfg.label, "%s+", ""), cfg.parent, "UIPanelScrollFrameTemplate")
     Scroller:SetPoint("BOTTOMRIGHT", cfg.parent, "BOTTOMRIGHT", -28, 8)
-    Scroller:SetWidth(cfg.width - 24)
+    Scroller:SetWidth(cfg.width)
     Scroller:SetHeight(cfg.height)
     Scroller.title = cfg.label
     Scroller:Hide()
 
     local Content = CreateFrame("Frame", ADDON_NAME .. "Scroller" .. string.gsub(cfg.label, "%s+", "") .. "Content", Scroller)
-    Content:SetWidth(cfg.width - 24)
+    Content:SetWidth(cfg.width)
     Content:SetHeight(1)
     Content.offset = -large
 
@@ -242,10 +239,10 @@ function ns:CreatePVP(Parent, Relative)
     return Relative
 end
 
-function ns:RegisterWarmode(warmode)
-    if not warmode then return end
+function ns:RegisterWarmode(Warmode)
+    if not Warmode then return end
     ns.Warmodes = ns.Warmodes or {}
-    table.insert(ns.Warmodes, warmode)
+    table.insert(ns.Warmodes, Warmode)
 end
 
 function ns:RefreshWarmodes()
@@ -316,19 +313,26 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests)
     -- For each Rare in the Zone
     local i = 0
     for _, rare in ipairs(zone.rares) do
+        local isWorldQuest, isAvailable = false, false
+        if type(rare.quest) == "number" and (C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly) then
+            isWorldQuest = true
+            if contains(worldQuests, rare.quest) then
+                isAvailable = true
+            elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
+                isAvailable = true
+                C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+            end
+        elseif type(rare.quest) == "number" then
+            isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
+        end
         if rare.hidden then
-        elseif type(rare.quest) == "number" and not contains(worldQuests, rare.quest) and (C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest) and not C_QuestLog.AddWorldQuestWatch(rare.quest) and not C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+        elseif isWorldQuest and not isAvailable then
         else
             local items = {}
-            if rare.items then
+            if rare.items and #rare.items > 0 then
                 -- For each Item dropped by the Rare in the Zone
                 for _, item in ipairs(rare.items) do
-                    if not GetItemInfo(item.id) then
-                    elseif RAVFOR_data.options.showTransmog == false and item.transmog then
-                    elseif RAVFOR_data.options.showMounts == false and item.mount then
-                    elseif RAVFOR_data.options.showPets == false and item.pet then
-                    elseif RAVFOR_data.options.showToys == false and item.toy then
-                    elseif RAVFOR_data.options.showGear == false and not item.transmog and not item.mount and not item.pet and not item.toy then
+                    if GetItemInfo(item.id) == nil then
                     elseif RAVFOR_data.options.showCannotUse == false and ((item.covenantOnly and covenant ~= zone.covenant) or (item.class and item.class:upper() ~= class)) then
                     elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
                     else
@@ -337,7 +341,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests)
                     end
                 end
             end
-            if RAVFOR_data.options.showNoDrops == false and #items == 0 and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
+            if #items > 0 and RAVFOR_data.options.showNoDrops == false and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
             else
                 -- Rare
                 i = i + 1
@@ -511,19 +515,19 @@ function ns:SendTarget(zone, rare)
     if isLead then
         local inInstance, _ = IsInInstance()
         if inInstance then
-            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
             print("Sending target to Instance members…")
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
         elseif IsInGroup() then
             if GetNumGroupMembers() > 5 then
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
                 print("Sending target to Raid members…")
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
             else
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
                 print("Sending target to Party members…")
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
             end
         end
-    -- Enable for testing
-    -- else
+    -- else -- Enable for testing
+    --     print("Sending target to… self!")
     --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
     end
 end
@@ -675,15 +679,13 @@ function ns:BuildWindow()
 
     local Window = CreateFrame("Frame", ADDON_NAME .. "Window", UIParent, "UIPanelDialogTemplate")
     Window:SetFrameStrata("MEDIUM")
-    Window:SetWidth(width)
-    Window:SetHeight(height)
-    Window:SetPoint("CENTER", 0, 0)
+    Window:SetWidth(RAVFOR_data.options.windowWidth)
+    Window:SetHeight(RAVFOR_data.options.windowHeight)
+    Window:SetScale(RAVFOR_data.options.scale)
+    Window:SetPoint(RAVFOR_data.options.windowPosition, RAVFOR_data.options.windowX, RAVFOR_data.options.windowY)
     Window:EnableMouse(true)
     Window:SetMovable(true)
     Window:SetClampedToScreen(true)
-    Window:SetResizable(true)
-    Window:SetMinResize(width, height)
-    Window:SetMaxResize(width*1.5, height*2)
     Window:RegisterForDrag("LeftButton")
     Window:Hide()
     Window:SetScript("OnShow", function()
@@ -692,21 +694,31 @@ function ns:BuildWindow()
     Window:SetScript("OnHide", function()
         PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
     end)
-    Window:SetScript("OnMouseDown", function()
-        Window:StartMoving()
-    end)
-    Window:SetScript("OnMouseUp", function()
-        Window:StopMovingOrSizing()
-    end)
     tinsert(UISpecialFrames, Window:GetName())
     ns.Window = Window
+
+    local Heading = Window:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    Heading:SetPoint("TOP", Window, "TOP")
+    Heading:SetPoint("BOTTOM", Window, "TOP", 0, -30)
+    Heading:SetText(ns:TextColor(ns.name .. " ") .. ns:TextColor(ns.expansion, ns.color) .. ns:TextColor(" v" .. ns.version))
+    local HeadingFrame = CreateFrame("Frame", ADDON_NAME .. "Heading", Window)
+    HeadingFrame:SetAllPoints(Heading)
+    HeadingFrame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_TOP", 0, small)
+        -- GameTooltip:SetText("Left-click to move.\nRight-click to resize.") -- TODO get resizing working
+        GameTooltip:SetText("Left-click to move.")
+        GameTooltip:Show()
+    end)
+    HeadingFrame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end)
 
     local OptionsButton = CreateFrame("Button", ADDON_NAME .. "OptionsButton", Window, "UIPanelButtonTemplate")
     OptionsButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
     OptionsButton:SetWidth(18)
     OptionsButton:SetHeight(18)
-    OptionsButton:RegisterForClicks("AnyUp")
-    OptionsButton:SetScript("OnMouseUp", function(self)
+    OptionsButton:RegisterForClicks("LeftButton")
+    OptionsButton:SetScript("OnMouseDown", function(self, button)
         PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
@@ -715,15 +727,10 @@ function ns:BuildWindow()
     OptionsButtonIcon:SetAllPoints(OptionsButton)
     OptionsButtonIcon:SetTexture(134063)
 
-    local Heading = Window:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    Heading:SetPoint("TOP", Window, "TOP")
-    Heading:SetPoint("BOTTOM", Window, "TOP", 0, -30)
-    Heading:SetText(ns:TextColor(ns.name .. " ") .. ns:TextColor(ns.expansion, ns.color) .. ns:TextColor(" v" .. ns.version))
-
     local Scroller = CreateScroller({
         label = "General",
         parent = Window,
-        width = Window:GetWidth() - 20,
+        width = Window:GetWidth() - 42,
         height = Window:GetHeight() - Heading:GetHeight() - 6,
         current = true,
     })
@@ -733,7 +740,7 @@ function ns:BuildWindow()
         local Scroller = CreateScroller({
             label = title,
             parent = Window,
-            width = Window:GetWidth() - 20,
+            width = Window:GetWidth() - 42,
             height = Window:GetHeight() - Heading:GetHeight() - 6,
         })
         Scrollers[title] = Scroller
@@ -764,6 +771,28 @@ function ns:BuildWindow()
         Tabs[title] = Tab
         previousTab = Tab
     end
+
+    -- Window Interactions
+    local function WindowInteractionStart(self, button)
+        if button == "LeftButton" then
+            Window:StartMoving()
+            Window.isMoving = true
+            Window.hasMoved = false
+        end
+    end
+    local function WindowInteractionEnd(self)
+        if Window.isMoving then
+            Window:StopMovingOrSizing()
+            Window.isMoving = false
+            Window.hasMoved = true
+            local point, _, _, x, y = Window:GetPoint()
+            RAVFOR_data.options.windowPosition = point
+            RAVFOR_data.options.windowX = x
+            RAVFOR_data.options.windowY = y
+        end
+    end
+    Window:SetScript("OnMouseDown", WindowInteractionStart)
+    Window:SetScript("OnMouseUp", WindowInteractionEnd)
 
     -- Get "Watched" World Quests
     -- What is useful is that the weekly WQ Rare is auto-tracked on login, so we

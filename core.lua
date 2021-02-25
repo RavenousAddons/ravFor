@@ -47,10 +47,11 @@ function ravFor_OnEvent(self, event, arg, ...)
             end
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
+        C_ChatInfo.RegisterAddonMessagePrefix(ADDON_NAME)
         ns:SetDefaultOptions()
-        ns:BuildOptions()
-        ns:BuildWindow()
+        ns:CreateMinimapButton()
         ns:EnsureMacro()
+        ns:CacheAndBuild()
         if not RAVFOR_version then
             ns:PrettyPrint(string.format(L.Install, ns.color, ns.version, ns.command))
             ns.Window:Show()
@@ -58,8 +59,6 @@ function ravFor_OnEvent(self, event, arg, ...)
             ns:PrettyPrint(string.format(L.Update, ns.color, ns.version, ns.command))
         end
         RAVFOR_version = ns.version
-        InterfaceOptions_AddCategory(ns.Options)
-        C_ChatInfo.RegisterAddonMessagePrefix(ADDON_NAME)
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
     elseif event == "CHAT_MSG_CURRENCY" or event == "CURRENCY_DISPLAY_UPDATE" then
         if ns.Currencies then
@@ -100,17 +99,7 @@ SlashCmdList["RAVFOR"] = function(message, editbox)
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
     else
-        if (ns.Window:IsVisible()) then
-            UIFrameFadeOut(ns.Window, 0.1, 1, 0)
-            C_Timer.After(0.1, function()
-                ns.Window:Hide()
-            end)
-        else
-            UIFrameFadeIn(ns.Window, 0.1, 0, 1)
-            C_Timer.After(0.1, function()
-                ns.Window:Show()
-            end)
-        end
+        ns:ToggleWindow(ns.Window)
     end
 end
 SLASH_RAVFOR1 = "/" .. ns.command
