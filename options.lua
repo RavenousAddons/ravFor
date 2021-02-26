@@ -63,6 +63,7 @@ function ns:BuildOptions()
         for _, Control in pairs(self.Controls) do
             RAVFOR_data.options[Control.var] = ns.defaults[Control.var]
         end
+        ReloadUI()
     end
     Options.cancel = function(self)
         for _, Control in pairs(self.Controls) do
@@ -100,6 +101,7 @@ function ns:BuildOptions()
             Checkbox.tooltipText = Default.tooltip
             Checkbox.restart = false
             Checkbox.tooltipText = Checkbox.tooltipText .. "\n" .. RED_FONT_COLOR:WrapTextInColorCode(REQUIRES_RELOAD)
+            Checkbox.var = Default.var
 
             Checkbox.GetValue = function(self)
                 return self:GetChecked()
@@ -120,5 +122,6 @@ function ns:BuildOptions()
         end
     end
 
+    RefreshControls(Options.Controls)
     ns.Options = Options
 end

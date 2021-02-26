@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: 1.2.0
+## Version: 1.2.1
 
 ## Name: Ravenous For Shadowlands
 ## Title: Ravenous For |cffffc478Shadowlands|r
@@ -8,6 +8,8 @@
 
 ## SavedVariables: RAVFOR_version
 ## SavedVariablesPerCharacter: RAVFOR_data
+
+## OptionalDeps: HandyNotes_Shadowlands
 
 ## X-License: Public Domain
 ## X-Website: https://github.com/RavenousAddons/ravFor

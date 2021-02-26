@@ -341,7 +341,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests)
                     end
                 end
             end
-            if #items > 0 and RAVFOR_data.options.showNoDrops == false and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
+            if #items == 0 and RAVFOR_data.options.showNoDrops == false and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
             else
                 -- Rare
                 i = i + 1
@@ -553,27 +553,6 @@ function ns:CreateGreatVault(Parent, Relative)
     GreatVaultNotice:SetPoint("LEFT", Relative, "RIGHT", large, 0)
 
     return Relative
-end
-
----
--- Sp-eye-glass (Shadowlands)
----
-
-function ns:CreateSpeyeglass(Parent, Relative)
-
-    local Speyeglass = CreateFrame("Button", ADDON_NAME .. "Speyeglass", Parent)
-    local SpeyeglassLabel = Speyeglass:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    SpeyeglassLabel:SetJustifyH("LEFT")
-    SpeyeglassLabel:SetText(ns:TextIcon(134441) .. "  " .. ns:TextColor("Have you found your |cff0070dd|Hitem:183696::::::::60:63:::::::|h[Sp-eye-glass]|h|r in " .. ns:TextColor(C_Map.GetMapInfo(1536).name, ns.data.covenants[4].color) .. "?", "ffffff"))
-    SpeyeglassLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
-    Speyeglass:SetAllPoints(SpeyeglassLabel)
-    Speyeglass:SetScript("OnClick", function()
-        RaidNotice_AddMessage(RaidBossEmoteFrame, "Look for a treasure chest in Maldraxxus at 48.33, 16.35", ChatTypeInfo["RAID_WARNING"])
-        C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(1536, 0.4833, 0.1635))
-        C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-    end)
-
-    return Speyeglass
 end
 
 ---
@@ -835,11 +814,6 @@ function ns:BuildWindow()
             -- Zone
             local Zone = ns:CreateZone(Parent, Relative, zone, worldQuests)
             Relative = Zone
-        end
-        if title == "Shadowlands" then
-            -- Sp-eye-glass
-            local Speyeglass = ns:CreateSpeyeglass(Parent, Relative)
-            Relative = Speyeglass
         end
         -- Notes
         if expansion.notes and #expansion.notes > 0 then
