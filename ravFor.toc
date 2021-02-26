@@ -9,8 +9,6 @@
 ## SavedVariables: RAVFOR_version
 ## SavedVariablesPerCharacter: RAVFOR_data
 
-## OptionalDeps: HandyNotes_Shadowlands
-
 ## X-License: Public Domain
 ## X-Website: https://github.com/RavenousAddons/ravFor
 ## X-Curse-Project-ID: 446419
