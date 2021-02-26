@@ -314,16 +314,18 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests)
     local i = 0
     for _, rare in ipairs(zone.rares) do
         local isWorldQuest, isAvailable = false, false
-        if type(rare.quest) == "number" and (C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly) then
-            isWorldQuest = true
-            if contains(worldQuests, rare.quest) then
-                isAvailable = true
-            elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
-                isAvailable = true
-                C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+        if type(rare.quest) == "number" then
+            if C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
+                isWorldQuest = true
+                if contains(worldQuests, rare.quest) or C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+                    isAvailable = true
+                elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
+                    isAvailable = true
+                    C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+                end
+            else
+                isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
             end
-        elseif type(rare.quest) == "number" then
-            isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
         end
         if rare.hidden then
         elseif isWorldQuest and not isAvailable then
