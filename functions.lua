@@ -602,7 +602,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local c = {}
     local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
-    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+    for d in tostring(waypoint):gmatch("[0-9][0-9]") do
         tinsert(c, d)
     end
 
