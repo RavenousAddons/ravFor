@@ -440,7 +440,7 @@ ns.data = {
                                 },
                             },
                             notes = {
-                                "|cffff6666Red|r = |cff6666ffBlue|r > |cffffff66Yellow|r",
+                                "To Summon: |cffff6666Red|r = |cff6666ffBlue|r > |cffffff66Yellow|r",
                             },
                         },
                         {
@@ -463,7 +463,7 @@ ns.data = {
                                 },
                             },
                             notes = {
-                                "10 |cffff6666Red|r 10 |cff6666ffBlue|r 10 |cffffff66Yellow|r",
+                                "To Summon: 10 |cffff6666Red|r 10 |cff6666ffBlue|r 10 |cffffff66Yellow|r",
                             },
                         },
                         {
@@ -477,7 +477,7 @@ ns.data = {
                                 },
                             },
                             notes = {
-                                "15+ |cffffff66Yellow|r",
+                                "To Summon: 15+ |cffffff66Yellow|r",
                             },
                         },
                         {
@@ -491,7 +491,7 @@ ns.data = {
                                 },
                             },
                             notes = {
-                                "15+ |cff6666ffBlue|r",
+                                "To Summon: 15+ |cff6666ffBlue|r",
                             },
                         },
                         {
@@ -505,7 +505,7 @@ ns.data = {
                                 },
                             },
                             notes = {
-                                "|cffff6666Red|r = |cffffff66Yellow|r > |cff6666ffBlue|r",
+                                "To Summon: |cffff6666Red|r = |cffffff66Yellow|r > |cff6666ffBlue|r",
                             },
                         },
                         {
@@ -514,7 +514,7 @@ ns.data = {
                             quest = 61718,
                             waypoint = 58197421,
                             notes = {
-                                "15+ |cffff6666Red|r",
+                                "To Summon: 15+ |cffff6666Red|r",
                             },
                         },
                         {
@@ -523,7 +523,7 @@ ns.data = {
                             quest = 61722,
                             waypoint = 58197421,
                             notes = {
-                                "|cff6666ffBlue|r = |cffffff66Yellow|r > |cffff6666Red|r",
+                                "To Summon: |cff6666ffBlue|r = |cffffff66Yellow|r > |cffff6666Red|r",
                             },
                         },
                         {
@@ -2094,6 +2094,17 @@ ns.data = {
             id = 1767, -- Stygia
             color = "e5cc80",
         },
+    },
+    reputationColors = {
+        "cc2222",
+        "ff0000",
+        "ee6622",
+        "ffff00",
+        "00ff00",
+        "00ff88",
+        "00ffcc",
+        "00ffff",
+        "00ffff",
     },
     covenants = {
         -- Kyrian

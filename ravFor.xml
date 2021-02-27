@@ -4,7 +4,6 @@
     <Script file="locales.lua" />
     <Script file="functions.lua" />
     <Script file="options.lua" />
-    <Script file="window.lua" />
     <Script file="core.lua" />
 
     <Frame name="ravFor">
