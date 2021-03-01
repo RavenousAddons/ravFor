@@ -333,29 +333,16 @@ end
 function ns:SendTarget(zone, rare)
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
     local playerName = UnitName("player")
-    local isLead = false
-    for i = 1, MAX_RAID_MEMBERS do
-        local lookup, rank = GetRaidRosterInfo(i)
-        if lookup == playerName then
-            if rank > 1 then isLead = true end
-            break
+    ns:PrettyPrint("Sending new target to group...")
+    local inInstance, _ = IsInInstance()
+    if inInstance then
+        C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
+    elseif IsInGroup() then
+        if GetNumGroupMembers() > 5 then
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
+        else
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
         end
-    end
-    if isLead then
-        ns:PrettyPrint("Sending new target to group...")
-        local inInstance, _ = IsInInstance()
-        if inInstance then
-            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
-        elseif IsInGroup() then
-            if GetNumGroupMembers() > 5 then
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
-            else
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
-            end
-        end
-    -- else -- Enable for testing
-    --     print("Sending new target to… self!")
-    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
     end
 end
 
@@ -652,6 +639,9 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         GameTooltip:SetText(prefix .. ":")
         GameTooltip:AddLine(TextColor(rare.name))
         GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. TextColor(" |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r"))
+        if isLead then
+            GameTooltip:AddLine(TextColor("Hold Alt/Control/Shift to Share.", "bbbbbb"))
+        end
         GameTooltip:Show()
     end)
     Rare:SetScript("OnLeave", HideTooltip)
@@ -664,7 +654,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
                 break
             end
         end
-        if isLead then
+        if isLead and (IsAltKeyDown() or IsControlKeyDown() or IsShiftKeyDown()) then
             -- Send the Rare to Group Members if Group Lead
             ns:SendTarget(zone, rare)
         else
@@ -717,8 +707,8 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
     local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
     local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
-    local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor, "bbbbbb") .. zoneCovenant or ""
-    local classOnly = item.class and TextColor(L.OnlyFor, "bbbbbb") .. itemClass or ""
+    local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor) .. zoneCovenant or ""
+    local classOnly = item.class and TextColor(L.OnlyFor) .. itemClass or ""
     local owned = IsItemOwned(item) and " " .. checkmark or ""
 
     local Item = CreateFrame("Button", ADDON_NAME .. "Item" .. item.id, Parent)
