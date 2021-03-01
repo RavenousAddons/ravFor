@@ -1,9 +1,6 @@
 local ADDON_NAME, ns = ...
 local L = ns.L
 
-local expansion = ns.data.expansions[ns.expansion]
-local zones = expansion.zones
-
 function ravFor_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CHAT_MSG_ADDON")
@@ -51,7 +48,29 @@ function ravFor_OnEvent(self, event, arg, ...)
         ns:SetDefaultOptions()
         ns:CreateMinimapButton()
         ns:EnsureMacro()
-        ns:CacheAndBuild()
+        ns:CacheAndBuild(function()
+            -- These happen once all Items have been cached
+            ns:BuildOptions()
+            InterfaceOptions_AddCategory(ns.Options)
+            ns:BuildWindow()
+            if ns.waitingForWindow then
+                ns:ToggleWindow(ns.Window, "Show")
+            end
+            if ns.waitingForOptions then
+                InterfaceOptionsFrame_OpenToCategory(ns.Options)
+                InterfaceOptionsFrame_OpenToCategory(ns.Options)
+            end
+            if ns.MinimapButton then
+                ns.MinimapButton:SetScript("OnMouseDown", function(self, button)
+                    if button == "RightButton" then
+                        InterfaceOptionsFrame_OpenToCategory(ns.Options)
+                        InterfaceOptionsFrame_OpenToCategory(ns.Options)
+                    else
+                        ns:ToggleWindow(ns.Window)
+                    end
+                end)
+            end
+        end)
         if not RAVFOR_version then
             ns:PrettyPrint(string.format(L.Install, ns.color, ns.version, ns.command))
             ns.Window:Show()

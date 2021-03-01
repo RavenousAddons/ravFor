@@ -1,13 +1,18 @@
 local ADDON_NAME, ns = ...
 local L = ns.L
 
-local expansions = ns.data.expansions
 local covenants = ns.data.covenants
+local expansions = ns.data.expansions
+local notes = ns.data.notes
+local renownLevels = ns.data.renownLevels
+local reputationColors = ns.data.reputationColors
 
 local small = 6
 local medium = 12
 local large = 16
 local gigantic = 24
+
+local cacheInterval = 0.001
 
 local _, class = UnitClass("player")
 local faction, _ = UnitFactionGroup("player")
@@ -41,6 +46,88 @@ local function HideTooltip()
     GameTooltip:Hide()
 end
 
+local function TextColor(text, color)
+    color = color and color or "eeeeee"
+    return "|cff" .. color .. text .. "|r"
+end
+
+local function TextIcon(icon, size)
+    size = size and size or 16
+    return "|T" .. icon .. ":" .. size .. "|t"
+end
+
+local quest = TextIcon(132049)
+local skull = TextIcon(137025)
+local checkmark = TextIcon(628564)
+
+local function IsRareDead(rare)
+    if type(rare.quest) == "table" then
+        for _, quest in ipairs(rare.quest) do
+            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+                return false
+            end
+        end
+        return true
+    elseif rare.quest then
+        return C_QuestLog.IsQuestFlaggedCompleted(rare.quest)
+    end
+    return false
+end
+
+local function IsItemOwned(item)
+    if item.mount then
+        return select(11, C_MountJournal.GetMountInfoByID(item.mount))
+    elseif item.pet then
+        return C_PetJournal.GetNumCollectedInfo(item.pet) > 0
+    elseif item.toy then
+        return PlayerHasToy(item.id)
+    elseif item.quest then
+        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
+    elseif item.achievement then
+        return select(4, GetAchievementInfo(item.achievement))
+    else
+        return C_TransmogCollection.PlayerHasTransmog(item.id)
+    end
+    return false
+end
+
+local function RunsUntil95(chance, bound)
+    bound = bound and bound or 300
+    for i = 1, bound do
+        local percentage = 1 - ((1 - chance / 100) ^ i)
+        if percentage > 0.95 then
+            -- return percentage * 100
+            return i
+        end
+    end
+    -- return string.format("%.2f", (1 - ((1 - chance) ^ bound)) * 100 .. "")
+    return bound
+end
+
+local function GetMaxRenown()
+    -- if 0, then reset is today but has not yet happened
+    local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
+    local now = C_DateAndTime.GetCurrentCalendarTime()
+    local year, month, day = now.year, now.month, now.monthDay
+    local lookup_year, lookup_month, lookup_day
+    local maxRenown = 3
+    for _, lookup in ipairs(renownLevels) do
+        lookup_year = lookup.year and lookup.year or lookup_year
+        lookup_month = lookup.month and lookup.month or lookup_month
+        lookup_day = lookup.day and lookup.day or lookup_day
+        if year > lookup_year then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month > lookup_month then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month == lookup_month and day > lookup_day then
+            maxRenown = lookup.level
+        elseif year == lookup_year and month == lookup_month and day == lookup_day and daysUntilWeeklyReset > 0 then
+            maxRenown = lookup.level
+        end
+    end
+    return maxRenown
+end
+
 ---
 -- Global Functions
 ---
@@ -48,20 +135,6 @@ end
 function ns:PrettyPrint(message)
     DEFAULT_CHAT_FRAME:AddMessage("|cff" .. ns.color .. ns.name .. ":|r " .. message)
 end
-
-function ns:TextColor(text, color)
-    color = color and color or "eeeeee"
-    return "|cff" .. color .. text .. "|r"
-end
-
-function ns:TextIcon(icon, size)
-    size = size and size or 16
-    return "|T" .. icon .. ":" .. size .. "|t"
-end
-
-local quest = ns:TextIcon(132049)
-local skull = ns:TextIcon(137025)
-local checkmark = ns:TextIcon(628564)
 
 local hasSeenNoSpaceMessage = false
 function ns:EnsureMacro()
@@ -99,150 +172,199 @@ function ns:ToggleWindow(frame, force)
 end
 
 ---
--- Minimap Button (thanks Leatrix!)
+-- Data Management
 ---
 
-function ns:CreateMinimapButton()
-    if RAVFOR_data.options.minimapButton ~= true then
-        if ns.MinimapButton then ns.MinimapButton:Hide() end
-        return
-    end
-
-    local Button = CreateFrame("Button", nil, Minimap)
-    Button:SetFrameLevel(8)
-    Button:SetSize(28, 28)
-    Button:EnableMouse(true)
-    Button:SetMovable(true)
-    Button:ClearAllPoints()
-    Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)),(80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
-
-    Button:SetNormalTexture("Interface/AddOns/ravFor/ravFor.tga")
-    Button:SetPushedTexture("Interface/AddOns/ravFor/ravFor.tga")
-    Button:SetHighlightTexture("Interface/AddOns/ravFor/ravFor.tga")
-
-    local function UpdateMinimapButton()
-        local Xpoa, Ypoa = GetCursorPosition()
-        local Xmin, Ymin = Minimap:GetLeft(), Minimap:GetBottom()
-        Xpoa = Xmin - Xpoa / Minimap:GetEffectiveScale() + 70
-        Ypoa = Ypoa / Minimap:GetEffectiveScale() - Ymin - 70
-        RAVFOR_data.options.minimapPosition = math.deg(math.atan2(Ypoa, Xpoa))
-        Button:ClearAllPoints()
-        Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)), (80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
-    end
-
-    -- TODO FIX CLICK + DRAG CONFLICT
-
-    Button:RegisterForDrag("LeftButton")
-    Button:SetScript("OnDragStart", function()
-        Button:StartMoving()
-        Button.isMoving = true
-        Button:SetScript("OnUpdate", UpdateMinimapButton)
-    end)
-
-    Button:SetScript("OnDragStop", function()
-        Button:StopMovingOrSizing()
-        Button.isMoving = false
-        Button:SetScript("OnUpdate", nil)
-        UpdateMinimapButton()
-    end)
-
-    Button:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_RIGHT")
-        GameTooltip:SetText("Left-click to open Window.\nRight-click to open Interface Options.")
-        GameTooltip:Show()
-    end)
-    Button:SetScript("OnLeave", HideTooltip)
-
-    Button:SetScript("OnMouseDown", function(self, button)
-        if not self.isMoving then
-            if button == "RightButton" then
-                ns.waitingForOptions = true
-                ns:PrettyPrint(L.NotLoaded)
-            else
-                ns:ToggleWindow(ns.Window)
-            end
-        end
-    end)
-
-    ns.MinimapButton = Button
+local function Register(Key, Value)
+    if not Key or not Value then return end
+    ns[Key] = ns[Key] or {}
+    table.insert(ns[Key], Value)
 end
 
----
--- Calculate # of kills until 95%+ chance item has dropped
----
+local function RegisterCovenant(Covenant, Renown)
+    if (not Covenant) or (not Renown) then return end
+    ns.Covenant = Covenant
+    ns.Renown = Renown
+end
 
-function ns:RunsUntil95(chance, bound)
-    bound = bound and bound or 300
-    for i = 1, bound do
-        local percentage = 1 - ((1 - chance / 100) ^ i)
-        if percentage > 0.95 then
-            -- return percentage * 100
-            return i
+function ns:RefreshCurrencies()
+    for _, Currency in ipairs(ns.Currencies) do
+        local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency)
+        local quantity = currency.discovered and currency.quantity or 0
+        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
+        Currency:SetText(TextColor(commaValue(currency.quantity) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, Currency.color and Currency.color or "ffffff"))
+    end
+end
+
+function ns:RefreshFactions()
+    for _, Faction in ipairs(ns.Factions) do
+        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, hasBonusRepGain, _ = GetFactionInfoByID(Faction.faction)
+        local quantity = commaValue(reputation - reputationMin)
+        Faction:SetText(TextColor(string.format(L.Faction, TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]), TextColor(factionName, Faction.color and Faction.color or "ffffff")), "bbbbbb"))
+        if standingID == 8 then
+            Faction.anchor:SetScript("OnEnter", nil)
+            Faction.anchor:SetScript("OnLeave", nil)
+        else
+            Faction.anchor:SetScript("OnEnter", function(self)
+                GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+                GameTooltip:SetText(TextColor(quantity .. "/" .. commaValue(reputationMax)))
+                GameTooltip:Show()
+            end)
+            Faction.anchor:SetScript("OnLeave", HideTooltip)
         end
     end
-    -- return string.format("%.2f", (1 - ((1 - chance) ^ bound)) * 100 .. "")
-    return bound
+end
+
+function ns:RefreshWarmodes()
+    for _, WarmodeLabel in ipairs(ns.Warmodes) do
+        WarmodeLabel:SetText(TextColor("Warmode is " .. (C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r") .. ".", "ffffff"))
+        WarmodeLabel.anchor:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+            GameTooltip:SetText(TextColor((C_PvP.IsWarModeDesired() and "|cffff6666Disable|r" or "|cff66ff66Enable|r") .. " War Mode"))
+            GameTooltip:Show()
+        end)
+    end
+end
+
+function ns:RefreshRares()
+    for _, Rare in ipairs(ns.Rares) do
+        local withoutDead = string.gsub(string.gsub(string.gsub(Rare:GetText(), quest, ""), skull, ""), checkmark, "")
+        Rare:SetText((IsRareDead(Rare.rare) and checkmark or ((type(Rare.rare.quest) == "number" and C_QuestLog.IsWorldQuest(Rare.rare.quest)) or Rare.rare.biweekly or Rare.rare.weekly) and quest or skull) .. withoutDead)
+    end
+end
+
+function ns:RefreshItems()
+    for _, Item in ipairs(ns.Items) do
+        local withoutOwned = string.gsub(Item:GetText(), checkmark, "")
+        Item:SetText(withoutOwned .. (IsItemOwned(Item.item) and checkmark or ""))
+    end
+end
+
+function ns:RefreshCovenant()
+    local covenant = C_Covenants.GetActiveCovenantID()
+    local renown = C_CovenantSanctumUI.GetRenownLevel()
+    local maxRenown = GetMaxRenown()
+
+    ns.Covenant:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, covenants[covenant].color))
+    ns.Renown:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff6666") or TextColor(renown, "ffffff")) .. TextColor(" Renown", covenants[covenant].color))
 end
 
 ---
 -- Item Cache Preloader
 ---
 
-local function CacheItem(i, itemIDs)
+local function CacheItem(i, itemIDs, callback)
     local Item = Item:CreateFromItemID(itemIDs[i])
     Item:ContinueOnItemLoad(function()
         if i < #itemIDs then
-            C_Timer.After(0.02, function()
-                CacheItem(i + 1, itemIDs)
+            -- Sadly this *must* be rate-limited
+            -- 0 = per frame, as fast as we can go
+            C_Timer.After(0, function()
+                CacheItem(i + 1, itemIDs, callback)
             end)
         else
-            ns:BuildOptions()
-            InterfaceOptions_AddCategory(ns.Options)
-            ns:BuildWindow()
-            -- Control clicks
-            if ns.MinimapButton then
-                ns.MinimapButton:SetScript("OnMouseDown", function(self, button)
-                    if button == "RightButton" then
-                        InterfaceOptionsFrame_OpenToCategory(ns.Options)
-                        InterfaceOptionsFrame_OpenToCategory(ns.Options)
-                    else
-                        ns:ToggleWindow(ns.Window)
-                    end
-                end)
-            end
-            if ns.waitingForWindow then
-                ns:ToggleWindow(ns.Window, "Show")
-            end
-            if ns.waitingForOptions then
-                InterfaceOptionsFrame_OpenToCategory(ns.Options)
-                InterfaceOptionsFrame_OpenToCategory(ns.Options)
-            end
+            callback()
         end
     end)
 end
 
-function ns:CacheAndBuild()
+function ns:CacheAndBuild(callback)
+    local covenant = C_Covenants.GetActiveCovenantID()
+    local worldQuests = {}
+    if C_QuestLog.GetNumWorldQuestWatches() then
+        for i = 1, C_QuestLog.GetNumWorldQuestWatches() do
+            tinsert(worldQuests, C_QuestLog.GetQuestIDForWorldQuestWatchIndex(i))
+        end
+    end
     local itemIDs = {}
-    for title, expansion in pairs(ns.data.expansions) do
+    for title, expansion in pairs(expansions) do
         for _, zone in ipairs(expansion.zones) do
             for _, rare in ipairs(zone.rares) do
-                if rare.items and #rare.items then
+                local isWorldQuest, isAvailable = false, false
+                if type(rare.quest) == "number" then
+                    if C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
+                        isWorldQuest = true
+                        if contains(worldQuests, rare.quest) or C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+                            isAvailable = true
+                        elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
+                            isAvailable = true
+                            C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+                        end
+                    else
+                        isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
+                    end
+                end
+                if rare.hidden or rare.items == nil then
+                elseif isWorldQuest and not isAvailable then
+                else
                     for _, item in ipairs(rare.items) do
-                        table.insert(itemIDs, item.id)
+                        if RAVFOR_data.options.showCannotUse == false and ((item.covenantOnly and C_Covenants.GetCovenantData(covenant).name ~= zone.covenant) or (item.class and item.class:upper() ~= class)) then
+                        elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
+                        else
+                            table.insert(itemIDs, item.id)
+                        end
                     end
                 end
             end
         end
     end
-    CacheItem(1, itemIDs)
+    CacheItem(1, itemIDs, callback)
 end
 
 ---
--- Build Functions
+-- Targets
 ---
 
-function ns:CreateSpacer(Parent, Relative, size)
+function ns:NewTarget(zone, rare)
+    local zoneName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local c = {}
+    local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
+    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+        tinsert(c, d)
+    end
+    -- Print message to chat
+    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    -- Add the waypoint to the map and track it
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
+    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+end
+
+function ns:SendTarget(zone, rare)
+    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
+    local playerName = UnitName("player")
+    local isLead = false
+    for i = 1, MAX_RAID_MEMBERS do
+        local lookup, rank = GetRaidRosterInfo(i)
+        if lookup == playerName then
+            if rank > 1 then isLead = true end
+            break
+        end
+    end
+    if isLead then
+        local inInstance, _ = IsInInstance()
+        if inInstance then
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
+        elseif IsInGroup() then
+            if GetNumGroupMembers() > 5 then
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
+            else
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
+            end
+        end
+    -- else -- Enable for testing
+    --     print("Sending target to… self!")
+    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
+    end
+end
+
+---
+-- UI
+---
+
+local function CreateSpacer(Parent, Relative, size)
     size = size and size or 24
+
     local Spacer = CreateFrame("Frame", nil, Parent)
     Spacer:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT")
     Spacer:SetWidth(Parent:GetWidth())
@@ -250,65 +372,6 @@ function ns:CreateSpacer(Parent, Relative, size)
 
     return Spacer
 end
-
-local function GetMaxRenown()
-    -- if 0, then reset is today but has not yet happened
-    local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
-    local now = C_DateAndTime.GetCurrentCalendarTime()
-    local year, month, day = now.year, now.month, now.monthDay
-    local lookup_year, lookup_month, lookup_day
-    local maxRenown = 3
-    for _, lookup in ipairs(ns.data.renownLevels) do
-        lookup_year = lookup.year and lookup.year or lookup_year
-        lookup_month = lookup.month and lookup.month or lookup_month
-        lookup_day = lookup.day and lookup.day or lookup_day
-        if year > lookup_year then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month > lookup_month then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month == lookup_month and day > lookup_day then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month == lookup_month and day == lookup_day and daysUntilWeeklyReset > 0 then
-            maxRenown = lookup.level
-        end
-    end
-    return maxRenown
-end
-
-local function IsRareDead(rare)
-    if type(rare.quest) == "table" then
-        for _, quest in ipairs(rare.quest) do
-            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
-                return false
-            end
-        end
-        return true
-    elseif rare.quest then
-        return C_QuestLog.IsQuestFlaggedCompleted(rare.quest)
-    end
-    return false
-end
-
-local function IsItemOwned(item)
-    if item.mount then
-        return select(11, C_MountJournal.GetMountInfoByID(item.mount))
-    elseif item.pet then
-        return C_PetJournal.GetNumCollectedInfo(item.pet) > 0
-    elseif item.toy then
-        return PlayerHasToy(item.id)
-    elseif item.quest then
-        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
-    elseif item.achievement then
-        return select(4, GetAchievementInfo(item.achievement))
-    else
-        return C_TransmogCollection.PlayerHasTransmog(item.id)
-    end
-    return false
-end
-
----
--- Global Window Functions
----
 
 local function CreateScroller(cfg)
     local Scroller = CreateFrame("ScrollFrame", ADDON_NAME .. "Scroller" .. string.gsub(cfg.label, "%s+", ""), cfg.parent, "UIPanelScrollFrameTemplate")
@@ -322,13 +385,13 @@ local function CreateScroller(cfg)
     Content:SetWidth(cfg.width)
     Content:SetHeight(1)
     Content.offset = -large
+    Scroller.Content = Content
 
     Scroller:SetScrollChild(Content)
     Scroller:SetScript("OnShow", function()
         Scroller:SetScrollChild(Content)
     end)
 
-    Scroller.Content = Content
     return Scroller
 end
 
@@ -366,47 +429,68 @@ local function CreateTab(cfg)
 end
 
 ---
--- Core Stuff
+-- Targets
 ---
 
-function ns:RegisterCurrency(Currency)
-    if not Currency then return end
-    ns.Currencies = ns.Currencies or {}
-    table.insert(ns.Currencies, Currency)
-end
-
-function ns:RefreshCurrencies()
-    for _, Currency in ipairs(ns.Currencies) do
-        local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency)
-        local quantity = currency.discovered and currency.quantity or 0
-        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
-        Currency:SetText(ns:TextColor(commaValue(currency.quantity) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. ns:TextColor(currency.name, Currency.color and Currency.color or "ffffff"))
+function ns:NewTarget(zone, rare)
+    local zoneName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+    local c = {}
+    local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
+    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
+        tinsert(c, d)
     end
+    -- Print message to chat
+    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    -- Add the waypoint to the map and track it
+    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
+    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
 end
 
-function ns:RegisterFaction(Faction)
-    if not Faction then return end
-    ns.Factions = ns.Factions or {}
-    table.insert(ns.Factions, Faction)
-end
-
-function ns:RefreshFactions()
-    for _, Faction in ipairs(ns.Factions) do
-        local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, hasBonusRepGain, _ = GetFactionInfoByID(Faction.faction)
-        local quantity = commaValue(reputation - reputationMin)
-        Faction:SetText(ns:TextColor(string.format(L.Faction, ns:TextColor(_G["FACTION_STANDING_LABEL"..standingID], ns.data.reputationColors[standingID]), ns:TextColor(factionName, Faction.color and Faction.color or "ffffff"))))
-        if standingID == 8 then
-            Faction.anchor:SetScript("OnEnter", nil)
-            Faction.anchor:SetScript("OnLeave", nil)
-        else
-            Faction.anchor:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
-                GameTooltip:SetText(ns:TextColor(quantity .. "/" .. commaValue(reputationMax)))
-                GameTooltip:Show()
-            end)
-            Faction.anchor:SetScript("OnLeave", HideTooltip)
+function ns:SendTarget(zone, rare)
+    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
+    local playerName = UnitName("player")
+    local isLead = false
+    for i = 1, MAX_RAID_MEMBERS do
+        local lookup, rank = GetRaidRosterInfo(i)
+        if lookup == playerName then
+            if rank > 1 then isLead = true end
+            break
         end
     end
+    if isLead then
+        local inInstance, _ = IsInInstance()
+        if inInstance then
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
+        elseif IsInGroup() then
+            if GetNumGroupMembers() > 5 then
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
+            else
+                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
+            end
+        end
+    -- else -- Enable for testing
+    --     print("Sending target to… self!")
+    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
+    end
+end
+
+---
+-- Notes
+---
+
+function ns:CreateNotes(Parent, Relative, notes, indent)
+    indent = indent and indent or ""
+    for i, note in ipairs(notes) do
+        local Note = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        Note:SetJustifyH("LEFT")
+        Note:SetText(indent .. TextColor(note, "eeeeee"))
+        Note:SetWidth(Parent:GetWidth())
+        Note:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -medium-(Relative.offset or 0))
+        Relative = Note
+    end
+
+    return Relative
 end
 
 ---
@@ -417,7 +501,7 @@ function ns:CreatePVP(Parent, Relative)
     local PVP = Parent:CreateFontString(ADDON_NAME .. "PVP", "ARTWORK", "GameFontNormalLarge")
     PVP:SetPoint("TOPLEFT", Relative, "TOPLEFT", 0, -gigantic-(Relative.offset or 0))
     PVP:SetJustifyH("LEFT")
-    PVP:SetText(ns:TextIcon(236396) .. "  " .. ns:TextColor("PVP", "f5c87a"))
+    PVP:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "f5c87a"))
     Relative = PVP
     local LittleRelative = PVP
 
@@ -426,14 +510,14 @@ function ns:CreatePVP(Parent, Relative)
     Honor:SetJustifyH("LEFT")
     Honor.currency = 1792
     Honor.color = "f5c87a"
-    ns:RegisterCurrency(Honor)
+    Register("Currencies", Honor)
     LittleRelative = Honor
 
     local Warmode = CreateFrame("Button", ADDON_NAME .. "Warmode", Parent)
     local WarmodeLabel = Warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     WarmodeLabel:SetJustifyH("LEFT")
     WarmodeLabel:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
-    ns:RegisterWarmode(WarmodeLabel)
+    Register("Warmodes", WarmodeLabel)
     Warmode:SetAllPoints(WarmodeLabel)
     Warmode:SetScript("OnClick", function()
         if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
@@ -453,30 +537,13 @@ function ns:CreatePVP(Parent, Relative)
     Conquest:SetJustifyH("LEFT")
     Conquest.currency = 1602
     Conquest.color = "f5c87a"
-    ns:RegisterCurrency(Conquest)
+    Register("Currencies", Conquest)
     LittleRelative = Conquest
 
     ns:RefreshCurrencies()
 
     Relative.offset = large
     return Relative
-end
-
-function ns:RegisterWarmode(Warmode)
-    if not Warmode then return end
-    ns.Warmodes = ns.Warmodes or {}
-    table.insert(ns.Warmodes, Warmode)
-end
-
-function ns:RefreshWarmodes()
-    for _, WarmodeLabel in ipairs(ns.Warmodes) do
-        WarmodeLabel:SetText(ns:TextColor("Warmode is " .. (C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r") .. ".", "ffffff"))
-        WarmodeLabel.anchor:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
-            GameTooltip:SetText(ns:TextColor((C_PvP.IsWarModeDesired() and "|cffff6666Disable|r" or "|cff66ff66Enable|r") .. " War Mode"))
-            GameTooltip:Show()
-        end)
-    end
 end
 
 ---
@@ -491,15 +558,15 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
     local Zone = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
     Zone:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Zone:SetJustifyH("LEFT")
-    Zone:SetText(ns:TextIcon(zoneIcon) .. "  " .. ns:TextColor(mapName:upper(), zoneColor))
+    Zone:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName:upper(), zoneColor))
     Relative = Zone
     Relative.offset = 0
     local LittleRelative = Zone
 
     if zone.covenant then
         local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-        local zoneCovenant = ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
-        local zonePhrase = ns:TextColor("\"" .. string.format(covenants[zone.covenant].phrase, zoneCovenant) .. "\"")
+        local zoneCovenant = TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
+        local zonePhrase = TextColor("\"" .. string.format(covenants[zone.covenant].phrase, zoneCovenant) .. "\"", "bbbbbb")
         local Covenant = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
         Covenant:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
         Covenant:SetJustifyH("LEFT")
@@ -523,7 +590,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
             Faction.anchor = FactionAnchor
             Faction.faction = faction
             Faction.color = zoneColor
-            ns:RegisterFaction(Faction)
+            Register("Factions", Faction)
             ns:RefreshFactions()
             LittleRelative = Faction
         end
@@ -540,7 +607,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
         Currency:SetJustifyH("LEFT")
         Currency.currency = zone.currency
         Currency.color = zoneColor
-        ns:RegisterCurrency(Currency)
+        Register("Currencies", Currency)
         ns:RefreshCurrencies()
         LittleRelative = Currency
     end
@@ -598,7 +665,7 @@ end
 function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
-    local zoneCovenant = zone.covenant and ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
+    local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local c = {}
     local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
@@ -607,13 +674,13 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     end
 
     local dead = IsRareDead(rare) and checkmark or ((type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest)) or rare.biweekly or rare.weekly) and quest or skull
-    local covenantRequired = rare.covenantRequired and ns:TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and ns:TextColor(",") or "") or ""
-    local drops = #items > 0 and  " " .. ns:TextColor(L.Drops, "bbbbbb") or ""
+    local covenantRequired = rare.covenantRequired and TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
+    local drops = #items > 0 and  " " .. TextColor(L.Drops, "bbbbbb") or ""
 
     local Rare = CreateFrame("Button", ADDON_NAME .. "Rare" .. rare.id, Parent)
     local RareLabel = Rare:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     RareLabel:SetJustifyH("LEFT")
-    RareLabel:SetText(dead .. " " .. ns:TextColor(i .. ". ") .. rare.name .. covenantRequired .. drops)
+    RareLabel:SetText(dead .. " " .. TextColor(i .. ". ") .. rare.name .. covenantRequired .. drops)
     RareLabel:SetHeight(16)
     RareLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Rare:SetAllPoints(RareLabel)
@@ -628,7 +695,9 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
             end
         end
         local prefix = isLead and "Create & Send Map Pin" or "Create Map Pin"
-        GameTooltip:SetText(ns:TextColor(prefix .. ":\n") .. rare.name .. ns:TextColor("\n|cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r"))
+        GameTooltip:SetText(prefix .. ":")
+        GameTooltip:AddLine(TextColor(rare.name))
+        GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. TextColor(" |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r"))
         GameTooltip:Show()
     end)
     Rare:SetScript("OnLeave", HideTooltip)
@@ -650,7 +719,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         end
     end)
     RareLabel.rare = rare
-    ns:RegisterRare(RareLabel)
+    Register("Rares", RareLabel)
     Relative = Rare
 
     if RAVFOR_data.options.showReputation == true and rare.reputation then
@@ -660,7 +729,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         local factionName = select(1, GetFactionInfoByID(zone.faction))
         local Reputation = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Reputation", "ARTWORK", "GameFontNormal")
         Reputation:SetJustifyH("LEFT")
-        Reputation:SetText("    " .. ns:TextColor(string.format(L.Reputation, rare.reputation, ns:TextColor(factionName, zoneColor)), "8080ff"))
+        Reputation:SetText("    " .. TextColor(string.format(L.Reputation, rare.reputation, TextColor(factionName, zoneColor)), "8080ff"))
         Reputation:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
         Relative = Reputation
     end
@@ -681,36 +750,27 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     return Relative
 end
 
-function ns:RegisterRare(Rare)
-    if not Rare then return end
-    ns.Rares = ns.Rares or {}
-    table.insert(ns.Rares, Rare)
-end
-
-function ns:RefreshRares()
-    for _, Rare in ipairs(ns.Rares) do
-        local withoutDead = string.gsub(string.gsub(string.gsub(Rare:GetText(), quest, ""), skull, ""), checkmark, "")
-        Rare:SetText((IsRareDead(Rare.rare) and checkmark or ((type(Rare.rare.quest) == "number" and C_QuestLog.IsWorldQuest(Rare.rare.quest)) or Rare.rare.biweekly or Rare.rare.weekly) and quest or skull) .. withoutDead)
-    end
-end
+---
+-- Item
+---
 
 function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
-    local zoneCovenant = zone.covenant and ns:TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
+    local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
 
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
     local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
-    local guaranteed = item.guaranteed and ns:TextColor(" 100% drop!") or ""
-    local achievement = item.achievement and ns:TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
-    local covenantOnly = item.covenantOnly and ns:TextColor(L.OnlyFor, "bbbbbb") .. zoneCovenant or ""
-    local classOnly = item.class and ns:TextColor(L.OnlyFor, "bbbbbb") .. itemClass or ""
+    local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
+    local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
+    local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor, "bbbbbb") .. zoneCovenant or ""
+    local classOnly = item.class and TextColor(L.OnlyFor, "bbbbbb") .. itemClass or ""
     local owned = IsItemOwned(item) and " " .. checkmark or ""
 
     local Item = CreateFrame("Button", ADDON_NAME .. "Item" .. item.id, Parent)
     local ItemLabel = Item:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     ItemLabel:SetJustifyH("LEFT")
-    ItemLabel:SetText("    " .. ns:TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. covenantOnly .. classOnly .. owned)
+    ItemLabel:SetText("    " .. TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. covenantOnly .. classOnly .. owned)
     ItemLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
     ItemLabel:SetWidth(Parent:GetWidth())
     Item:SetAllPoints(ItemLabel)
@@ -724,88 +784,10 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
         ns:PrettyPrint(itemLink)
     end)
     ItemLabel.item = item
-    ns:RegisterItem(ItemLabel)
+    Register("Items", ItemLabel)
 
     Relative = ItemLabel
     return Relative
-end
-
-function ns:RegisterItem(Item)
-    if not Item then return end
-    ns.Items = ns.Items or {}
-    table.insert(ns.Items, Item)
-end
-
-function ns:RefreshItems()
-    for _, Item in ipairs(ns.Items) do
-        local withoutOwned = string.gsub(Item:GetText(), checkmark, "")
-        Item:SetText(withoutOwned .. (IsItemOwned(Item.item) and checkmark or ""))
-    end
-end
-
----
--- Notes
----
-
-function ns:CreateNotes(Parent, Relative, notes, indent)
-    indent = indent and indent or ""
-    for i, note in ipairs(notes) do
-        local Note = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-        Note:SetJustifyH("LEFT")
-        Note:SetText(indent .. ns:TextColor(note, "eeeeee"))
-        Note:SetWidth(Parent:GetWidth())
-        Note:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -medium-(Relative.offset or 0))
-        Relative = Note
-    end
-
-    return Relative
-end
-
----
--- Targets
----
-
-function ns:NewTarget(zone, rare)
-    local zoneName = C_Map.GetMapInfo(zone.id).name
-    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-    local c = {}
-    local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
-    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
-        tinsert(c, d)
-    end
-    -- Print message to chat
-    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
-    -- Add the waypoint to the map and track it
-    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
-    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-end
-
-function ns:SendTarget(zone, rare)
-    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
-    local playerName = UnitName("player")
-    local isLead = false
-    for i = 1, MAX_RAID_MEMBERS do
-        local lookup, rank = GetRaidRosterInfo(i)
-        if lookup == playerName then
-            if rank > 1 then isLead = true end
-            break
-        end
-    end
-    if isLead then
-        local inInstance, _ = IsInInstance()
-        if inInstance then
-            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
-        elseif IsInGroup() then
-            if GetNumGroupMembers() > 5 then
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
-            else
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
-            end
-        end
-    -- else -- Enable for testing
-    --     print("Sending target to… self!")
-    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
-    end
 end
 
 ---
@@ -819,13 +801,13 @@ function ns:CreateGreatVault(Parent, Relative)
 
     local GreatVault = Parent:CreateFontString(ADDON_NAME .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
     GreatVault:SetJustifyH("LEFT")
-    GreatVault:SetText(ns:TextIcon(3847780) .. "  " .. ns:TextColor("The Great Vault", "8899c6"))
+    GreatVault:SetText(TextIcon(3847780) .. "  " .. TextColor("The Great Vault", "8899c6"))
     GreatVault:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Relative = GreatVault
 
     local GreatVaultNotice = Parent:CreateFontString(ADDON_NAME .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
     GreatVaultNotice:SetJustifyH("LEFT")
-    GreatVaultNotice:SetText(ns:TextColor("Go to Oribos to claim your rewards!", "ff6666"))
+    GreatVaultNotice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
     GreatVaultNotice:SetPoint("LEFT", Relative, "RIGHT", large, 0)
 
     return Relative
@@ -850,7 +832,7 @@ function ns:CreateCovenant(Parent, Relative)
     Renown:SetJustifyH("LEFT")
     Renown:SetPoint("TOP", Relative, "BOTTOM", 0, -medium-small)
 
-    ns:RegisterCovenant(Covenant, Renown)
+    RegisterCovenant(Covenant, Renown)
     ns:RefreshCovenant()
 
     local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
@@ -858,7 +840,7 @@ function ns:CreateCovenant(Parent, Relative)
     Anima:SetJustifyH("LEFT")
     Anima.currency = 1813
     Anima.color = "95c3e1"
-    ns:RegisterCurrency(Anima)
+    Register("Currencies", Anima)
     LittleRelative = Anima
 
     local RedeemedSouls = Parent:CreateFontString(ADDON_NAME .. "RedeemedSouls", "ARTWORK", "GameFontNormal")
@@ -866,7 +848,7 @@ function ns:CreateCovenant(Parent, Relative)
     RedeemedSouls:SetJustifyH("LEFT")
     RedeemedSouls.currency = 1810
     RedeemedSouls.color = "f5dcd0"
-    ns:RegisterCurrency(RedeemedSouls)
+    Register("Currencies", RedeemedSouls)
     LittleRelative = RedeemedSouls
 
     local GratefulOfferings = Parent:CreateFontString(ADDON_NAME .. "GratefulOfferings", "ARTWORK", "GameFontNormal")
@@ -874,27 +856,12 @@ function ns:CreateCovenant(Parent, Relative)
     GratefulOfferings:SetJustifyH("LEFT")
     GratefulOfferings.currency = 1885
     GratefulOfferings.color = "96dc93"
-    ns:RegisterCurrency(GratefulOfferings)
+    Register("Currencies", GratefulOfferings)
 
     ns:RefreshCurrencies()
 
     Relative.offset = large + large + medium
     return Relative
-end
-
-function ns:RegisterCovenant(Covenant, Renown)
-    if (not Covenant) or (not Renown) then return end
-    ns.Covenant = Covenant
-    ns.Renown = Renown
-end
-
-function ns:RefreshCovenant()
-    local covenant = C_Covenants.GetActiveCovenantID()
-    local renown = C_CovenantSanctumUI.GetRenownLevel()
-    local maxRenown = GetMaxRenown()
-
-    ns.Covenant:SetText(ns:TextIcon(3726261) .. "  " .. ns:TextColor(C_Covenants.GetCovenantData(covenant).name, ns.data.covenants[covenant].color))
-    ns.Renown:SetText((renown < maxRenown and ns:TextColor(renown .. "/" .. maxRenown, "ff6666") or ns:TextColor(renown, "ffffff")) .. ns:TextColor(" Renown", ns.data.covenants[covenant].color))
 end
 
 ---
@@ -908,7 +875,7 @@ function ns:CreateTorghast(Parent, Relative)
 
     local Torghast = Parent:CreateFontString(ADDON_NAME .. "Torghast", "ARTWORK", "GameFontNormalLarge")
     Torghast:SetJustifyH("LEFT")
-    Torghast:SetText(ns:TextIcon(3642306) .. "  " .. ns:TextColor(("Torghast"):upper(), "b0ccd8"))
+    Torghast:SetText(TextIcon(3642306) .. "  " .. TextColor(("Torghast"):upper(), "b0ccd8"))
     Torghast:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Relative = Torghast
 
@@ -918,7 +885,7 @@ function ns:CreateTorghast(Parent, Relative)
 
     SoulAsh.currency = 1828
     SoulAsh.color = "b0ccd8"
-    ns:RegisterCurrency(SoulAsh)
+    Register("Currencies", SoulAsh)
     ns:RefreshCurrencies()
 
     return Relative
@@ -955,7 +922,7 @@ function ns:BuildWindow()
     local Heading = Window:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     Heading:SetPoint("TOP", Window, "TOP")
     Heading:SetPoint("BOTTOM", Window, "TOP", 0, -30)
-    Heading:SetText(ns:TextColor(ns.name .. " ") .. ns:TextColor(ns.expansion, ns.color) .. ns:TextColor(" v" .. ns.version))
+    Heading:SetText(TextColor(ns.name .. " ") .. TextColor(ns.expansion, ns.color) .. TextColor(" v" .. ns.version))
 
     local OptionsButton = CreateFrame("Button", ADDON_NAME .. "OptionsButton", Window, "UIPanelButtonTemplate")
     OptionsButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
@@ -1060,12 +1027,12 @@ function ns:BuildWindow()
     -- Notes
     local NoteHeading = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     NoteHeading:SetJustifyH("LEFT")
-    NoteHeading:SetText(ns:TextIcon(1506451) .. "  " .. ns:TextColor("Notes", "eeeeee"))
+    NoteHeading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "eeeeee"))
     NoteHeading:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Relative = NoteHeading
-    local Notes = ns:CreateNotes(Parent, Relative, ns.data.notes)
+    local Notes = ns:CreateNotes(Parent, Relative, notes)
     Relative = Notes
-    local Spacer = ns:CreateSpacer(Parent, Relative)
+    local Spacer = CreateSpacer(Parent, Relative)
 
     for title, expansion in pairs(expansions) do
         Parent = Scrollers[title].Content
@@ -1093,13 +1060,13 @@ function ns:BuildWindow()
         if expansion.notes and #expansion.notes > 0 then
             local NoteHeading = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
             NoteHeading:SetJustifyH("LEFT")
-            NoteHeading:SetText(ns:TextIcon(1506451) .. "  " .. ns:TextColor("Notes", "eeeeee"))
+            NoteHeading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "eeeeee"))
             NoteHeading:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
             Relative = NoteHeading
             local Notes = ns:CreateNotes(Parent, Relative, expansion.notes)
             Relative = Notes
         end
-        local Spacer = ns:CreateSpacer(Parent, Relative)
+        local Spacer = CreateSpacer(Parent, Relative)
     end
 
     for title, Tab in pairs(Tabs) do
@@ -1114,4 +1081,76 @@ function ns:BuildWindow()
             end
         end)
     end
+end
+
+---
+-- Minimap Button
+-- Thanks to Leatrix for the gist of this code!
+---
+
+function ns:CreateMinimapButton()
+    if RAVFOR_data.options.minimapButton ~= true then
+        if ns.MinimapButton then ns.MinimapButton:Hide() end
+        return
+    end
+
+    local Button = CreateFrame("Button", nil, Minimap)
+    Button:SetFrameLevel(8)
+    Button:SetSize(28, 28)
+    Button:EnableMouse(true)
+    Button:SetMovable(true)
+    Button:ClearAllPoints()
+    Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)),(80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
+
+    Button:SetNormalTexture("Interface/AddOns/ravFor/ravFor.tga")
+    Button:SetPushedTexture("Interface/AddOns/ravFor/ravFor.tga")
+    Button:SetHighlightTexture("Interface/AddOns/ravFor/ravFor.tga")
+
+    local function UpdateMinimapButton()
+        local Xpoa, Ypoa = GetCursorPosition()
+        local Xmin, Ymin = Minimap:GetLeft(), Minimap:GetBottom()
+        Xpoa = Xmin - Xpoa / Minimap:GetEffectiveScale() + 70
+        Ypoa = Ypoa / Minimap:GetEffectiveScale() - Ymin - 70
+        RAVFOR_data.options.minimapPosition = math.deg(math.atan2(Ypoa, Xpoa))
+        Button:ClearAllPoints()
+        Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)), (80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
+    end
+
+    -- TODO FIX CLICK + DRAG CONFLICT
+
+    Button:RegisterForDrag("LeftButton")
+    Button:SetScript("OnDragStart", function()
+        Button:StartMoving()
+        Button.isMoving = true
+        Button:SetScript("OnUpdate", UpdateMinimapButton)
+    end)
+
+    Button:SetScript("OnDragStop", function()
+        Button:StopMovingOrSizing()
+        Button.isMoving = false
+        Button:SetScript("OnUpdate", nil)
+        UpdateMinimapButton()
+    end)
+
+    Button:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_RIGHT")
+        GameTooltip:SetText(ns.name)
+        GameTooltip:AddLine("Left-click to open Window.")
+        GameTooltip:AddLine("Right-click to open Interface Options.")
+        GameTooltip:Show()
+    end)
+    Button:SetScript("OnLeave", HideTooltip)
+
+    Button:SetScript("OnMouseDown", function(self, button)
+        if not self.isMoving then
+            if button == "RightButton" then
+                ns.waitingForOptions = true
+                ns:PrettyPrint(L.NotLoaded)
+            else
+                ns:ToggleWindow(ns.Window)
+            end
+        end
+    end)
+
+    ns.MinimapButton = Button
 end

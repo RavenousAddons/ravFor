@@ -25,15 +25,15 @@ local function RefreshControls(Controls)
     end
 end
 
----
--- Global Options Functions
----
-
-function ns:RegisterDefaultOption(key, value)
+local function RegisterDefaultOption(key, value)
     if RAVFOR_data.options[key] == nil then
         RAVFOR_data.options[key] = value
     end
 end
+
+---
+-- Global Options Functions
+---
 
 function ns:SetDefaultOptions()
     if RAVFOR_data == nil then
@@ -43,7 +43,7 @@ function ns:SetDefaultOptions()
         RAVFOR_data.options = {}
     end
     for k, v in pairs(ns.defaults) do
-        ns:RegisterDefaultOption(k, v)
+        RegisterDefaultOption(k, v)
     end
 end
 

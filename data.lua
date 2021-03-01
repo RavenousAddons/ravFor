@@ -40,7 +40,7 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
-                            -- hidden = true,
+                            hidden = true,
                             name = "Hunt: Shadehounds",
                             id = 174827,
                             -- quest = ?????,
@@ -469,7 +469,7 @@ ns.data = {
                         {
                             name = "Gelloh",
                             id = 157307,
-                            quest = 61720,
+                            quest = 61721,
                             waypoint = 58197421,
                             items = {
                                 {
@@ -1877,8 +1877,8 @@ ns.data = {
                 {
                     -- Mechagon
                     id = 1462,
-                    color = "d8d3cc",
-                    icon = "2620862",
+                    color = "dbd9a9",
+                    icon = "2915728",
                     rares = {
                         {
                             name = "Arachnoid Harvester",
