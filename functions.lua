@@ -342,6 +342,7 @@ function ns:SendTarget(zone, rare)
         end
     end
     if isLead then
+        ns:PrettyPrint("Sending new target to group...")
         local inInstance, _ = IsInInstance()
         if inInstance then
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
@@ -353,7 +354,7 @@ function ns:SendTarget(zone, rare)
             end
         end
     -- else -- Enable for testing
-    --     print("Sending target to… self!")
+    --     print("Sending new target to… self!")
     --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
     end
 end
@@ -426,53 +427,6 @@ local function CreateTab(cfg)
     end)
 
     return Tab
-end
-
----
--- Targets
----
-
-function ns:NewTarget(zone, rare)
-    local zoneName = C_Map.GetMapInfo(zone.id).name
-    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-    local c = {}
-    local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
-    for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
-        tinsert(c, d)
-    end
-    -- Print message to chat
-    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
-    -- Add the waypoint to the map and track it
-    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
-    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-end
-
-function ns:SendTarget(zone, rare)
-    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
-    local playerName = UnitName("player")
-    local isLead = false
-    for i = 1, MAX_RAID_MEMBERS do
-        local lookup, rank = GetRaidRosterInfo(i)
-        if lookup == playerName then
-            if rank > 1 then isLead = true end
-            break
-        end
-    end
-    if isLead then
-        local inInstance, _ = IsInInstance()
-        if inInstance then
-            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
-        elseif IsInGroup() then
-            if GetNumGroupMembers() > 5 then
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
-            else
-                C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
-            end
-        end
-    -- else -- Enable for testing
-    --     print("Sending target to… self!")
-    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
-    end
 end
 
 ---

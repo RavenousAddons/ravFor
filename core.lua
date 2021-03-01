@@ -17,6 +17,11 @@ end
 
 function ravFor_OnEvent(self, event, arg, ...)
     if event == "CHAT_MSG_ADDON" and arg == ADDON_NAME then
+        if ns.chatOnCooldown == true then return end
+        ns.chatOnCooldown = true
+        C_TimerC_Timer.After(10, function()
+            ns.chatOnCooldown = false
+        end)
         local message, _ = ...
         if string.match(message, "target") then
             local zoneID, rareID = strsplit(",", message)
