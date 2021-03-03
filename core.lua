@@ -66,7 +66,7 @@ function ravFor_OnEvent(self, event, arg, ...)
                 InterfaceOptionsFrame_OpenToCategory(ns.Options)
             end
             if ns.MinimapButton then
-                ns.MinimapButton:SetScript("OnMouseDown", function(self, button)
+                ns.MinimapButton:SetScript("OnMouseUp", function(self, button)
                     if button == "RightButton" then
                         InterfaceOptionsFrame_OpenToCategory(ns.Options)
                         InterfaceOptionsFrame_OpenToCategory(ns.Options)

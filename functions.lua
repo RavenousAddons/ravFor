@@ -907,8 +907,9 @@ function ns:BuildWindow()
     OptionsButtonIcon:SetAllPoints(OptionsButton)
     OptionsButtonIcon:SetTexture(134063)
 
+    -- TODO Get the resizer attached to Window + Events
     -- local Resizer = CreateFrame("Button", ADDON_NAME .. "Resizer", Window)
-    -- 386862
+    -- Icon/Texture to use: 386862
 
     local Scroller = CreateScroller({
         label = "General",
@@ -980,7 +981,7 @@ function ns:BuildWindow()
 
     -- Get "Watched" World Quests
     -- What is useful is that the weekly WQ Rare is auto-tracked on login, so we
-    -- can use this + quest completion to determine the weekly WQ Rare
+    -- can use this + quest completion to determine the Weekly WQ Rare
     local worldQuests = {}
     if C_QuestLog.GetNumWorldQuestWatches() then
         for i = 1, C_QuestLog.GetNumWorldQuestWatches() do
@@ -1087,8 +1088,6 @@ function ns:CreateMinimapButton()
         Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)), (80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
     end
 
-    -- TODO FIX CLICK + DRAG CONFLICT
-
     Button:RegisterForDrag("LeftButton")
     Button:SetScript("OnDragStart", function()
         Button:StartMoving()
@@ -1112,7 +1111,7 @@ function ns:CreateMinimapButton()
     end)
     Button:SetScript("OnLeave", HideTooltip)
 
-    Button:SetScript("OnMouseDown", function(self, button)
+    Button:SetScript("OnMouseUp", function(self, button)
         if not self.isMoving then
             if button == "RightButton" then
                 ns.waitingForOptions = true
