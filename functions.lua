@@ -298,8 +298,9 @@ function ns:CacheAndBuild(callback)
                 elseif isWorldQuest and not isAvailable then
                 else
                     for _, item in ipairs(rare.items) do
-                        if RAVFOR_data.options.showCannotUse == false and ((item.covenantOnly and C_Covenants.GetCovenantData(covenant).name ~= zone.covenant) or (item.class and item.class:upper() ~= class)) then
-                        elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
+                        if RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
+                        elseif RAVFOR_data.options.showCannotUse == false and (item.class and item.class:upper() ~= class) then
+                        elseif RAVFOR_data.options.showCannotUse == false and (item.covenantOnly and C_Covenants.GetCovenantData(covenant).name ~= zone.covenant) then
                         else
                             table.insert(itemIDs, item.id)
                         end
@@ -578,8 +579,9 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
                 -- For each Item dropped by the Rare in the Zone
                 for _, item in ipairs(rare.items) do
                     if GetItemInfo(item.id) == nil then
-                    elseif RAVFOR_data.options.showCannotUse == false and ((item.covenantOnly and covenant ~= zone.covenant) or (item.class and item.class:upper() ~= class)) then
                     elseif RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
+                    elseif RAVFOR_data.options.showCannotUse == false and item.class and item.class:upper() ~= class then
+                    elseif RAVFOR_data.options.showCannotUse == false and item.covenantOnly and covenant ~= zone.covenant then
                     else
                         -- Insert Item into Items
                         table.insert(items, item)

@@ -16,14 +16,14 @@ L.Install = "Thanks for installing |cff%1$sv%2$s|r! You can open the interface w
 L.Update = "Thanks for updating to |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
 L.Defaults = {
     {
+        var = "minimapButton",
+        text = "Display Minimap button",
+        tooltip = "When enabled, a button will be attached to your Minimap that can open/close the window and interface options.",
+    },
+    {
         var = "macro",
         text = "Automatically create macro",
         tooltip = "When enabled, a macro called |cffffffff" .. ns.name .. "|r will be automatically created and managed for you under |cffffffffGeneral Macros|r.",
-    },
-    {
-        var = "minimapButton",
-        text = "Display Minimap button",
-        tooltip = "When enabled, a button will be attached to your Minimap that can open/close the window.",
     },
     {
         var = "showReputation",
@@ -38,7 +38,7 @@ L.Defaults = {
     {
         var = "showCannotUse",
         text = "Show Items you cannot use",
-        tooltip = "When enabled, Items which you cannot use (wrong Class/Covenant/etc.) will appear in lists.",
+        tooltip = "When enabled, Items which you cannot use (by Class/Covenant/etc.) will appear in lists.",
     },
     {
         var = "showNoDrops",
