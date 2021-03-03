@@ -332,9 +332,8 @@ function ns:NewTarget(zone, rare)
 end
 
 function ns:SendTarget(zone, rare)
-    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
-    local playerName = UnitName("player")
     ns:PrettyPrint("Sending new target to group...")
+    local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
     local inInstance, _ = IsInInstance()
     if inInstance then
         C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
@@ -344,6 +343,8 @@ function ns:SendTarget(zone, rare)
         else
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
         end
+    -- else
+    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
     end
 end
 

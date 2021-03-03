@@ -19,7 +19,7 @@ function ravFor_OnEvent(self, event, arg, ...)
     if event == "CHAT_MSG_ADDON" and arg == ADDON_NAME then
         if ns.chatOnCooldown == true then return end
         ns.chatOnCooldown = true
-        C_TimerC_Timer.After(10, function()
+        C_Timer.After(10, function()
             ns.chatOnCooldown = false
         end)
         local message, _ = ...
@@ -28,23 +28,25 @@ function ravFor_OnEvent(self, event, arg, ...)
             zoneID = math.floor(string.gsub(zoneID, "target={", ""))
             rareID = math.floor(string.gsub(rareID, "}", ""))
             local rare
-            for _, zone in ipairs(zones) do
-                if zone.id == zoneID then
-                    for _, rare in ipairs(zone.rares) do
-                        if rare.id == rareID then
-                            local n = random(#L.TargetMessages)
-                            local zoneName = C_Map.GetMapInfo(zoneID).name
-                            local c = {}
-                            local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
-                            for d in tostring(waypoint):gmatch("[0-9][0-9]") do
-                                tinsert(c, d)
+            for title, expansion in pairs(ns.data.expansions) do
+                for _, zone in ipairs(expansion.zones) do
+                    if zone.id == zoneID then
+                        for _, rare in ipairs(zone.rares) do
+                            if rare.id == rareID then
+                                local n = random(#L.TargetMessages)
+                                local zoneName = C_Map.GetMapInfo(zoneID).name
+                                local c = {}
+                                local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
+                                for d in tostring(waypoint):gmatch("[0-9][0-9]") do
+                                    tinsert(c, d)
+                                end
+                                RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "!", ChatTypeInfo["RAID_WARNING"])
+                                ns:NewTarget(zone, rare)
+                                break
                             end
-                            RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "!", ChatTypeInfo["RAID_WARNING"])
-                            ns:NewTarget(zone, rare)
-                            break
                         end
+                        break
                     end
-                    break
                 end
             end
         end
