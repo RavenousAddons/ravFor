@@ -115,8 +115,7 @@ function ravFor_OnEvent(self, event, arg, ...)
 end
 
 SlashCmdList["RAVFOR"] = function(message, editbox)
-    local command, argument = strsplit(" ", message)
-    if command == "version" or command == "v" then
+    if message == "version" or message == "v" then
         ns:PrettyPrint(string.format(L.Version, ns.version))
     elseif message == "c" or string.match(message, "con") or message == "h" or string.match(message, "help") or message == "o" or string.match(message, "opt") or message == "s" or string.match(message, "sett") or string.match(message, "togg") then
         PlaySound(SOUNDKIT.IG_MAINMENU_OPEN)

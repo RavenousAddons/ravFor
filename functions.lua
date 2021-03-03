@@ -324,7 +324,7 @@ function ns:NewTarget(zone, rare)
         tinsert(c, d)
     end
     -- Print message to chat
-    ns:PrettyPrint("\n" .. rare.name .. "  |cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
     -- Add the waypoint to the map and track it
     C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
     C_SuperTrack.SetSuperTrackedUserWaypoint(true)
@@ -868,8 +868,27 @@ function ns:BuildWindow()
     Heading:SetPoint("BOTTOM", Window, "TOP", 0, -30)
     Heading:SetText(TextColor(ns.name .. " ") .. TextColor(ns.expansion, ns.color) .. TextColor(" v" .. ns.version))
 
+    local LockButton = CreateFrame("Button", ADDON_NAME .. "LockButton", Window, "UIPanelButtonTemplate")
+    LockButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
+    LockButton:SetWidth(18)
+    LockButton:SetHeight(18)
+    LockButton:RegisterForClicks("LeftButton")
+    LockButton:SetScript("OnMouseDown", function(self, button)
+        RAVFOR_data.options.locked = not RAVFOR_data.options.locked
+        GameTooltip:SetText(TextColor(RAVFOR_data.options.locked and "Unlock Window" or "Lock Window"))
+    end)
+    LockButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetText(TextColor(RAVFOR_data.options.locked and "Unlock Window" or "Lock Window"))
+        GameTooltip:Show()
+    end)
+    LockButton:SetScript("OnLeave", HideTooltip)
+    local LockButtonIcon = LockButton:CreateTexture()
+    LockButtonIcon:SetAllPoints(LockButton)
+    LockButtonIcon:SetTexture(130944)
+
     local OptionsButton = CreateFrame("Button", ADDON_NAME .. "OptionsButton", Window, "UIPanelButtonTemplate")
-    OptionsButton:SetPoint("TOPLEFT", Window, "TOPLEFT", 9, -small)
+    OptionsButton:SetPoint("TOPLEFT", LockButton, "TOPRIGHT", 2, 0)
     OptionsButton:SetWidth(18)
     OptionsButton:SetHeight(18)
     OptionsButton:RegisterForClicks("LeftButton")
@@ -878,9 +897,18 @@ function ns:BuildWindow()
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
     end)
+    OptionsButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetText(TextColor("Open Interface Options"))
+        GameTooltip:Show()
+    end)
+    OptionsButton:SetScript("OnLeave", HideTooltip)
     local OptionsButtonIcon = OptionsButton:CreateTexture()
     OptionsButtonIcon:SetAllPoints(OptionsButton)
     OptionsButtonIcon:SetTexture(134063)
+
+    -- local Resizer = CreateFrame("Button", ADDON_NAME .. "Resizer", Window)
+    -- 386862
 
     local Scroller = CreateScroller({
         label = "General",
@@ -927,9 +955,8 @@ function ns:BuildWindow()
         previousTab = Tab
     end
 
-    -- Window Interactions
     local function WindowInteractionStart(self, button)
-        if button == "LeftButton" then
+        if button == "LeftButton" and not RAVFOR_data.options.locked then
             Window:StartMoving()
             Window.isMoving = true
             Window.hasMoved = false

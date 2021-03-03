@@ -1,6 +1,7 @@
 local ADDON_NAME, ns = ...
 
 ns.defaults = {
+    locked = false,
     macro = true,
     minimapButton = true,
     showReputation = true,

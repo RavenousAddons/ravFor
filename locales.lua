@@ -14,7 +14,6 @@ L.Version = "%s is the current version." -- ns.version
 L.NotLoaded = "Please wait a moment while data is populated."
 L.Install = "Thanks for installing |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
 L.Update = "Thanks for updating to |cff%1$sv%2$s|r! You can open the interface with |cff%1$s/%3$s|r." -- ns.color, ns.version, ns.command
-L.Configuration = "Configuration"
 L.Defaults = {
     {
         var = "macro",
