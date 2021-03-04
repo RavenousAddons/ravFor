@@ -1,18 +1,18 @@
 local ADDON_NAME, ns = ...
 local L = ns.L
 
-local covenants = ns.data.covenants
-local expansions = ns.data.expansions
 local notes = ns.data.notes
-local renownLevels = ns.data.renownLevels
+local expansions = ns.data.expansions
+local currencies = ns.data.currencies
 local reputationColors = ns.data.reputationColors
+local covenants = ns.data.covenants
+local renownLevels = ns.data.renownLevels
+local animaValuesBySpellID = ns.data.animaValuesBySpellID
 
 local small = 6
 local medium = 12
 local large = 16
 local gigantic = 24
-
-local cacheInterval = 0.001
 
 local _, class = UnitClass("player")
 local faction, _ = UnitFactionGroup("player")
@@ -104,6 +104,34 @@ local function RunsUntil95(chance, bound)
     return bound
 end
 
+local function GetAnimaItems()
+    local items = {}
+    for bagID = 0, 4 do
+        for slot = 0, GetContainerNumSlots(bagID) do
+            if GetContainerItemInfo(bagID, slot) then
+                local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID = GetContainerItemInfo(bagID, slot)
+                local isAnimaItem = C_Item.IsAnimaItemByID(itemLink)
+                if isAnimaItem then
+                    table.insert(items, {
+                        id = itemID,
+                        count = itemCount,
+                    })
+                end
+            end
+        end
+    end
+    return items
+end
+
+local function GetAnimaItemsTotal()
+    local total = 0
+    for _, item in ipairs(GetAnimaItems()) do
+        local spellName, spellID = GetItemSpell(item.id)
+        total = total + (animaValuesBySpellID[spellID] * item.count)
+    end
+    return total
+end
+
 local function GetMaxRenown()
     -- if 0, then reset is today but has not yet happened
     local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
@@ -126,6 +154,12 @@ local function GetMaxRenown()
         end
     end
     return maxRenown
+end
+
+local function GetCurrencyData(id)
+    for _, currency in ipairs(currencies) do
+        if id == currency.id then return currency end
+    end
 end
 
 ---
@@ -189,10 +223,11 @@ end
 
 function ns:RefreshCurrencies()
     for _, Currency in ipairs(ns.Currencies) do
-        local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency)
+        local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency.id)
         local quantity = currency.discovered and currency.quantity or 0
-        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + currency.quantity) or commaValue(currency.maxQuantity)
-        Currency:SetText(TextColor(commaValue(currency.quantity) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, Currency.color and Currency.color or "ffffff"))
+        local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + quantity) or commaValue(currency.maxQuantity)
+        local add = Currency.add and Currency.add() or 0
+        Currency:SetText(TextColor(commaValue(quantity + add) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, Currency.currency.color or "ffffff"))
     end
 end
 
@@ -451,8 +486,7 @@ function ns:CreatePVP(Parent, Relative)
     local Honor = Parent:CreateFontString(ADDON_NAME .. "Honor", "ARTWORK", "GameFontNormal")
     Honor:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Honor:SetJustifyH("LEFT")
-    Honor.currency = 1792
-    Honor.color = "f5c87a"
+    Honor.currency = GetCurrencyData(1792)
     Register("Currencies", Honor)
     LittleRelative = Honor
 
@@ -478,8 +512,7 @@ function ns:CreatePVP(Parent, Relative)
     local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
     Conquest:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
     Conquest:SetJustifyH("LEFT")
-    Conquest.currency = 1602
-    Conquest.color = "f5c87a"
+    Conquest.currency = GetCurrencyData(1602)
     Register("Currencies", Conquest)
     LittleRelative = Conquest
 
@@ -548,8 +581,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
             Currency:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
         end
         Currency:SetJustifyH("LEFT")
-        Currency.currency = zone.currency
-        Currency.color = zoneColor
+        Currency.currency = GetCurrencyData(zone.currency)
         Register("Currencies", Currency)
         ns:RefreshCurrencies()
         LittleRelative = Currency
@@ -785,24 +817,35 @@ function ns:CreateCovenant(Parent, Relative)
     local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
     Anima:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Anima:SetJustifyH("LEFT")
-    Anima.currency = 1813
-    Anima.color = "95c3e1"
+    Anima.currency = GetCurrencyData(1813)
+    Anima.add = GetAnimaItemsTotal
     Register("Currencies", Anima)
     LittleRelative = Anima
+
+    local AnimaAnchor = CreateFrame("Frame", nil, Parent)
+    AnimaAnchor:SetAllPoints(Anima)
+    AnimaAnchor:SetScript("OnEnter", function(self)
+        local currency = C_CurrencyInfo.GetCurrencyInfo(Anima.currency.id)
+        local quantity = currency.discovered and currency.quantity or 0
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetText(TextColor(currency.name, Anima.currency.color))
+        GameTooltip:AddLine("In Reservoir: " .. TextColor(commaValue(quantity)))
+        GameTooltip:AddLine("In Bags: " .. TextColor(commaValue(GetAnimaItemsTotal())))
+        GameTooltip:Show()
+    end)
+    AnimaAnchor:SetScript("OnLeave", HideTooltip)
 
     local RedeemedSouls = Parent:CreateFontString(ADDON_NAME .. "RedeemedSouls", "ARTWORK", "GameFontNormal")
     RedeemedSouls:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
     RedeemedSouls:SetJustifyH("LEFT")
-    RedeemedSouls.currency = 1810
-    RedeemedSouls.color = "f5dcd0"
+    RedeemedSouls.currency = GetCurrencyData(1810)
     Register("Currencies", RedeemedSouls)
     LittleRelative = RedeemedSouls
 
     local GratefulOfferings = Parent:CreateFontString(ADDON_NAME .. "GratefulOfferings", "ARTWORK", "GameFontNormal")
     GratefulOfferings:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
     GratefulOfferings:SetJustifyH("LEFT")
-    GratefulOfferings.currency = 1885
-    GratefulOfferings.color = "96dc93"
+    GratefulOfferings.currency = GetCurrencyData(1885)
     Register("Currencies", GratefulOfferings)
 
     ns:RefreshCurrencies()
@@ -830,8 +873,7 @@ function ns:CreateTorghast(Parent, Relative)
     SoulAsh:SetJustifyH("LEFT")
     SoulAsh:SetPoint("LEFT", Relative, "RIGHT", large, 0)
 
-    SoulAsh.currency = 1828
-    SoulAsh.color = "b0ccd8"
+    SoulAsh.currency = GetCurrencyData(1828)
     Register("Currencies", SoulAsh)
     ns:RefreshCurrencies()
 

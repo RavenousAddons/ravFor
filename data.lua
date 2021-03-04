@@ -2080,7 +2080,7 @@ ns.data = {
             color = "4db3ea",
         },
         {
-            id = 1813, -- Anima
+            id = 1813, -- Reservoir Anima
             color = "95c3e1",
         },
         {
@@ -2095,6 +2095,10 @@ ns.data = {
             id = 1767, -- Stygia
             color = "e5cc80",
         },
+        {
+            id = 1885, -- Grateful Offerings
+            color = "96dc93",
+        }
     },
     reputationColors = {
         "cc2222",
@@ -2201,4 +2205,10 @@ ns.data = {
             day = 9,
         },
     },
+    animaValuesBySpellID = {
+        [347555] = 3,
+        [345706] = 5,
+        [336327] = 35,
+        [336456] = 250,
+    }
 }
