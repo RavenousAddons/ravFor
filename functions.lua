@@ -23,10 +23,10 @@ local factionCity = (faction == "Alliance" and "Stormwind" or "Orgrimmar")
 ---
 
 local function commaValue(amount)
-    local formatted = amount
+    local formatted, i = amount
     while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then
+        formatted, i = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if i == 0 then
             break
         end
     end
@@ -236,17 +236,16 @@ function ns:RefreshFactions()
         local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, hasBonusRepGain, _ = GetFactionInfoByID(Faction.faction)
         local quantity = commaValue(reputation - reputationMin)
         Faction:SetText(TextColor(string.format(L.Faction, TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]), TextColor(factionName, Faction.color and Faction.color or "ffffff")), "bbbbbb"))
-        if standingID == 8 then
-            Faction.anchor:SetScript("OnEnter", nil)
-            Faction.anchor:SetScript("OnLeave", nil)
-        else
-            Faction.anchor:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
-                GameTooltip:SetText(TextColor(quantity .. "/" .. commaValue(reputationMax)))
-                GameTooltip:Show()
-            end)
-            Faction.anchor:SetScript("OnLeave", HideTooltip)
-        end
+        Faction.anchor:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+            GameTooltip:SetText("Reputation with " .. TextColor(factionName, Faction.color and Faction.color or "ffffff"))
+            GameTooltip:AddLine(TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]))
+            if standingID < 8 then
+                GameTooltip:AddLine(TextColor(quantity .. "/" .. commaValue(reputationMax)))
+            end
+            GameTooltip:Show()
+        end)
+        Faction.anchor:SetScript("OnLeave", HideTooltip)
     end
 end
 
@@ -540,8 +539,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
     local LittleRelative = Zone
 
     if zone.covenant then
-        local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
-        local zoneCovenant = TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor)
+        local zoneCovenant = string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords")
         local zonePhrase = TextColor("\"" .. string.format(covenants[zone.covenant].phrase, zoneCovenant) .. "\"", "bbbbbb")
         local Covenant = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
         Covenant:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
@@ -576,7 +574,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
         local Currency = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
         if zone.covenant or zone.faction then
             Currency:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
-            Relative.offset = Relative.offset + large
+            Relative.offset = Relative.offset + ((zone.covenant and zone.faction) and gigantic or large)
         else
             Currency:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
         end

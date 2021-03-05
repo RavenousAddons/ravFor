@@ -841,6 +841,7 @@ ns.data = {
                     id = 1525,
                     covenant = 2,
                     faction = {2413, 2439},
+                    currency = 1820,
                     rares = {
                         {
                             name = "Nurgash Muckformed",
@@ -2070,35 +2071,48 @@ ns.data = {
         {
             id = 1792, -- Honor
             color = "f5c87a",
+            icon = 1455894,
         },
         {
             id = 1602, -- Conquest
             color = "f5c87a",
+            icon = 1523630,
         },
         {
             id = 1721, -- Prismatic Manapearl
             color = "4db3ea",
+            icon = 463858,
         },
         {
             id = 1813, -- Reservoir Anima
             color = "95c3e1",
+            icon = 3528288,
         },
         {
             id = 1810, -- Redeemed Souls
             color = "f5dcd0",
+            icon = 1391776,
         },
         {
             id = 1828, -- Soul Ash
             color = "b0ccd8",
+            icon = 3743738,
         },
         {
             id = 1767, -- Stygia
             color = "e5cc80",
+            icon = 3743739,
         },
         {
             id = 1885, -- Grateful Offerings
             color = "96dc93",
-        }
+            icon = 134344,
+        },
+        {
+            id = 1820, -- Infused Ruby,
+            color = "f04c73",
+            icon = 133250,
+        },
     },
     reputationColors = {
         "cc2222",
