@@ -15,9 +15,6 @@ local large = 16
 local gigantic = 24
 
 local _, class = UnitClass("player")
-local name = UnitName("player")
-local realm = GetNormalizedRealmName()
-local receiver = string.format("%1$s-%2$s", name, realm)
 local faction, _ = UnitFactionGroup("player")
 local factionCity = (faction == "Alliance" and "Stormwind" or "Orgrimmar")
 
@@ -361,7 +358,7 @@ function ns:NewTarget(zone, rare, sender)
         tinsert(c, d)
     end
     -- Print message to chat if sent by self
-    if sender == receiver then
+    if sender == string.format("%1$s-%2$s", UnitName("player"), GetNormalizedRealmName()) then
         ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
     end
     -- Add the waypoint to the map and track it
@@ -705,7 +702,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
             ns:SendTarget(zone, rare)
         else
             -- Mark the Rare
-            ns:NewTarget(zone, rare, receiver)
+            ns:NewTarget(zone, rare, string.format("%1$s-%2$s", UnitName("player"), GetNormalizedRealmName()))
         end
     end)
     RareLabel.rare = rare
