@@ -22,7 +22,7 @@ function ravFor_OnEvent(self, event, arg, ...)
         C_Timer.After(10, function()
             ns.chatOnCooldown = false
         end)
-        local message, _ = ...
+        local message, channel, sender, _ = ...
         if string.match(message, "target") then
             local zoneID, rareID = strsplit(",", message)
             zoneID = math.floor(string.gsub(zoneID, "target={", ""))
@@ -40,8 +40,19 @@ function ravFor_OnEvent(self, event, arg, ...)
                                 for d in tostring(waypoint):gmatch("[0-9][0-9]") do
                                     tinsert(c, d)
                                 end
-                                RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "!", ChatTypeInfo["RAID_WARNING"])
-                                ns:NewTarget(zone, rare)
+                                ns:NewTarget(zone, rare, sender)
+                                local inInstance, _ = IsInInstance()
+                                if inInstance then
+                                    SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "INSTANCE")
+                                elseif IsInGroup() then
+                                    if GetNumGroupMembers() > 5 then
+                                        SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "RAID")
+                                    else
+                                        SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "PARTY")
+                                    end
+                                -- else -- Uncomment for testing
+                                --     SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "WHISPER", _, UnitName("player"))
+                                end
                                 break
                             end
                         end

@@ -15,8 +15,13 @@ local large = 16
 local gigantic = 24
 
 local _, class = UnitClass("player")
+local name = UnitName("player")
+local realm = GetNormalizedRealmName()
+local receiver = string.format("%1$s-%2$s", name, realm)
 local faction, _ = UnitFactionGroup("player")
 local factionCity = (faction == "Alliance" and "Stormwind" or "Orgrimmar")
+
+local CQL = C_QuestLog
 
 ---
 -- Local Functions
@@ -63,13 +68,13 @@ local checkmark = TextIcon(628564)
 local function IsRareDead(rare)
     if type(rare.quest) == "table" then
         for _, quest in ipairs(rare.quest) do
-            if not C_QuestLog.IsQuestFlaggedCompleted(quest) then
+            if not CQL.IsQuestFlaggedCompleted(quest) then
                 return false
             end
         end
         return true
     elseif rare.quest then
-        return C_QuestLog.IsQuestFlaggedCompleted(rare.quest)
+        return CQL.IsQuestFlaggedCompleted(rare.quest)
     end
     return false
 end
@@ -82,7 +87,7 @@ local function IsItemOwned(item)
     elseif item.toy then
         return PlayerHasToy(item.id)
     elseif item.quest then
-        return C_QuestLog.IsQuestFlaggedCompleted(item.quest)
+        return CQL.IsQuestFlaggedCompleted(item.quest)
     elseif item.achievement then
         return select(4, GetAchievementInfo(item.achievement))
     else
@@ -96,11 +101,9 @@ local function RunsUntil95(chance, bound)
     for i = 1, bound do
         local percentage = 1 - ((1 - chance / 100) ^ i)
         if percentage > 0.95 then
-            -- return percentage * 100
             return i
         end
     end
-    -- return string.format("%.2f", (1 - ((1 - chance) ^ bound)) * 100 .. "")
     return bound
 end
 
@@ -234,14 +237,13 @@ end
 function ns:RefreshFactions()
     for _, Faction in ipairs(ns.Factions) do
         local factionName, _, standingID, reputationMin, reputationMax, reputation, _, _, _, _, hasRep, _, _, _, hasBonusRepGain, _ = GetFactionInfoByID(Faction.faction)
-        local quantity = commaValue(reputation - reputationMin)
         Faction:SetText(TextColor(string.format(L.Faction, TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]), TextColor(factionName, Faction.color and Faction.color or "ffffff")), "bbbbbb"))
         Faction.anchor:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
-            GameTooltip:SetText("Reputation with " .. TextColor(factionName, Faction.color and Faction.color or "ffffff"))
+            GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
+            GameTooltip:SetText(TextColor("Reputation with ") .. TextColor(factionName, Faction.color and Faction.color or "ffffff"))
             GameTooltip:AddLine(TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]))
             if standingID < 8 then
-                GameTooltip:AddLine(TextColor(quantity .. "/" .. commaValue(reputationMax)))
+                GameTooltip:AddLine(commaValue(reputation - reputationMin) .. "/" .. commaValue(reputationMax - reputationMin))
             end
             GameTooltip:Show()
         end)
@@ -251,9 +253,9 @@ end
 
 function ns:RefreshWarmodes()
     for _, WarmodeLabel in ipairs(ns.Warmodes) do
-        WarmodeLabel:SetText(TextColor("Warmode is " .. (C_PvP.IsWarModeDesired() and "|cff66ff66Enabled|r" or "|cffff6666Disabled|r") .. ".", "ffffff"))
+        WarmodeLabel:SetText(TextColor(L.WarmodeLabel .. (C_PvP.IsWarModeDesired() and "|cff66ff66" .. _G.VIDEO_OPTIONS_ENABLED .. "|r" or "|cffff6666" .. _G.VIDEO_OPTIONS_DISABLED .. "|r") .. ".", "ffffff"))
         WarmodeLabel.anchor:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+            GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
             GameTooltip:SetText(TextColor((C_PvP.IsWarModeDesired() and "|cffff6666Disable|r" or "|cff66ff66Enable|r") .. " War Mode"))
             GameTooltip:Show()
         end)
@@ -263,7 +265,7 @@ end
 function ns:RefreshRares()
     for _, Rare in ipairs(ns.Rares) do
         local withoutDead = string.gsub(string.gsub(string.gsub(Rare:GetText(), quest, ""), skull, ""), checkmark, "")
-        Rare:SetText((IsRareDead(Rare.rare) and checkmark or ((type(Rare.rare.quest) == "number" and C_QuestLog.IsWorldQuest(Rare.rare.quest)) or Rare.rare.biweekly or Rare.rare.weekly) and quest or skull) .. withoutDead)
+        Rare:SetText((IsRareDead(Rare.rare) and checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest)) or Rare.rare.biweekly or Rare.rare.weekly) and quest or skull) .. withoutDead)
     end
 end
 
@@ -305,9 +307,9 @@ end
 function ns:CacheAndBuild(callback)
     local covenant = C_Covenants.GetActiveCovenantID()
     local worldQuests = {}
-    if C_QuestLog.GetNumWorldQuestWatches() then
-        for i = 1, C_QuestLog.GetNumWorldQuestWatches() do
-            tinsert(worldQuests, C_QuestLog.GetQuestIDForWorldQuestWatchIndex(i))
+    if CQL.GetNumWorldQuestWatches() then
+        for i = 1, CQL.GetNumWorldQuestWatches() do
+            tinsert(worldQuests, CQL.GetQuestIDForWorldQuestWatchIndex(i))
         end
     end
     local itemIDs = {}
@@ -316,16 +318,16 @@ function ns:CacheAndBuild(callback)
             for _, rare in ipairs(zone.rares) do
                 local isWorldQuest, isAvailable = false, false
                 if type(rare.quest) == "number" then
-                    if C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
+                    if CQL.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
                         isWorldQuest = true
-                        if contains(worldQuests, rare.quest) or C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+                        if contains(worldQuests, rare.quest) or CQL.IsQuestFlaggedCompleted(rare.quest) then
                             isAvailable = true
-                        elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
+                        elseif CQL.AddWorldQuestWatch(rare.quest) then
                             isAvailable = true
-                            C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+                            CQL.RemoveWorldQuestWatch(rare.quest)
                         end
                     else
-                        isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
+                        isAvailable = CQL.IsQuestFlaggedCompleted(rare.quest) and false or true
                     end
                 end
                 if rare.hidden or rare.items == nil then
@@ -350,7 +352,7 @@ end
 -- Targets
 ---
 
-function ns:NewTarget(zone, rare)
+function ns:NewTarget(zone, rare, sender)
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local c = {}
@@ -358,8 +360,10 @@ function ns:NewTarget(zone, rare)
     for d in tostring(rare.waypoint):gmatch("[0-9][0-9]") do
         tinsert(c, d)
     end
-    -- Print message to chat
-    ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    -- Print message to chat if sent by self
+    if sender == receiver then
+        ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    end
     -- Add the waypoint to the map and track it
     C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
     C_SuperTrack.SetSuperTrackedUserWaypoint(true)
@@ -371,6 +375,7 @@ function ns:SendTarget(zone, rare)
     C_Timer.After(10, function()
         ns.sendOnCooldown = false
     end)
+
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
     local inInstance, _ = IsInInstance()
     if inInstance then
@@ -447,8 +452,8 @@ local function CreateTab(cfg)
     TabIcon:SetTexture(cfg.icon)
 
     Tab:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_LEFT")
-        GameTooltip:SetText(cfg.label)
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetText(TextColor(cfg.label))
         GameTooltip:Show()
         TabBackground:SetDesaturated(nil)
     end)
@@ -598,16 +603,16 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant)
     for _, rare in ipairs(zone.rares) do
         local isWorldQuest, isAvailable = false, false
         if type(rare.quest) == "number" then
-            if C_QuestLog.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
+            if CQL.IsWorldQuest(rare.quest) or rare.worldquest or rare.weekly or rare.biweekly then
                 isWorldQuest = true
-                if contains(worldQuests, rare.quest) or C_QuestLog.IsQuestFlaggedCompleted(rare.quest) then
+                if contains(worldQuests, rare.quest) or CQL.IsQuestFlaggedCompleted(rare.quest) then
                     isAvailable = true
-                elseif C_QuestLog.AddWorldQuestWatch(rare.quest) then
+                elseif CQL.AddWorldQuestWatch(rare.quest) then
                     isAvailable = true
-                    C_QuestLog.RemoveWorldQuestWatch(rare.quest)
+                    CQL.RemoveWorldQuestWatch(rare.quest)
                 end
             else
-                isAvailable = C_QuestLog.IsQuestFlaggedCompleted(rare.quest) and false or true
+                isAvailable = CQL.IsQuestFlaggedCompleted(rare.quest) and false or true
             end
         end
         if rare.hidden then
@@ -655,7 +660,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         tinsert(c, d)
     end
 
-    local dead = IsRareDead(rare) and checkmark or ((type(rare.quest) == "number" and C_QuestLog.IsWorldQuest(rare.quest)) or rare.biweekly or rare.weekly) and quest or skull
+    local dead = IsRareDead(rare) and checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest)) or rare.biweekly or rare.weekly) and quest or skull
     local covenantRequired = rare.covenantRequired and TextColor(L.SummonedBy) .. zoneCovenant .. (#items > 0 and TextColor(",") or "") or ""
     local drops = #items > 0 and  " " .. TextColor(L.Drops, "bbbbbb") or ""
 
@@ -667,7 +672,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     RareLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Rare:SetAllPoints(RareLabel)
     Rare:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
         local isLead = false
         for i = 1, MAX_RAID_MEMBERS do
             local lookup, rank = GetRaidRosterInfo(i)
@@ -676,12 +681,12 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
                 break
             end
         end
-        local prefix = isLead and "Create & Send Map Pin" or "Create Map Pin"
-        GameTooltip:SetText(prefix .. ":")
-        GameTooltip:AddLine(TextColor(rare.name))
-        GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. TextColor(" |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r"))
+        local prefix = isLead and L.CreateSendMapPin or L.CreateMapPin
+        GameTooltip:SetText(TextColor(prefix .. ":"))
+        GameTooltip:AddLine(rare.name)
+        GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4])
         if isLead then
-            GameTooltip:AddLine(TextColor("Hold Alt/Control/Shift to Share.", "bbbbbb"))
+            GameTooltip:AddLine(TextColor(L.ModifierToShare, "bbbbbb"))
         end
         GameTooltip:Show()
     end)
@@ -700,7 +705,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
             ns:SendTarget(zone, rare)
         else
             -- Mark the Rare
-            ns:NewTarget(zone, rare)
+            ns:NewTarget(zone, rare, receiver)
         end
     end)
     RareLabel.rare = rare
@@ -746,8 +751,8 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
 
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
     local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
-    local guaranteed = item.guaranteed and TextColor(" 100% drop!") or ""
-    local achievement = item.achievement and TextColor(" from ") .. GetAchievementLink(item.achievement) or ""
+    local guaranteed = item.guaranteed and TextColor(L.HundredDrop) or ""
+    local achievement = item.achievement and TextColor(L.From) .. GetAchievementLink(item.achievement) or ""
     local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor) .. zoneCovenant or ""
     local classOnly = item.class and TextColor(L.OnlyFor) .. itemClass or ""
     local owned = IsItemOwned(item) and " " .. checkmark or ""
@@ -760,7 +765,7 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     ItemLabel:SetWidth(Parent:GetWidth())
     Item:SetAllPoints(ItemLabel)
     Item:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
         GameTooltip:SetHyperlink(itemLink)
         GameTooltip:Show()
     end)
@@ -833,10 +838,10 @@ function ns:CreateCovenant(Parent, Relative)
     AnimaAnchor:SetScript("OnEnter", function(self)
         local currency = C_CurrencyInfo.GetCurrencyInfo(Anima.currency.id)
         local quantity = currency.discovered and currency.quantity or 0
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
         GameTooltip:SetText(TextColor(currency.name, Anima.currency.color))
-        GameTooltip:AddLine("In Reservoir: " .. TextColor(commaValue(quantity)))
-        GameTooltip:AddLine("In Bags: " .. TextColor(commaValue(GetAnimaItemsTotal())))
+        GameTooltip:AddLine(TextColor(L.InReservoir) .. commaValue(quantity))
+        GameTooltip:AddLine(TextColor(L.InBags) .. commaValue(GetAnimaItemsTotal()))
         GameTooltip:Show()
     end)
     AnimaAnchor:SetScript("OnLeave", HideTooltip)
@@ -929,7 +934,7 @@ function ns:BuildWindow()
         GameTooltip:SetText(TextColor(RAVFOR_data.options.locked and "Unlock Window" or "Lock Window"))
     end)
     LockButton:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
         GameTooltip:SetText(TextColor(RAVFOR_data.options.locked and "Unlock Window" or "Lock Window"))
         GameTooltip:Show()
     end)
@@ -949,7 +954,7 @@ function ns:BuildWindow()
         InterfaceOptionsFrame_OpenToCategory(ns.Options)
     end)
     OptionsButton:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
         GameTooltip:SetText(TextColor("Open Interface Options"))
         GameTooltip:Show()
     end)
@@ -1034,9 +1039,9 @@ function ns:BuildWindow()
     -- What is useful is that the weekly WQ Rare is auto-tracked on login, so we
     -- can use this + quest completion to determine the Weekly WQ Rare
     local worldQuests = {}
-    if C_QuestLog.GetNumWorldQuestWatches() then
-        for i = 1, C_QuestLog.GetNumWorldQuestWatches() do
-            tinsert(worldQuests, C_QuestLog.GetQuestIDForWorldQuestWatchIndex(i))
+    if CQL.GetNumWorldQuestWatches() then
+        for i = 1, CQL.GetNumWorldQuestWatches() do
+            tinsert(worldQuests, CQL.GetQuestIDForWorldQuestWatchIndex(i))
         end
     end
 
@@ -1211,10 +1216,10 @@ function ns:CreateMinimapButton()
     end)
 
     Button:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
         GameTooltip:SetText(TextColor(ns.name))
-        GameTooltip:AddLine("Left-click to show the main Window.")
-        GameTooltip:AddLine("Right-click to show the Addon settings.")
+        GameTooltip:AddLine(L.MinimapLClick)
+        GameTooltip:AddLine(L.MinimapRClick)
         GameTooltip:Show()
     end)
     Button:SetScript("OnLeave", HideTooltip)

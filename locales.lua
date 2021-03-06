@@ -68,6 +68,16 @@ L.TargetMessages = {
 L.NoMacroSpace = "Unfortunately, you don't have enough global macro space for the macro to be created!"
 L.alpha = "You must go to a rested area to disable War Mode."
 L.beta = "You must go to %s to enable War Mode." -- factionCity
+L.CreateMapPin = "Create Map Pin"
+L.CreateSendMapPin = "Create & Send Map Pin"
+L.ModifierToShare = "Hold Alt/Control/Shift to share."
+L.WarmodeLabel = "Warmode is "
+L.HundredDrop = " 100% drop!"
+L.From = " from "
+L.InReservoir = "In Reservoir: "
+L.InBags = "In Bags: "
+L.MinimapLClick = "Left-click to show the main Window."
+L.MinimapRClick = "Right-click to show the Addon settings."
 
 -- Check locale and assign appropriate
 local CURRENT_LOCALE = GetLocale()
