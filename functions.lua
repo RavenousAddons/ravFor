@@ -334,7 +334,7 @@ function ns:CacheAndBuild(callback)
                     for _, item in ipairs(rare.items) do
                         if RAVFOR_data.options.showOwned == false and IsItemOwned(item) then
                         elseif RAVFOR_data.options.showCannotUse == false and (item.class and item.class:upper() ~= class) then
-                        elseif RAVFOR_data.options.showCannotUse == false and (item.covenantOnly and C_Covenants.GetCovenantData(covenant).name ~= zone.covenant) then
+                        elseif RAVFOR_data.options.showCannotUse == false and (item.covenantOnly and covenant ~= zone.covenant) then
                         else
                             table.insert(itemIDs, item.id)
                         end
@@ -366,18 +366,26 @@ function ns:NewTarget(zone, rare)
 end
 
 function ns:SendTarget(zone, rare)
-    ns:PrettyPrint("Sending new target to group...")
+    if ns.sendOnCooldown == true then return end
+    ns.sendOnCooldown = true
+    C_Timer.After(10, function()
+        ns.sendOnCooldown = false
+    end)
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
     local inInstance, _ = IsInInstance()
     if inInstance then
+        ns:PrettyPrint("Sending " .. rare.name .. " to instance group...")
         C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
     elseif IsInGroup() then
         if GetNumGroupMembers() > 5 then
+            ns:PrettyPrint("Sending " .. rare.name .. " to raid...")
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
         else
+            ns:PrettyPrint("Sending " .. rare.name .. " to party...")
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
         end
-    -- else
+    -- else -- Uncomment for testing
+    --     ns:PrettyPrint("Sending " .. rare.name .. " to self...")
     --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
     end
 end
@@ -439,7 +447,7 @@ local function CreateTab(cfg)
     TabIcon:SetTexture(cfg.icon)
 
     Tab:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_CURSOR")
+        GameTooltip:SetOwner(self or UIParent, "ANCHOR_LEFT")
         GameTooltip:SetText(cfg.label)
         GameTooltip:Show()
         TabBackground:SetDesaturated(nil)
@@ -1110,46 +1118,103 @@ function ns:CreateMinimapButton()
     end
 
     local Button = CreateFrame("Button", nil, Minimap)
+    Button:SetFrameStrata("MEDIUM")
     Button:SetFrameLevel(8)
-    Button:SetSize(28, 28)
+    Button:SetSize(31, 31)
     Button:EnableMouse(true)
     Button:SetMovable(true)
     Button:ClearAllPoints()
-    Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)),(80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
 
-    Button:SetNormalTexture("Interface/AddOns/ravFor/ravFor.tga")
-    Button:SetPushedTexture("Interface/AddOns/ravFor/ravFor.tga")
-    Button:SetHighlightTexture("Interface/AddOns/ravFor/ravFor.tga")
+    Button:SetHighlightTexture(136477) --"Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
+    local overlay = Button:CreateTexture(nil, "OVERLAY")
+    overlay:SetSize(53, 53)
+    overlay:SetTexture(136430) --"Interface\\Minimap\\MiniMap-TrackingBorder"
+    overlay:SetPoint("TOPLEFT")
+    local background = Button:CreateTexture(nil, "BACKGROUND")
+    background:SetSize(20, 20)
+    background:SetTexture(136467) --"Interface\\Minimap\\UI-Minimap-Background"
+    background:SetPoint("TOPLEFT", 7, -5)
+    local icon = Button:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(23, 23)
+    icon:SetTexture("Interface/AddOns/ravFor/ravFor.tga")
+    icon:SetPoint("TOPLEFT", 6, -6)
 
-    local function UpdateMinimapButton()
-        local Xpoa, Ypoa = GetCursorPosition()
-        local Xmin, Ymin = Minimap:GetLeft(), Minimap:GetBottom()
-        Xpoa = Xmin - Xpoa / Minimap:GetEffectiveScale() + 70
-        Ypoa = Ypoa / Minimap:GetEffectiveScale() - Ymin - 70
-        RAVFOR_data.options.minimapPosition = math.deg(math.atan2(Ypoa, Xpoa))
-        Button:ClearAllPoints()
-        Button:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(RAVFOR_data.options.minimapPosition)), (80 * sin(RAVFOR_data.options.minimapPosition)) - 52)
+    local minimapShapes = {
+        ["ROUND"] = {true, true, true, true},
+        ["SQUARE"] = {false, false, false, false},
+        ["CORNER-TOPLEFT"] = {false, false, false, true},
+        ["CORNER-TOPRIGHT"] = {false, false, true, false},
+        ["CORNER-BOTTOMLEFT"] = {false, true, false, false},
+        ["CORNER-BOTTOMRIGHT"] = {true, false, false, false},
+        ["SIDE-LEFT"] = {false, true, false, true},
+        ["SIDE-RIGHT"] = {true, false, true, false},
+        ["SIDE-TOP"] = {false, false, true, true},
+        ["SIDE-BOTTOM"] = {true, true, false, false},
+        ["TRICORNER-TOPLEFT"] = {false, true, true, true},
+        ["TRICORNER-TOPRIGHT"] = {true, false, true, true},
+        ["TRICORNER-BOTTOMLEFT"] = {true, true, false, true},
+        ["TRICORNER-BOTTOMRIGHT"] = {true, true, true, false},
+    }
+
+    local rad, cos, sin, sqrt, max, min = math.rad, math.cos, math.sin, math.sqrt, math.max, math.min
+    function updatePosition(button, position)
+        local angle = rad(position or 225)
+        local x, y, q = cos(angle), sin(angle), 1
+        if x < 0 then q = q + 1 end
+        if y > 0 then q = q + 2 end
+        local minimapShape = GetMinimapShape and GetMinimapShape() or "ROUND"
+        local quadTable = minimapShapes[minimapShape]
+        local w = (Minimap:GetWidth() / 2) + 5
+        local h = (Minimap:GetHeight() / 2) + 5
+        if quadTable[q] then
+            x, y = x*w, y*h
+        else
+            local diagRadiusW = sqrt(2*(w)^2)-10
+            local diagRadiusH = sqrt(2*(h)^2)-10
+            x = max(-w, min(x*diagRadiusW, w))
+            y = max(-h, min(y*diagRadiusH, h))
+        end
+        button:ClearAllPoints()
+        button:SetPoint("CENTER", Minimap, "CENTER", x, y)
+    end
+    updatePosition(Button, RAVFOR_data.options.minimapPosition)
+
+    local deg, atan2 = math.deg, math.atan2
+    local function onUpdate(self)
+        local mx, my = Minimap:GetCenter()
+        local px, py = GetCursorPosition()
+        local scale = Minimap:GetEffectiveScale()
+        px, py = px / scale, py / scale
+        local pos = 225
+        if self.db then
+            pos = deg(atan2(py - my, px - mx)) % 360
+            self.db.minimapPos = pos
+        else
+            pos = deg(atan2(py - my, px - mx)) % 360
+            self.minimapPos = pos
+        end
+        updatePosition(self, pos)
+        RAVFOR_data.options.minimapPosition = pos
     end
 
     Button:RegisterForDrag("LeftButton")
     Button:SetScript("OnDragStart", function()
         Button:StartMoving()
         Button.isMoving = true
-        Button:SetScript("OnUpdate", UpdateMinimapButton)
+        Button:SetScript("OnUpdate", onUpdate)
     end)
 
     Button:SetScript("OnDragStop", function()
         Button:StopMovingOrSizing()
         Button.isMoving = false
         Button:SetScript("OnUpdate", nil)
-        UpdateMinimapButton()
     end)
 
     Button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self or UIParent, "ANCHOR_RIGHT")
-        GameTooltip:SetText(ns.name)
-        GameTooltip:AddLine("Left-click to open Window.")
-        GameTooltip:AddLine("Right-click to open Interface Options.")
+        GameTooltip:SetText(TextColor(ns.name))
+        GameTooltip:AddLine("Left-click to show the main Window.")
+        GameTooltip:AddLine("Right-click to show the Addon settings.")
         GameTooltip:Show()
     end)
     Button:SetScript("OnLeave", HideTooltip)

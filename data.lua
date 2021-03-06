@@ -2,12 +2,13 @@ local ADDON_NAME, ns = ...
 
 ns.defaults = {
     locked = false,
-    macro = true,
     minimapButton = true,
+    macro = true,
     showReputation = true,
     showOwned = true,
     showCannotUse = true,
     showNoDrops = true,
+    allowSharing = true,
     showGear = true,
     showTransmog = true,
     showMounts = true,
@@ -24,9 +25,11 @@ ns.defaults = {
 
 ns.data = {
     notes = {
-        "Thanks for installing Ravenous For Shadowlands! Check your General Macros for a macro called |cffffc478Ravenous For|r or type |cffffc478/ravfor|r to open the main window. I love making Addons that people find useful and improves their enjoyment of the game, more than anything else. If you'd like to get involved in any capacity, please reach out!",
+        "Thanks for installing Ravenous For Shadowlands! Check your General Macros for a macro called |cffffc478Ravenous For|r, use the Minimap button, or type |cffffc478/ravfor|r to open the main window.",
+        "Clicking on Rares' names will place a Map Pin on their location and print a shareable link to the Map Pin in your chat. If you're the leader of your group, you can Shift+Click on their names to mark the them just as before for yourself and everyone else in your group who also has the Addon.",
+        "There are a handful of other things to mouseover and click, and let me know how I can improve or add to these existing features!",
         "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
-        "Still to come:\n\n- Correctly tracking all different drop types (particularly: items, armor, weapons)\n- Investigating Mythic+ and Rated PVP data that can be exposed by the API\n- Your brilliant idea? Please get in touch!",
+        "Still in-progress:\n\n- Correctly checking whether or not armor/weapons are usable by the player\n- More bug-fixes, features, improvements\n- Your brilliant idea? Please get in touch!",
     },
     expansions = {
         ["Shadowlands"] = {

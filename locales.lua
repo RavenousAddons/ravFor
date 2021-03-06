@@ -45,6 +45,11 @@ L.Defaults = {
         text = "Show Rares with no drops/no reputation",
         tooltip = "When enabled, Rares which neither drop items nor award currency or reputation will appear in lists.",
     },
+    {
+        var = "allowSharing",
+        text = "Allow Shared Targets",
+        tooltip = "When enabled, allow the leader of your group (yourself included) to share Rare locations with other Addon users.",
+    },
 }
 L.SupportHeading = "Help and Support:"
 L.Support1 = "This Addon creates and maintains a macro called |r%s|cffffffff for you under |rGeneral Macros|cffffffff." -- ns.name
