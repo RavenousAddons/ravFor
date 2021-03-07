@@ -227,7 +227,7 @@ function ns:RefreshCurrencies()
         local quantity = currency.discovered and currency.quantity or 0
         local max = currency.useTotalEarnedForMaxQty and commaValue(currency.maxQuantity - currency.totalEarned + quantity) or commaValue(currency.maxQuantity)
         local add = Currency.add and Currency.add() or 0
-        Currency:SetText(TextColor(commaValue(quantity + add) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, Currency.currency.color or "ffffff"))
+        Currency:SetText(TextColor(commaValue(quantity + add) .. (currency.maxQuantity >= currency.quantity and "/" .. max or ""), "ffffff") .. " " .. TextColor(currency.name, Currency.currency.color or "ffffff") .. " " .. TextIcon(currency.iconFileID))
     end
 end
 
