@@ -1,5 +1,7 @@
 # Ravenous For *Shadowlands*
 
+[![Ravenous Addons Discord](https://img.shields.io/badge/discord-Ravenous%20Addons-7289da)](https://discord.gg/9XeTpbcjzu) [![Buy me a coffee](https://img.shields.io/badge/help%20out-Buy%20me%20a%20coffee-81b3a0)](https://www.buymeacoffee.com/waldenpond)
+
 *Keep track of your progress through the expansion!*
 
 ![General Tab](https://raw.githubusercontent.com/RavenousAddons/assets/main/ravFor1.1.2-General.png)
