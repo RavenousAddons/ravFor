@@ -59,18 +59,18 @@ local function TextIcon(icon, size)
 end
 
 local icons = {
-    Quest = TextIcon(132049),
-    Checkmark = TextIcon(628564),
-    SkullBlue = TextIcon(311235),
-    SkullBlueGlow = TextIcon(311228),
-    SkullGreen = TextIcon(311236),
-    SkullGreenGlow = TextIcon(311229),
-    SkullGrey = TextIcon(308480),
-    SkullGreyGlow = TextIcon(311230),
-    SkullPurple = TextIcon(311237),
-    SkullPurpleGlow = TextIcon(311231),
-    SkullRed = TextIcon(311238),
-    SkullRedGlow = TextIcon(311232),
+    ["Quest"] = TextIcon(132049),
+    ["Checkmark"] = TextIcon(628564),
+    ["SkullBlue"] = TextIcon(311235),
+    ["SkullBlueGlow"] = TextIcon(311228),
+    ["SkullGreen"] = TextIcon(311236),
+    ["SkullGreenGlow"] = TextIcon(311229),
+    ["SkullGrey"] = TextIcon(308480),
+    ["SkullGreyGlow"] = TextIcon(311230),
+    ["SkullPurple"] = TextIcon(311237),
+    ["SkullPurpleGlow"] = TextIcon(311231),
+    ["SkullRed"] = TextIcon(311238),
+    ["SkullRedGlow"] = TextIcon(311232),
 }
 
 local function IsRareDead(rare)
@@ -273,7 +273,7 @@ end
 function ns:RefreshRares()
     for _, Rare in ipairs(ns.Rares) do
         local without = Rare:GetText()
-        for _, icon in ipairs(icons) do
+        for _, icon in pairs(icons) do
             without = string.gsub(without, icon, "")
         end
         Rare.rare.quest = Rare.rare.quest or (faction == "Alliance" and (Rare.rare.questAlliance or nil) or (Rare.rare.questHorde or nil))
@@ -284,7 +284,7 @@ end
 function ns:RefreshItems()
     for _, Item in ipairs(ns.Items) do
         local without = Item:GetText()
-        for _, icon in ipairs(icons) do
+        for _, icon in pairs(icons) do
             without = string.gsub(without, icon, "")
         end
         Item:SetText(without .. (IsItemOwned(Item.item) and icons.Checkmark or ""))
