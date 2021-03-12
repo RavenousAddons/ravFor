@@ -33,26 +33,7 @@ function ravFor_OnEvent(self, event, arg, ...)
                     if zone.id == zoneID then
                         for _, rare in ipairs(zone.rares) do
                             if rare.id == rareID then
-                                local n = random(#L.TargetMessages)
-                                local zoneName = C_Map.GetMapInfo(zoneID).name
-                                local c = {}
-                                local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
-                                for d in tostring(waypoint):gmatch("[0-9][0-9]") do
-                                    tinsert(c, d)
-                                end
-                                ns:NewTarget(zone, rare, sender)
-                                local inInstance, _ = IsInInstance()
-                                if inInstance then
-                                    SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "INSTANCE")
-                                elseif IsInGroup() then
-                                    if GetNumGroupMembers() > 5 then
-                                        SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "RAID")
-                                    else
-                                        SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "PARTY")
-                                    end
-                                -- else -- Uncomment for testing
-                                --     SendChatMessage(L.TargetMessages[n] .. " " .. rare.name .. " @ " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink(), "WHISPER", _, UnitName("player"))
-                                end
+                                ns:NewRare(zone, rare, sender)
                                 break
                             end
                         end
@@ -75,7 +56,7 @@ function ravFor_OnEvent(self, event, arg, ...)
             ns:BuildOptions()
             InterfaceOptions_AddCategory(ns.Options)
             ns:BuildWindow()
-            if ns.waitingForWindow then
+            if ns.waitingForWindow or not RAVFOR_version then
                 ns:ToggleWindow(ns.Window, "Show")
             end
             if ns.waitingForOptions then
@@ -95,7 +76,6 @@ function ravFor_OnEvent(self, event, arg, ...)
         end)
         if not RAVFOR_version then
             ns:PrettyPrint(string.format(L.Install, ns.color, ns.version, ns.command))
-            ns.Window:Show()
         elseif RAVFOR_version ~= ns.version then
             ns:PrettyPrint(string.format(L.Update, ns.color, ns.version, ns.command))
         end

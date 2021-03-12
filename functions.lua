@@ -73,6 +73,20 @@ local icons = {
     ["SkullRedGlow"] = TextIcon(311232),
 }
 
+local function IsLead()
+    local name = UnitName("player")
+    local fullName = string.format("%1$s-%2$s", name, GetNormalizedRealmName())
+    for i = 1, MAX_RAID_MEMBERS do
+        local lookup, rank, _ = GetRaidRosterInfo(i)
+        if lookup == name or lookup == fullName then
+            if rank > 1 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function IsRareDead(rare)
     if type(rare.quest) == "table" then
         for _, quest in ipairs(rare.quest) do
@@ -277,7 +291,7 @@ function ns:RefreshRares()
             without = string.gsub(without, icon, "")
         end
         Rare.rare.quest = Rare.rare.quest or (faction == "Alliance" and (Rare.rare.questAlliance or nil) or (Rare.rare.questHorde or nil))
-        Rare:SetText((IsRareDead(Rare.rare) and icons.SkullGrey or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.Quest or (Rare.rare.biweekly or Rare.rare.weekly) and icons.SkullBlueGlow or Rare.rare.quest and icons.SkullRedGlow or icons.SkullPurple) .. without)
+        Rare:SetText((IsRareDead(Rare.rare) and icons.SkullGrey or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.Quest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.SkullBlueGlow or Rare.rare.quest and icons.SkullRedGlow or icons.SkullPurple) .. without)
     end
 end
 
@@ -366,49 +380,76 @@ function ns:CacheAndBuild(callback)
 end
 
 ---
--- Targets
+-- Waypoints & Sharing
 ---
 
-function ns:NewTarget(zone, rare, sender)
-    local zoneName = C_Map.GetMapInfo(zone.id).name
-    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+-- Sets Map Pin and returns zone.id, x1, x2, y1, y2
+function ns:SetWaypoint(zone, rare)
+    -- Breakdown the waypoint into segments
     local c = {}
     local waypoint = type(rare.waypoint) == "table" and rare.waypoint[1] or rare.waypoint
     for d in tostring(waypoint):gmatch("[0-9][0-9]") do
         tinsert(c, d)
     end
-    -- Print message to chat if sent by self
-    if sender == string.format("%1$s-%2$s", UnitName("player"), GetNormalizedRealmName()) then
-        ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
-    end
+
     -- Add the waypoint to the map and track it
     C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(zone.id, "0." .. c[1] .. c[2], "0." .. c[3] .. c[4]))
     C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+
+    return { c[1], c[2], c[3], c[4] }
 end
 
-function ns:SendTarget(zone, rare)
-    if ns.sendOnCooldown == true then return end
+function ns:NewRare(zone, rare, sender)
+    local c = ns:SetWaypoint(zone, rare)
+
+    local zoneName = C_Map.GetMapInfo(zone.id).name
+    local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
+
+    if not sender then
+        ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
+    else
+        local n = random(#L.TargetMessages)
+        RaidNotice_AddMessage(RaidBossEmoteFrame, L.TargetMessages[n] .. " " .. rare.name .. " in " .. zoneName .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4], ChatTypeInfo["RAID_WARNING"])
+    end
+end
+
+function ns:ShareRare(zone, rare)
+    local c = ns:SetWaypoint(zone, rare)
+
+    if ns.sendOnCooldown == true then
+        ns:PrettyPrint(L.PleaseWait)
+        return
+    end
     ns.sendOnCooldown = true
     C_Timer.After(10, function()
         ns.sendOnCooldown = false
     end)
 
+    local isLead = IsLead()
+    local zoneName = C_Map.GetMapInfo(zone.id).name
+    local n = random(#L.TargetMessages)
+    local message = L.TargetMessages[n] .. " " .. rare.name .. " in " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink()
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
-    local inInstance, _ = IsInInstance()
-    if inInstance then
-        ns:PrettyPrint("Sending " .. rare.name .. " to instance group...")
-        C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
-    elseif IsInGroup() then
-        if GetNumGroupMembers() > 5 then
-            ns:PrettyPrint("Sending " .. rare.name .. " to raid...")
+
+    if IsInInstance() then
+        SendChatMessage(message, "INSTANCE")
+        if isLead then
+            C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "INSTANCE_CHAT")
+        end
+    elseif IsInRaid() then
+        SendChatMessage(message, "RAID")
+        if isLead then
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "RAID")
-        else
-            ns:PrettyPrint("Sending " .. rare.name .. " to party...")
+        end
+    elseif IsInGroup() then
+        SendChatMessage(message, "PARTY")
+        if isLead then
             C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "PARTY")
         end
-    -- else -- Uncomment for testing
-    --     ns:PrettyPrint("Sending " .. rare.name .. " to self...")
-    --     C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player"))
+    else
+        -- SendChatMessage(message, "WHISPER", _, UnitName("player")) -- Uncomment for testing
+        -- C_ChatInfo.SendAddonMessage(ADDON_NAME, target, "WHISPER", UnitName("player")) -- Uncomment for testing
+        ns:NewRare(zone, rare)
     end
 end
 
@@ -695,7 +736,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         tinsert(c, d)
     end
 
-    local dead = IsRareDead(rare) and icons.SkullGrey or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.Quest or (rare.biweekly or rare.weekly) and icons.SkullBlueGlow or rare.quest and icons.SkullRedGlow or icons.SkullPurple
+    local dead = IsRareDead(rare) and icons.SkullGrey or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.Quest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.SkullBlueGlow or rare.quest and icons.SkullRedGlow or icons.SkullPurple
     local rareFaction = rare.faction and "|cff" .. (rare.faction == "Alliance" and "0078ff" or "b30000") .. rare.faction .. "|r" or nil
     local factionOnly = rareFaction and TextColor(L.OnlyFor) .. rareFaction or ""
     local rareControl = rare.control and "|cff" .. (rare.control == "Alliance" and "0078ff" or "b30000") .. rare.control .. "|r" or nil
@@ -712,15 +753,8 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     Rare:SetAllPoints(RareLabel)
     Rare:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
-        local isLead = false
-        for i = 1, MAX_RAID_MEMBERS do
-            local lookup, rank = GetRaidRosterInfo(i)
-            if lookup == playerName then
-                if rank > 1 then isLead = true end
-                break
-            end
-        end
-        local prefix = isLead and L.CreateSendMapPin or L.CreateMapPin
+        local isLead = IsLead()
+        local prefix = isLead and L.ShareMapPin or L.CreateMapPin
         GameTooltip:SetText(TextColor(prefix .. ":"))
         GameTooltip:AddLine(rare.name .. ((rare.quest and IsRareDead(rare)) and TextColor(" (" .. _G.DEAD .. ")", "bbbbbb") or ""))
         GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4])
@@ -729,8 +763,12 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         end
         if type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest) then
             GameTooltip:AddLine(icons.Quest .. " World Quest")
-        elseif rare.biweekly or rare.weekly then
+        elseif rare.biweekly then
+            GameTooltip:AddLine("Bi-weekly")
+        elseif rare.weekly then
             GameTooltip:AddLine("Weekly")
+        elseif rare.fortnightly then
+            GameTooltip:AddLine("Fortnightly")
         elseif rare.achievement then
             GameTooltip:AddLine("Achievement-based")
         end
@@ -738,20 +776,10 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     end)
     Rare:SetScript("OnLeave", HideTooltip)
     Rare:SetScript("OnClick", function()
-        local isLead = false
-        for i = 1, MAX_RAID_MEMBERS do
-            local lookup, rank = GetRaidRosterInfo(i)
-            if lookup == playerName then
-                if rank > 1 then isLead = true end
-                break
-            end
-        end
-        if isLead and (IsAltKeyDown() or IsControlKeyDown() or IsShiftKeyDown()) then
-            -- Send the Rare to Group Members if Group Lead
-            ns:SendTarget(zone, rare)
+        if IsAltKeyDown() or IsControlKeyDown() or IsShiftKeyDown() then
+            ns:ShareRare(zone, rare)
         else
-            -- Mark the Rare
-            ns:NewTarget(zone, rare, string.format("%1$s-%2$s", UnitName("player"), GetNormalizedRealmName()))
+            ns:NewRare(zone, rare)
         end
     end)
     RareLabel.rare = rare
