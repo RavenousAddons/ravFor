@@ -63,15 +63,15 @@ function ravFor_OnEvent(self, event, arg, ...)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:SetDefaultOptions()
-        if RAVFOR_data.options.allowSharing then
-            C_ChatInfo.RegisterAddonMessagePrefix(ADDON_NAME)
-        else
-            self:UnregisterEvent("CHAT_MSG_ADDON")
-        end
         ns:CreateMinimapButton()
         ns:EnsureMacro()
         ns:CacheAndBuild(function()
             -- These happen once all Items have been cached
+            if RAVFOR_data.options.allowSharing then
+                C_ChatInfo.RegisterAddonMessagePrefix(ADDON_NAME)
+            else
+                self:UnregisterEvent("CHAT_MSG_ADDON")
+            end
             ns:BuildOptions()
             InterfaceOptions_AddCategory(ns.Options)
             ns:BuildWindow()

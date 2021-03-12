@@ -60,6 +60,7 @@ L.Reputation = "+%1$s Reputation with %2$s" -- Reputation Value, Faction Name
 L.Drops = "drops:"
 L.OnlyFor = " only for "
 L.SummonedBy = ", summoned by "
+L.ZoneControl = " (%1$s-controlled Zone)" -- Faction Name
 L.TargetMessages = {
     "Moving out to",
     "Let's go and delete",

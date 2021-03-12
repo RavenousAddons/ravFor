@@ -26,7 +26,8 @@ ns.defaults = {
 ns.data = {
     notes = {
         "Thanks for installing Ravenous For Shadowlands! Check your General Macros for a macro called |cffffc478Ravenous For|r, use the Minimap button, or type |cffffc478/ravfor|r to open the main window.",
-        "Clicking on Rares' names will place a Map Pin on their location and print a shareable link to the Map Pin in your chat. If you're the leader of your group, you can Shift+Click on their names to mark the them just as before for yourself and everyone else in your group who also has the Addon.",
+        "Clicking on Rares' names will place a Map Pin on their location and print a shareable link to the Map Pin in your chat. If you're the leader of your group, you can Alt/Ctrl/Shift+Click on their names to mark the them for yourself and everyone else in your group who also has the Addon.",
+        "Most notable Rares, Reputations, and Currencies are filled-out for Shadowlands, and the plan is to continue to update the Addon as the expansion progresses. As preparation/testing I've also included a number of notable Mount drops from Battle for Azeroth Rares, but there are no major plans to flesh this out as I've done for Shadowlands.",
         "There are a handful of other things to mouseover and click, and let me know how I can improve or add to these existing features!",
         "This is very much a work-in-progress! For the list of issues please go to |cff0099ffhttps://github.com/RavenousAddons/ravFor/issues|r and message |cff63ad76WaldenPond#0001|r on Discord for feedback or help!",
         "Still in-progress:\n\n- Correctly checking whether or not armor/weapons are usable by the player\n- More bug-fixes, features, improvements\n- Your brilliant idea? Please get in touch!",
@@ -44,7 +45,7 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
-                            hidden = true,
+                            -- hidden = true,
                             name = "Hunt: Shadehounds",
                             id = 174827,
                             -- quest = ?????,
@@ -1933,6 +1934,221 @@ ns.data = {
                     },
                 },
                 {
+                    -- Arathi Highlands
+                    id = 14,
+                    color = "f8f1bd",
+                    icon = "409550",
+                    rares = {
+                        {
+                            name = "Beastrider Kama",
+                            id = 142709,
+                            questAlliance = 53083,
+                            questHorde = 53504,
+                            weekly = true,
+                            waypoint = 65347116,
+                            items = {
+                                {
+                                    id = 163644,
+                                    mount = 1180,
+                                },
+                            },
+                        },
+                        {
+                            name = "Nimar the Slayer",
+                            id = 142692,
+                            questAlliance = 53091,
+                            questHorde = 53517,
+                            weekly = true,
+                            waypoint = 67486058,
+                            items = {
+                                {
+                                    id = 163706,
+                                    mount = 1185,
+                                },
+                            },
+                        },
+                        {
+                            name = "Overseer Krix",
+                            id = 142423,
+                            questAlliance = 53014,
+                            questHorde = 53518,
+                            weekly = true,
+                            waypoint = {32923847, 27255710},
+                            items = {
+                                {
+                                    id = 163646,
+                                    mount = 1182,
+                                },
+                            },
+                        },
+                        {
+                            name = "Skullripper",
+                            id = 142437,
+                            questAlliance = 53022,
+                            questHorde = 53526,
+                            weekly = true,
+                            waypoint = 57154575,
+                            items = {
+                                {
+                                    id = 163645,
+                                    mount = 1183,
+                                },
+                            },
+                        },
+                        {
+                            name = "Knight-Captain Aldrin",
+                            id = 142739,
+                            quest = 53088,
+                            weekly = true,
+                            control = "Horde",
+                            waypoint = 48913996,
+                            items = {
+                                {
+                                    id = 163578,
+                                    mount = 1173,
+                                },
+                            },
+                        },
+                        {
+                            name = "Doomrider Helgrim",
+                            id = 142741,
+                            quest = 53085,
+                            weekly = true,
+                            control = "Alliance",
+                            waypoint = 53565764,
+                            items = {
+                                {
+                                    id = 163579,
+                                    mount = 1174,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    -- Darkshore
+                    id = 62,
+                    color = "f8f1bd",
+                    icon = "409550",
+                    rares = {
+                        {
+                            name = "Alash'anir",
+                            id = 148787,
+                            questAlliance = 54695,
+                            questHorde = 54696,
+                            weekly = true,
+                            waypoint = 56533078,
+                            items = {
+                                {
+                                    id = 166432,
+                                    mount = 1200,
+                                },
+                            },
+                        },
+                        {
+                            name = "Athil Dewfire",
+                            id = 148037,
+                            quest = 54431,
+                            weekly = true,
+                            waypoint = 41607640,
+                            faction = "Horde",
+                            items = {
+                                {
+                                    id = 166803,
+                                    mount = 1203,
+                                },
+                                {
+                                    id = 166449,
+                                    pet = 2544,
+                                },
+                            },
+                        },
+                        {
+                            name = "Blackpaw",
+                            id = 149651,
+                            quest = 54890,
+                            weekly = true,
+                            waypoint = 49682495,
+                            faction = "Horde",
+                            items = {
+                                {
+                                    id = 166428,
+                                    mount = 1199,
+                                },
+                            },
+                        },
+                        {
+                            name = "Shadowclaw",
+                            id = 149658,
+                            quest = 54892,
+                            weekly = true,
+                            waypoint = 39763269,
+                            faction = "Horde",
+                            items = {
+                                {
+                                    id = 166435,
+                                    mount = 1205,
+                                },
+                            },
+                        },
+                        {
+                            name = "Agathe Wyrmwood",
+                            id = 149652,
+                            quest = 54883,
+                            weekly = true,
+                            waypoint = 49502510,
+                            faction = "Alliance",
+                            items = {
+                                {
+                                    id = 166438,
+                                    mount = 1199,
+                                },
+                            },
+                        },
+                        {
+                            name = "Croz Bloodrage",
+                            id = 149661,
+                            quest = 54886,
+                            weekly = true,
+                            waypoint = 50703230,
+                            faction = "Alliance",
+                            items = {
+                                {
+                                    id = 166437,
+                                    mount = 1205,
+                                },
+                            },
+                        },
+                        {
+                            name = "Moxo the Beheader",
+                            id = 147701,
+                            quest = 54277,
+                            weekly = true,
+                            waypoint = 67241877,
+                            faction = "Alliance",
+                            items = {
+                                {
+                                    id = 166434,
+                                    mount = 1203,
+                                },
+                            },
+                        },
+                        {
+                            name = "Frightened Kodo",
+                            id = 148790,
+                            quest = 132245,
+                            weekly = true,
+                            waypoint = {41316548, 44046756, 41275401, 38006600, 39205650, 44006500},
+                            items = {
+                                {
+                                    id = 166433,
+                                    mount = 1201,
+                                },
+                            },
+                        },
+                    },
+                },
+                {
                     -- Uldum
                     id = 1527,
                     color = "f8f1bd",
@@ -1979,7 +2195,7 @@ ns.data = {
                         {
                             name = "Springfur Alpaca",
                             id = 162765,
-                            quest = 58879,
+                            -- quest = 58879,
                             waypoint = {15006200, 24000900, 27004800, 30002900, 39000800, 41007000, 47004800, 52001900, 55006900, 62705340, 63011446, 70003900, 76636813},
                             items = {
                                 {
@@ -2043,7 +2259,7 @@ ns.data = {
                             name = "Houndlord Ren",
                             id = 157160,
                             quest = 57345,
-                            assaulut = "MOG",
+                            assault = "MOG",
                             waypoint = {13132578, 11833049, 08953570},
                             items = {
                                 {
