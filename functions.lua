@@ -756,11 +756,11 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         local isLead = IsLead()
         local prefix = isLead and L.ShareMapPin or L.CreateMapPin
         GameTooltip:SetText(TextColor(prefix .. ":"))
-        GameTooltip:AddLine(rare.name .. ((rare.quest and IsRareDead(rare)) and TextColor(" (" .. _G.DEAD .. ")", "bbbbbb") or ""))
-        GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4])
         if isLead then
             GameTooltip:AddLine(TextColor(L.ModifierToShare, "bbbbbb"))
         end
+        GameTooltip:AddLine(rare.name .. ((rare.quest and IsRareDead(rare)) and TextColor(" (" .. _G.DEAD .. ")", "bbbbbb") or ""))
+        GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4])
         if type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest) then
             GameTooltip:AddLine(icons.Quest .. " World Quest")
         elseif rare.biweekly then

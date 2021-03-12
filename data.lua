@@ -45,11 +45,11 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
-                            -- hidden = true,
+                            hidden = true,
                             name = "Hunt: Shadehounds",
                             id = 174827,
                             -- quest = ?????,
-                            biweekly = true,
+                            fortnightly = true,
                             waypoint = 53607860,
                             items = {
                                 {
@@ -61,9 +61,9 @@ ns.data = {
                         {
                             hidden = true,
                             name = "Hunt: Death Elementals",
-                            id = 172958, -- 172958, 122960, 172961, 172962
+                            id = 172958, -- 172958, 172960, 172961, 172962
                             quest = 62593,
-                            biweekly = true,
+                            fortnightly = true,
                             waypoint = 53607860,
                         },
                         {
@@ -71,7 +71,7 @@ ns.data = {
                             name = "Hunt: Winged Soul Eaters",
                             id = 999999,
                             -- quest = ?????,
-                            biweekly = true,
+                            fortnightly = true,
                             waypoint = 53607860,
                         },
                         {
@@ -79,7 +79,7 @@ ns.data = {
                             name = "Hunt: Soul Eaters",
                             id = 999999,
                             -- quest = ?????,
-                            biweekly = true,
+                            fortnightly = true,
                             waypoint = 53607860,
                         },
                         {
