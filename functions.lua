@@ -211,7 +211,7 @@ end
 
 function ns:ToggleWindow(frame, force)
     if frame == nil then
-        ns:PrettyPrint(L.NotLoaded)
+        ns:PrettyPrint(_G.LFG_LIST_LOADING)
         ns.waitingForWindow = true
         return
     end
@@ -919,13 +919,6 @@ function ns:CreateCovenant(Parent, Relative)
     Relative = Covenant
     local LittleRelative = Covenant
 
-    local Renown = Parent:CreateFontString(ADDON_NAME .. "Renown", "ARTWORK", "GameFontNormal")
-    Renown:SetJustifyH("LEFT")
-    Renown:SetPoint("TOP", Relative, "BOTTOM", 0, -medium-small)
-
-    RegisterCovenant(Covenant, Renown)
-    ns:RefreshCovenant()
-
     local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
     Anima:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
     Anima:SetJustifyH("LEFT")
@@ -961,6 +954,13 @@ function ns:CreateCovenant(Parent, Relative)
     Register("Currencies", GratefulOfferings)
 
     ns:RefreshCurrencies()
+
+    local Renown = Parent:CreateFontString(ADDON_NAME .. "Renown", "ARTWORK", "GameFontNormal")
+    Renown:SetJustifyH("CENTER")
+    Renown:SetPoint("TOPRIGHT", Covenant, "BOTTOMRIGHT", 0, -medium)
+
+    RegisterCovenant(Covenant, Renown)
+    ns:RefreshCovenant()
 
     Relative.offset = large + large + medium
     return Relative
@@ -1332,7 +1332,7 @@ function ns:CreateMinimapButton()
         if not self.isMoving then
             if button == "RightButton" then
                 ns.waitingForOptions = true
-                ns:PrettyPrint(L.NotLoaded)
+                ns:PrettyPrint(_G.LFG_LIST_LOADING)
             else
                 ns:ToggleWindow(ns.Window)
             end
