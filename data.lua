@@ -2328,9 +2328,14 @@ ns.data = {
             icon = 134344,
         },
         {
-            id = 1820, -- Infused Ruby,
+            id = 1820, -- Infused Ruby
             color = "f04c73",
             icon = 133250,
+        },
+        {
+            id = 1191, -- Valor
+            color = "d4b48d",
+            icon = 463447,
         },
     },
     reputationColors = {

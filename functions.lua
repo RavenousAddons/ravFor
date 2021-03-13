@@ -60,17 +60,15 @@ end
 
 local icons = {
     ["Quest"] = TextIcon(132049),
+    ["QuestTurnin"] = TextIcon(132048),
+    ["QuestIncomplete"] = TextIcon(365195),
+    ["Daily"] = TextIcon(368364),
+    ["DailyTurnin"] = TextIcon(368577),
+    ["LegendaryQuest"] = TextIcon(646980),
+    ["LegendaryQuestTurnin"] = TextIcon(646979),
+    ["Achievement"] = TextIcon(235415, 20),
     ["Checkmark"] = TextIcon(628564),
-    ["SkullBlue"] = TextIcon(311235),
-    ["SkullBlueGlow"] = TextIcon(311228),
-    ["SkullGreen"] = TextIcon(311236),
-    ["SkullGreenGlow"] = TextIcon(311229),
-    ["SkullGrey"] = TextIcon(308480),
-    ["SkullGreyGlow"] = TextIcon(311230),
-    ["SkullPurple"] = TextIcon(311237),
-    ["SkullPurpleGlow"] = TextIcon(311231),
-    ["SkullRed"] = TextIcon(311238),
-    ["SkullRedGlow"] = TextIcon(311232),
+    ["Skull"] = TextIcon(137025),
 }
 
 local function IsLead()
@@ -291,7 +289,7 @@ function ns:RefreshRares()
             without = string.gsub(without, icon, "")
         end
         Rare.rare.quest = Rare.rare.quest or (faction == "Alliance" and (Rare.rare.questAlliance or nil) or (Rare.rare.questHorde or nil))
-        Rare:SetText((IsRareDead(Rare.rare) and icons.SkullGrey or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.Quest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.SkullBlueGlow or Rare.rare.quest and icons.SkullRedGlow or icons.SkullPurple) .. without)
+        Rare:SetText((IsRareDead(Rare.rare) and icons.Checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.LegendaryQuest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.Daily or Rare.rare.quest and icons.Skull or icons.Achievement) .. without)
     end
 end
 
@@ -405,7 +403,7 @@ function ns:NewRare(zone, rare, sender)
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
 
-    if not sender then
+    if not sender or sender == string.format("%1$s-%2$s", UnitName("player"), GetNormalizedRealmName()) then
         ns:PrettyPrint(rare.name .. "\n|cffffd100|Hworldmap:" .. zone.id .. ":" .. c[1] .. c[2] .. ":" .. c[3] .. c[4] .. "|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a |cff" .. zoneColor .. zoneName .. "|r |cffeeeeee" .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4] .. "|r]|h|r")
     else
         local n = random(#L.TargetMessages)
@@ -427,8 +425,7 @@ function ns:ShareRare(zone, rare)
 
     local isLead = IsLead()
     local zoneName = C_Map.GetMapInfo(zone.id).name
-    local n = random(#L.TargetMessages)
-    local message = L.TargetMessages[n] .. " " .. rare.name .. " in " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink()
+    local message = rare.name .. " in " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink()
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
 
     if IsInInstance() then
@@ -551,6 +548,7 @@ function ns:CreatePVP(Parent, Relative)
     PVP:SetJustifyH("LEFT")
     PVP:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "f5c87a"))
     Relative = PVP
+    Relative.offset = medium
     local LittleRelative = PVP
 
     local Honor = Parent:CreateFontString(ADDON_NAME .. "Honor", "ARTWORK", "GameFontNormal")
@@ -558,12 +556,23 @@ function ns:CreatePVP(Parent, Relative)
     Honor:SetJustifyH("LEFT")
     Honor.currency = GetCurrencyData(1792)
     Register("Currencies", Honor)
+    Relative.offset = Relative.offset + large
     LittleRelative = Honor
+
+    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
+    Conquest:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
+    Conquest:SetJustifyH("LEFT")
+    Conquest.currency = GetCurrencyData(1602)
+    Register("Currencies", Conquest)
+    Relative.offset = Relative.offset + large
+    LittleRelative = Conquest
 
     local Warmode = CreateFrame("Button", ADDON_NAME .. "Warmode", Parent)
     local WarmodeLabel = Warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     WarmodeLabel:SetJustifyH("LEFT")
-    WarmodeLabel:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
+    WarmodeLabel:SetPoint("TOPLEFT", Honor, "BOTTOMRIGHT", gigantic, small)
+    WarmodeLabel:SetPoint("BOTTOMLEFT", Conquest, "TOPRIGHT", gigantic, -small)
+    WarmodeLabel:SetJustifyV("CENTER")
     Register("Warmodes", WarmodeLabel)
     Warmode:SetAllPoints(WarmodeLabel)
     Warmode:SetScript("OnClick", function()
@@ -579,16 +588,32 @@ function ns:CreatePVP(Parent, Relative)
     WarmodeLabel.anchor = Warmode
     ns:RefreshWarmodes()
 
-    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
-    Conquest:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
-    Conquest:SetJustifyH("LEFT")
-    Conquest.currency = GetCurrencyData(1602)
-    Register("Currencies", Conquest)
-    LittleRelative = Conquest
+    ns:RefreshCurrencies()
+
+    return Relative
+end
+
+---
+-- Mythic+
+---
+
+function ns:CreateMythicPlus(Parent, Relative)
+    local MythicPlus = Parent:CreateFontString(ADDON_NAME .. "MythicPlus", "ARTWORK", "GameFontNormalLarge")
+    MythicPlus:SetPoint("TOPLEFT", Relative, "TOPLEFT", 0, -gigantic-(Relative.offset or 0))
+    MythicPlus:SetJustifyH("LEFT")
+    MythicPlus:SetText(TextIcon(648901) .. "  " .. TextColor("Mythic+", "d4b48d"))
+    Relative = MythicPlus
+    local LittleRelative = MythicPlus
+
+    local Valor = Parent:CreateFontString(ADDON_NAME .. "Valor", "ARTWORK", "GameFontNormal")
+    Valor:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
+    Valor:SetJustifyH("LEFT")
+    Valor.currency = GetCurrencyData(1191)
+    Register("Currencies", Valor)
+    LittleRelative = Valor
 
     ns:RefreshCurrencies()
 
-    Relative.offset = large
     return Relative
 end
 
@@ -736,7 +761,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         tinsert(c, d)
     end
 
-    local dead = IsRareDead(rare) and icons.SkullGrey or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.Quest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.SkullBlueGlow or rare.quest and icons.SkullRedGlow or icons.SkullPurple
+    local dead = IsRareDead(rare) and icons.Checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.LegendaryQuest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.Daily or rare.quest and icons.Skull or icons.Achievement
     local rareFaction = rare.faction and "|cff" .. (rare.faction == "Alliance" and "0078ff" or "b30000") .. rare.faction .. "|r" or nil
     local factionOnly = rareFaction and TextColor(L.OnlyFor) .. rareFaction or ""
     local rareControl = rare.control and "|cff" .. (rare.control == "Alliance" and "0078ff" or "b30000") .. rare.control .. "|r" or nil
@@ -1128,7 +1153,10 @@ function ns:BuildWindow()
     -- PVP
     local PVP = ns:CreatePVP(Parent, Relative)
     Relative = PVP
-    -- Notes
+    -- Mythic+
+    local MythicPlus = ns:CreateMythicPlus(Parent, Relative)
+    Relative = MythicPlus
+    -- Global Notes
     local NoteHeading = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     NoteHeading:SetJustifyH("LEFT")
     NoteHeading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "eeeeee"))
