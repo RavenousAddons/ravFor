@@ -3,7 +3,7 @@
 
 ## Name: Ravenous For Shadowlands
 ## Title: Ravenous For |cffffc478Shadowlands|r
-## Notes: Keep track of your progress through the expansion!
+## Notes: Keep track of your progress through the expansion!|n|cffbbbbbbSlash command: /r4|r
 ## Author: RavenousAddons
 
 ## SavedVariables: RAVFOR_version

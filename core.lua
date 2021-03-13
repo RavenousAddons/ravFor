@@ -44,6 +44,8 @@ function ravFor_OnEvent(self, event, arg, ...)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         ns:SetDefaultOptions()
+        ns:BuildOptions()
+        InterfaceOptions_AddCategory(ns.Options)
         ns:CreateMinimapButton()
         ns:EnsureMacro()
         ns:CacheAndBuild(function()
@@ -53,8 +55,6 @@ function ravFor_OnEvent(self, event, arg, ...)
             else
                 self:UnregisterEvent("CHAT_MSG_ADDON")
             end
-            ns:BuildOptions()
-            InterfaceOptions_AddCategory(ns.Options)
             ns:BuildWindow()
             if ns.waitingForWindow or not RAVFOR_version then
                 ns:ToggleWindow(ns.Window, "Show")
