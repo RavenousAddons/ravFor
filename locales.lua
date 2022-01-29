@@ -53,7 +53,6 @@ L.Defaults = {
 L.SupportHeading = "Help and Support:"
 L.Support1 = "This Addon creates and maintains a macro called |r%s|cffffffff for you under |rGeneral Macros|cffffffff." -- ns.name
 L.Support2 = "Check out the Addon on |rGitHub|cffffffff, |rWoWInterface|cffffffff, or |rCurse|cffffffff for more info and support!"
-L.Support3 = "You can also get help directly from the author on Discord: |r%s|cffffffff" -- ns.discord
 L.Faction = "%1$s with %2$s" -- Reputation Level, Faction Name
 L.Reputation = "+%1$s Reputation with %2$s" -- Reputation Value, Faction Name
 L.Drops = "drops:"
