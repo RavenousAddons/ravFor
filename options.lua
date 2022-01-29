@@ -138,11 +138,6 @@ function ns:BuildOptions()
     Support2:SetJustifyH("LEFT")
     Support2:SetText("|cffffffff" .. L.Support2 .. "|r")
 
-    local Support3 = Options:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    Support3:SetPoint("TOPLEFT", Support2, "BOTTOMLEFT", 0, -large)
-    Support3:SetJustifyH("LEFT")
-    Support3:SetText("|cffffffff" .. string.format(L.Support3, ns.discord) .. "|r")
-
     RefreshControls(Options.Controls)
     ns.Options = Options
 end
