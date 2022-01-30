@@ -6,8 +6,6 @@ local expansions = ns.data.expansions
 local currencies = ns.data.currencies
 local reputationColors = ns.data.reputationColors
 local covenants = ns.data.covenants
-local renownLevels = ns.data.renownLevels
-local animaValuesBySpellID = ns.data.animaValuesBySpellID
 
 local small = 6
 local medium = 12
@@ -116,67 +114,16 @@ local function IsItemOwned(item)
     return false
 end
 
-local function RunsUntil95(chance, bound)
-    bound = bound and bound or 300
+local function RunsUntilDrop(chance, reasonable, bound)
+    reasonable = reasonable and math.max(1, math.min(99, reasonable)) or 95
+    bound = bound and math.max(1, math.min(1000, bound)) or 300
     for i = 1, bound do
         local percentage = 1 - ((1 - chance / 100) ^ i)
-        if percentage > 0.95 then
+        if percentage > (reasonable / 100) then
             return i
         end
     end
     return bound
-end
-
-local function GetAnimaItems()
-    local items = {}
-    for bagID = 0, 4 do
-        for slot = 0, GetContainerNumSlots(bagID) do
-            if GetContainerItemInfo(bagID, slot) then
-                local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID = GetContainerItemInfo(bagID, slot)
-                local isAnimaItem = C_Item.IsAnimaItemByID(itemLink)
-                if isAnimaItem then
-                    table.insert(items, {
-                        id = itemID,
-                        count = itemCount,
-                    })
-                end
-            end
-        end
-    end
-    return items
-end
-
-local function GetAnimaItemsTotal()
-    local total = 0
-    for _, item in ipairs(GetAnimaItems()) do
-        local spellName, spellID = GetItemSpell(item.id)
-        total = total + (animaValuesBySpellID[spellID] * item.count)
-    end
-    return total
-end
-
-local function GetMaxRenown()
-    -- if 0, then reset is today but has not yet happened
-    local daysUntilWeeklyReset = math.floor(C_DateAndTime.GetSecondsUntilWeeklyReset() / 60 / 60 / 24)
-    local now = C_DateAndTime.GetCurrentCalendarTime()
-    local year, month, day = now.year, now.month, now.monthDay
-    local lookup_year, lookup_month, lookup_day
-    local maxRenown = 3
-    for _, lookup in ipairs(renownLevels) do
-        lookup_year = lookup.year and lookup.year or lookup_year
-        lookup_month = lookup.month and lookup.month or lookup_month
-        lookup_day = lookup.day and lookup.day or lookup_day
-        if year > lookup_year then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month > lookup_month then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month == lookup_month and day > lookup_day then
-            maxRenown = lookup.level
-        elseif year == lookup_year and month == lookup_month and day == lookup_day and daysUntilWeeklyReset > 0 then
-            maxRenown = lookup.level
-        end
-    end
-    return maxRenown
 end
 
 local function GetCurrencyData(id)
@@ -238,12 +185,6 @@ local function Register(Key, Value)
     table.insert(ns[Key], Value)
 end
 
-local function RegisterCovenant(Covenant, Renown)
-    if (not Covenant) or (not Renown) then return end
-    ns.Covenant = Covenant
-    ns.Renown = Renown
-end
-
 function ns:RefreshCurrencies()
     for _, Currency in ipairs(ns.Currencies) do
         local currency = C_CurrencyInfo.GetCurrencyInfo(Currency.currency.id)
@@ -262,23 +203,12 @@ function ns:RefreshFactions()
             GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
             GameTooltip:SetText(TextColor("Reputation with ") .. TextColor(factionName, Faction.color and Faction.color or "ffffff"))
             GameTooltip:AddLine(TextColor(_G["FACTION_STANDING_LABEL"..standingID], reputationColors[standingID]))
-            if standingID < 8 then
+            if reputation < reputationMax then
                 GameTooltip:AddLine(commaValue(reputation - reputationMin) .. "/" .. commaValue(reputationMax - reputationMin))
             end
             GameTooltip:Show()
         end)
         Faction.anchor:SetScript("OnLeave", HideTooltip)
-    end
-end
-
-function ns:RefreshWarmodes()
-    for _, WarmodeLabel in ipairs(ns.Warmodes) do
-        WarmodeLabel:SetText(TextColor(L.WarmodeLabel .. (C_PvP.IsWarModeDesired() and "|cff66ff66" .. _G.VIDEO_OPTIONS_ENABLED .. "|r" or "|cffff6666" .. _G.VIDEO_OPTIONS_DISABLED .. "|r") .. ".", "ffffff"))
-        WarmodeLabel.anchor:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
-            GameTooltip:SetText(TextColor((C_PvP.IsWarModeDesired() and "|cffff6666Disable|r" or "|cff66ff66Enable|r") .. " War Mode"))
-            GameTooltip:Show()
-        end)
     end
 end
 
@@ -301,15 +231,6 @@ function ns:RefreshItems()
         end
         Item:SetText(without .. (IsItemOwned(Item.item) and icons.Checkmark or ""))
     end
-end
-
-function ns:RefreshCovenant()
-    local covenant = C_Covenants.GetActiveCovenantID()
-    local renown = C_CovenantSanctumUI.GetRenownLevel()
-    local maxRenown = GetMaxRenown()
-
-    ns.Covenant:SetText(TextIcon(3726261) .. "  " .. TextColor(C_Covenants.GetCovenantData(covenant).name, covenants[covenant].color))
-    ns.Renown:SetText((renown < maxRenown and TextColor(renown .. "/" .. maxRenown, "ff6666") or TextColor(renown, "ffffff")) .. TextColor(" Renown", covenants[covenant].color))
 end
 
 ---
@@ -413,17 +334,19 @@ end
 
 function ns:ShareRare(zone, rare)
     local c = ns:SetWaypoint(zone, rare)
-
-    if ns.sendOnCooldown == true then
-        ns:PrettyPrint(L.PleaseWait)
-        return
-    end
-    ns.sendOnCooldown = true
-    C_Timer.After(10, function()
-        ns.sendOnCooldown = false
-    end)
-
     local isLead = IsLead()
+
+    if IsInInstance() or IsInRaid() or IsInGroup() then
+        if ns.sendOnCooldown == true then
+            ns:PrettyPrint(L.PleaseWait)
+            return
+        end
+        ns.sendOnCooldown = true
+        C_Timer.After(10, function()
+            ns.sendOnCooldown = false
+        end)
+    end
+
     local zoneName = C_Map.GetMapInfo(zone.id).name
     local message = rare.name .. " in " .. zoneName .. " " .. C_Map.GetUserWaypointHyperlink()
     local target = string.format("target={%1$s,%2$s}", zone.id, rare.id)
@@ -539,85 +462,6 @@ function ns:CreateNotes(Parent, Relative, notes, indent)
 end
 
 ---
--- PVP
----
-
-function ns:CreatePVP(Parent, Relative)
-    local PVP = Parent:CreateFontString(ADDON_NAME .. "PVP", "ARTWORK", "GameFontNormalLarge")
-    PVP:SetPoint("TOPLEFT", Relative, "TOPLEFT", 0, -gigantic-(Relative.offset or 0))
-    PVP:SetJustifyH("LEFT")
-    PVP:SetText(TextIcon(236396) .. "  " .. TextColor("PVP", "f5c87a"))
-    Relative = PVP
-    Relative.offset = medium
-    local LittleRelative = PVP
-
-    local Honor = Parent:CreateFontString(ADDON_NAME .. "Honor", "ARTWORK", "GameFontNormal")
-    Honor:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
-    Honor:SetJustifyH("LEFT")
-    Honor.currency = GetCurrencyData(1792)
-    Register("Currencies", Honor)
-    Relative.offset = Relative.offset + large
-    LittleRelative = Honor
-
-    local Conquest = Parent:CreateFontString(ADDON_NAME .. "Conquest", "ARTWORK", "GameFontNormal")
-    Conquest:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
-    Conquest:SetJustifyH("LEFT")
-    Conquest.currency = GetCurrencyData(1602)
-    Register("Currencies", Conquest)
-    Relative.offset = Relative.offset + large
-    LittleRelative = Conquest
-
-    local Warmode = CreateFrame("Button", ADDON_NAME .. "Warmode", Parent)
-    local WarmodeLabel = Warmode:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    WarmodeLabel:SetJustifyH("LEFT")
-    WarmodeLabel:SetPoint("TOPLEFT", Honor, "BOTTOMRIGHT", gigantic, small)
-    WarmodeLabel:SetPoint("BOTTOMLEFT", Conquest, "TOPRIGHT", gigantic, -small)
-    WarmodeLabel:SetJustifyV("CENTER")
-    Register("Warmodes", WarmodeLabel)
-    Warmode:SetAllPoints(WarmodeLabel)
-    Warmode:SetScript("OnClick", function()
-        if C_PvP.CanToggleWarMode(not C_PvP.IsWarModeDesired()) then
-            C_PvP.ToggleWarMode()
-        elseif C_PvP.IsWarModeDesired() then
-            RaidNotice_AddMessage(RaidBossEmoteFrame, L.alpha, ChatTypeInfo["RAID_WARNING"])
-        else
-            RaidNotice_AddMessage(RaidBossEmoteFrame, string.format(L.beta, factionCity), ChatTypeInfo["RAID_WARNING"])
-        end
-    end)
-    Warmode:SetScript("OnLeave", HideTooltip)
-    WarmodeLabel.anchor = Warmode
-    ns:RefreshWarmodes()
-
-    ns:RefreshCurrencies()
-
-    return Relative
-end
-
----
--- Mythic+
----
-
-function ns:CreateMythicPlus(Parent, Relative)
-    local MythicPlus = Parent:CreateFontString(ADDON_NAME .. "MythicPlus", "ARTWORK", "GameFontNormalLarge")
-    MythicPlus:SetPoint("TOPLEFT", Relative, "TOPLEFT", 0, -gigantic-(Relative.offset or 0))
-    MythicPlus:SetJustifyH("LEFT")
-    MythicPlus:SetText(TextIcon(648901) .. "  " .. TextColor("Mythic+", "d4b48d"))
-    Relative = MythicPlus
-    local LittleRelative = MythicPlus
-
-    local Valor = Parent:CreateFontString(ADDON_NAME .. "Valor", "ARTWORK", "GameFontNormal")
-    Valor:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
-    Valor:SetJustifyH("LEFT")
-    Valor.currency = GetCurrencyData(1191)
-    Register("Currencies", Valor)
-    LittleRelative = Valor
-
-    ns:RefreshCurrencies()
-
-    return Relative
-end
-
----
 -- Zone
 ---
 
@@ -660,9 +504,9 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
 
     if zone.faction then
         local zoneFactions = type(zone.faction) == "table" and zone.faction or {zone.faction}
-        for _, faction in ipairs(zoneFactions) do
+        for i, faction in ipairs(zoneFactions) do
             local Faction = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
-            if zone.covenant then
+            if i > 1 or zone.covenant then
                 Faction:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
                 Relative.offset = Relative.offset + large
             else
@@ -731,7 +575,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
                     end
                 end
             end
-            if #items == 0 and RAVFOR_data.options.showNoDrops == false and ((RAVFOR_data.options.showReputation and not rare.reptuation) or not RAVFOR_data.options.showReputation) then
+            if #items == 0 and RAVFOR_data.options.showNoDrops == false then
             elseif RAVFOR_data.options.showCannotUse == false and rare.faction and rare.faction:upper() ~= faction:upper() then
             else
                 -- Rare
@@ -801,7 +645,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     end)
     Rare:SetScript("OnLeave", HideTooltip)
     Rare:SetScript("OnClick", function()
-        if IsAltKeyDown() or IsControlKeyDown() or IsShiftKeyDown() then
+        if IsShiftKeyDown() then
             ns:ShareRare(zone, rare)
         else
             ns:NewRare(zone, rare)
@@ -810,18 +654,6 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     RareLabel.rare = rare
     Register("Rares", RareLabel)
     Relative = Rare
-
-    if RAVFOR_data.options.showReputation == true and rare.reputation then
-        if type(zone.faction) == "table" then
-            zone.faction = zone.faction[1]
-        end
-        local factionName = select(1, GetFactionInfoByID(zone.faction))
-        local Reputation = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Reputation", "ARTWORK", "GameFontNormal")
-        Reputation:SetJustifyH("LEFT")
-        Reputation:SetText("    " .. TextColor(string.format(L.Reputation, rare.reputation, TextColor(factionName, zoneColor)), "8080ff"))
-        Reputation:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
-        Relative = Reputation
-    end
 
     if #items > 0 then
         for _, item in ipairs(items) do
@@ -872,123 +704,26 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     end)
     Item:SetScript("OnLeave", HideTooltip)
     Item:SetScript("OnClick", function()
-        ns:PrettyPrint(itemLink)
+        if IsShiftKeyDown() then
+            if IsInInstance() then
+                SendChatMessage(itemLink, "INSTANCE")
+            elseif IsInRaid() then
+                SendChatMessage(itemLink, "RAID")
+            elseif IsInGroup() then
+                SendChatMessage(itemLink, "PARTY")
+            else
+                ns:PrettyPrint(itemLink)
+            end
+        elseif IsControlKeyDown() then
+            DressUpItemLink(itemLink)
+        else
+            ns:PrettyPrint(itemLink)
+        end
     end)
     ItemLabel.item = item
     Register("Items", ItemLabel)
 
     Relative = ItemLabel
-    return Relative
-end
-
----
--- Great Vault (Shadowlands)
----
-
-function ns:CreateGreatVault(Parent, Relative)
-    if not C_WeeklyRewards.CanClaimRewards() then
-        return Relative
-    end
-
-    local GreatVault = Parent:CreateFontString(ADDON_NAME .. "GreatVault", "ARTWORK", "GameFontNormalLarge")
-    GreatVault:SetJustifyH("LEFT")
-    GreatVault:SetText(TextIcon(3847780) .. "  " .. TextColor("The Great Vault", "8899c6"))
-    GreatVault:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
-    Relative = GreatVault
-
-    local GreatVaultNotice = Parent:CreateFontString(ADDON_NAME .. "GreatVaultNotice", "ARTWORK", "GameFontNormal")
-    GreatVaultNotice:SetJustifyH("LEFT")
-    GreatVaultNotice:SetText(TextColor("Go to Oribos to claim your rewards!", "ff6666"))
-    GreatVaultNotice:SetPoint("LEFT", Relative, "RIGHT", large, 0)
-
-    return Relative
-end
-
----
--- Covenant: Renown, Reservoir Anima, Redeemed Souls (Shadowlands)
----
-
-function ns:CreateCovenant(Parent, Relative)
-    if C_Covenants.GetActiveCovenantID() == 0 then
-        return Relative
-    end
-
-    local Covenant = Parent:CreateFontString(ADDON_NAME .. "Covenant", "ARTWORK", "GameFontNormalLarge")
-    Covenant:SetJustifyH("LEFT")
-    Covenant:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
-    Relative = Covenant
-    local LittleRelative = Covenant
-
-    local Anima = Parent:CreateFontString(ADDON_NAME .. "Anima", "ARTWORK", "GameFontNormal")
-    Anima:SetPoint("LEFT", LittleRelative, "RIGHT", gigantic, 0)
-    Anima:SetJustifyH("LEFT")
-    Anima.currency = GetCurrencyData(1813)
-    Anima.add = GetAnimaItemsTotal
-    Register("Currencies", Anima)
-    LittleRelative = Anima
-
-    local AnimaAnchor = CreateFrame("Frame", nil, Parent)
-    AnimaAnchor:SetAllPoints(Anima)
-    AnimaAnchor:SetScript("OnEnter", function(self)
-        local currency = C_CurrencyInfo.GetCurrencyInfo(Anima.currency.id)
-        local quantity = currency.discovered and currency.quantity or 0
-        GameTooltip:SetOwner(self or UIParent, "ANCHOR_BOTTOM", 0, -small)
-        GameTooltip:SetText(TextColor(currency.name, Anima.currency.color))
-        GameTooltip:AddLine(TextColor(L.InReservoir) .. commaValue(quantity))
-        GameTooltip:AddLine(TextColor(L.InBags) .. commaValue(GetAnimaItemsTotal()))
-        GameTooltip:Show()
-    end)
-    AnimaAnchor:SetScript("OnLeave", HideTooltip)
-
-    local RedeemedSouls = Parent:CreateFontString(ADDON_NAME .. "RedeemedSouls", "ARTWORK", "GameFontNormal")
-    RedeemedSouls:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
-    RedeemedSouls:SetJustifyH("LEFT")
-    RedeemedSouls.currency = GetCurrencyData(1810)
-    Register("Currencies", RedeemedSouls)
-    LittleRelative = RedeemedSouls
-
-    local GratefulOfferings = Parent:CreateFontString(ADDON_NAME .. "GratefulOfferings", "ARTWORK", "GameFontNormal")
-    GratefulOfferings:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
-    GratefulOfferings:SetJustifyH("LEFT")
-    GratefulOfferings.currency = GetCurrencyData(1885)
-    Register("Currencies", GratefulOfferings)
-
-    ns:RefreshCurrencies()
-
-    local Renown = Parent:CreateFontString(ADDON_NAME .. "Renown", "ARTWORK", "GameFontNormal")
-    Renown:SetJustifyH("CENTER")
-    Renown:SetPoint("TOPRIGHT", Covenant, "BOTTOMRIGHT", 0, -medium)
-
-    RegisterCovenant(Covenant, Renown)
-    ns:RefreshCovenant()
-
-    Relative.offset = large + large + medium
-    return Relative
-end
-
----
--- Torghast: Soul Ash (Shadowlands)
----
-
-function ns:CreateTorghast(Parent, Relative)
-    if UnitLevel("player") < 50 then
-        return Relative
-    end
-
-    local Torghast = Parent:CreateFontString(ADDON_NAME .. "Torghast", "ARTWORK", "GameFontNormalLarge")
-    Torghast:SetJustifyH("LEFT")
-    Torghast:SetText(TextIcon(3642306) .. "  " .. TextColor(("Torghast"):upper(), "b0ccd8"))
-    Torghast:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
-    Relative = Torghast
-
-    local SoulAsh = Parent:CreateFontString(ADDON_NAME .. "SoulAsh", "ARTWORK", "GameFontNormal")
-    SoulAsh:SetJustifyH("LEFT")
-    SoulAsh:SetPoint("LEFT", Relative, "RIGHT", large, 0)
-
-    SoulAsh.currency = GetCurrencyData(1828)
-    Register("Currencies", SoulAsh)
-    ns:RefreshCurrencies()
-
     return Relative
 end
 
@@ -1150,16 +885,10 @@ function ns:BuildWindow()
     local Parent = Scrollers["General"].Content
     local Relative = Parent
 
-    -- PVP
-    local PVP = ns:CreatePVP(Parent, Relative)
-    Relative = PVP
-    -- Mythic+
-    local MythicPlus = ns:CreateMythicPlus(Parent, Relative)
-    Relative = MythicPlus
     -- Global Notes
     local NoteHeading = Parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     NoteHeading:SetJustifyH("LEFT")
-    NoteHeading:SetText(TextIcon(1506451) .. "  " .. TextColor("Notes", "eeeeee"))
+    NoteHeading:SetText(TextIcon(1506451) .. "  " .. TextColor("Welcome!", "eeeeee"))
     NoteHeading:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Relative = NoteHeading
     local Notes = ns:CreateNotes(Parent, Relative, notes)
@@ -1169,17 +898,6 @@ function ns:BuildWindow()
     for title, expansion in pairs(expansions) do
         Parent = Scrollers[title].Content
         Relative = Parent
-        if title == "Shadowlands" then
-            -- Covenant
-            local Covenant = ns:CreateCovenant(Parent, Relative)
-            Relative = Covenant
-            -- Torghast
-            local Torghast = ns:CreateTorghast(Parent, Relative)
-            Relative = Torghast
-            -- Great Vault
-            local GreatVault = ns:CreateGreatVault(Parent, Relative)
-            Relative = GreatVault
-        end
         for i, zone in ipairs(expansion.zones) do
             if i > 1 then
                 Relative.offset = medium

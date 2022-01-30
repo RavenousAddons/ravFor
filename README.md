@@ -14,20 +14,19 @@ So far, this Addon creates a new window that keeps track of a number of features
 
 **What's tracked so far:**
 
-1. Your Covenant, Renown, and Max Renown
-2. Rares that you've killed for the day in the following Zones:
-    1. The Maw
-    2. Maldraxxus
-    3. Revendreth
-    4. Bastion
-    5. Ardenweald
-3. Items dropped by each Rare:
+1. Rares that you've killed for the day in the following Zones:
+    1. Korthia
+    2. The Maw
+    3. Maldraxxus
+    4. Revendreth
+    5. Bastion
+    6. Ardenweald
+2. Items dropped by each Rare:
     1. Mounts
     2. Pets
     3. Toys
-    4. Gear
-    5. Transmog
-    6. Other bits and bobs
+    4. Cosmetics
+    5. Items
 
 In addition, the Addon provides other information, like whether certain Rares require a particular Covenant to summon, or if certain mounts are restricted to another Covenant.
 

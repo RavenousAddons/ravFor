@@ -25,11 +25,6 @@ L.Defaults = {
         tooltip = "When enabled, a macro called |cffffffff" .. ns.name .. "|r will be automatically created and managed for you under |cffffffffGeneral Macros|r.",
     },
     {
-        var = "showReputation",
-        text = "Show Reputation gains",
-        tooltip = "When enabled, the list will show which Rares award reputation upon killing them.",
-    },
-    {
         var = "showOwned",
         text = "Show Collected Items",
         tooltip = "When enabled, Items which you have already collected will appear in lists.",

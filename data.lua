@@ -4,7 +4,6 @@ ns.defaults = {
     locked = false,
     minimapButton = true,
     macro = true,
-    showReputation = true,
     showOwned = true,
     showCannotUse = true,
     showNoDrops = true,
@@ -37,6 +36,38 @@ ns.data = {
             icon = 3642306,
             zones = {
                 {
+                    -- Korthia
+                    id = 1961,
+                    color = "e5cc80",
+                    icon = "3052062",
+                    currency = 1931,
+                    faction = {2470, 2472},
+                    rares = {
+                        {id=177336,name="Zelnithop",waypoint=30305480,items={{id=186542,pet=3136,},},quest=64442,},
+                        {id=177903,name="Dominated Protector",waypoint=51802080,items={{id=187390,},},quest=63830,},
+                        {id=179108,name="Kroke the Tormented",waypoint=59203580,items={{id=187394,},{id=187250,},{id=187248,},},quest=64428,},
+                        {id=179472,name="Konthrogz the Obliterator",waypoint=10008000,items={{id=187183,mount=1514,},{id=187375,},{id=187378,},{id=187384,},{id=187397,},},quest=64246,},
+                        {id=179608,name="Screaming Shade",waypoint=44604240,items={{id=187362,},{id=187400,},},quest=64263,},
+                        {id=179684,name="Malbog",waypoint=44202920,items={{id=186645,mount=1506,},{id=187377,},},notes={"Talk to Caretaker Kah-Kay in town, then follow footprints"},quest=64233,},
+                        {id=179760,name="Towering Exterminator",waypoint=12008000,items={{id=187241,},{id=187242,},{id=187373,},{id=187376,},{id=187035,},{id=187382,},{id=187392,},},quest=64245,},
+                        {id=179768,name="Consumption",waypoint=51154165,items={{id=187245,},{id=187246,},{id=187247,},{id=187402,},},notes={"Starts as a regular mob, eats Drab Gromit until it becomes a rare, and then a rare-elite. Loot gets better as it gets stronger, so wait."},quest=64243,},
+                        {id=179802,name="Yarxhov the Pillager",waypoint=39405240,items={{id=187103,quest=63917,},{id=187366,},{id=187391,},},quest=64257,},
+                        {id=179859,name="Xyraxz the Unknowable",waypoint=44903550,items={{id=186538,pet=3140,},{id=187104,quest=63918,},{id=187387,},{id=187368,},},quest=64278,},
+                        {id=179911,name="Silent Soulstalker",waypoint=57607040,items={{id=187381,},{id=187383,},},quest=64284,},
+                        {id=179912,name="Maelie the Wanderer",waypoint={30005560,33103865,35804650,35856225,38403140,39703490,41103980,41302750,42806040,43203130,49304170,50302290,59801510,61304040,62404970,},items={{id=186643,mount=1511,}},notes={"Tinybell asks you to find Maelie the Wanderer, who spawns in a different place each day. Find her each day, use Reassure on her, and get a mount from Tinybell"},quest={64292,64298,},},
+                        {id=179913,name="Deadsoul Hatcher",waypoint=59355220,items={{id=187174,toy=true,},{id=187396,},{id=187401,},},quest=64285,},
+                        {id=179914,name="Observer Yorik",waypoint=50307590,items={{id=187420,toy=true,},{id=187365,},{id=187405,},},quest=64440,},
+                        {id=179931,name="Relic Breaker Krelva",waypoint=22604140,items={{id=187403,},},quest=64291,},
+                        {id=179985,name="Stygian Stonecrusher",waypoint=46507950,items={{id=184790,},{id=186479,covenant=2},{id=187283,quest=64530,},{id=187386,},{id=187428,quest=64553,}},quest=64313,},
+                        {id=180014,name="Escaped Wilderling",waypoint=33103930,items={{id=186492,mount=1487,covenant=3}},quest=64320,},
+                        {id=180032,name="Wild Worldcracker",waypoint=47003560,items={{id=187176,toy=true,},{id=186483,mount=1493,covenant=1},{id=187380,},{id=187426,quest=64552,}},quest=64338,},
+                        {id=180042,name="Fleshwing",waypoint=59954370,items={{id=187372,},{id=186489,mount=1449,covenant=4,},{id=187181,},{id=187424,quest=64551,}},quest=64349,},
+                        {id=180160,name="Reliwik the Defiant",waypoint=56256615,items={{id=186652,mount=1509,},{id=187388,},},quest=64455,},
+                        {id=180162,name="Ve'rayn",waypoint=14008000,items={{id=187264,quest=64513,},{id=187369,},{id=187404,},},quest=64457,},
+                        {id=180246,name="Carriage Crusher",waypoint=58201775,items={{id=187370,},{id=187391,},{id=187399,},},quest=64258,},
+                    },
+                },
+                {
                     -- The Maw
                     id = 1543,
                     color = "e5cc80",
@@ -45,49 +76,10 @@ ns.data = {
                     faction = 2432,
                     rares = {
                         {
-                            hidden = true,
-                            name = "Hunt: Shadehounds",
-                            id = 174827,
-                            -- quest = ?????,
-                            fortnightly = true,
-                            waypoint = 53607860,
-                            items = {
-                                {
-                                    id = 184167,
-                                    mount = 1304,
-                                },
-                            },
-                        },
-                        {
-                            hidden = true,
-                            name = "Hunt: Death Elementals",
-                            id = 172958, -- 172958, 172960, 172961, 172962
-                            quest = 62593,
-                            fortnightly = true,
-                            waypoint = 53607860,
-                        },
-                        {
-                            hidden = true,
-                            name = "Hunt: Winged Soul Eaters",
-                            id = 999999,
-                            -- quest = ?????,
-                            fortnightly = true,
-                            waypoint = 53607860,
-                        },
-                        {
-                            hidden = true,
-                            name = "Hunt: Soul Eaters",
-                            id = 999999,
-                            -- quest = ?????,
-                            fortnightly = true,
-                            waypoint = 53607860,
-                        },
-                        {
                             name = "Borr-Geth",
                             id = 157833,
                             quest = 57469,
                             waypoint = 39014119,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 184312,
@@ -100,7 +92,6 @@ ns.data = {
                             id = 154330,
                             quest = 57509,
                             waypoint = 19194608,
-                            reputation = 80,
                             items = {
                                 {
                                     id = 183407,
@@ -113,7 +104,6 @@ ns.data = {
                             id = 162849,
                             quest = 60987,
                             waypoint = 16945102,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 184292,
@@ -126,7 +116,6 @@ ns.data = {
                             id = 170301,
                             quest = 60788,
                             waypoint = 19324172,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 184106,
@@ -143,7 +132,6 @@ ns.data = {
                             id = 172577,
                             quest = 61519,
                             waypoint = 23692139,
-                            reputation = 80,
                             items = {
                                 {
                                     id = 181794,
@@ -156,54 +144,42 @@ ns.data = {
                             id = 157964,
                             quest = 57482,
                             waypoint = 25923116,
-                            reputation = 80,
                         },
                         {
                             name = "Conjured Death",
                             id = 171317,
                             quest = 61106,
                             waypoint = 27731305,
-                            reputation = 80,
-                            items = {
-                                {
-                                    id = 183887,
-                                },
-                            },
                         },
                         {
                             name = "Darithis the Bleak",
                             id = 160770,
                             quest = 62281,
                             waypoint = 60964805,
-                            reputation = 100,
                         },
                         {
                             name = "Darklord Taraxis",
                             id = 158025,
                             quest = 62282,
                             waypoint = 49128175,
-                            reputation = 80,
                         },
                         {
                             name = "Dolos <Death's Knife>",
                             id = 170711,
                             quest = 60909,
                             waypoint = 28086058,
-                            reputation = 100,
                         },
                         {
                             name = "Eketra <The Impaler>",
                             id = 170774,
                             quest = 60915,
                             waypoint = 23765341,
-                            reputation = 100,
                         },
                         {
                             name = "Ekphoras, Herald of Grief",
                             id = 169827,
                             quest = 60666,
                             waypoint = 42342108,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 184105,
@@ -220,7 +196,6 @@ ns.data = {
                             id = 170303,
                             quest = 62260,
                             waypoint = 20586935,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 184108,
@@ -248,28 +223,24 @@ ns.data = {
                             id = 175012,
                             quest = 62788,
                             waypoint = 30775000,
-                            reputation = 100,
                         },
                         {
                             name = "Nascent Devourer",
                             id = 158278,
                             quest = 57573,
                             waypoint = 45507376,
-                            reputation = 80,
                         },
                         {
                             name = "Obolos <Prime Adjutant>",
                             id = 164064,
                             quest = 60667,
                             waypoint = 48801830,
-                            reputation = 80,
                         },
                         {
                             name = "Shadeweaver Zeris",
                             id = 170634,
                             quest = 60884,
                             waypoint = 32946646,
-                            reputation = 100,
                             items = {
                                 {
                                     id = 183066,
@@ -293,18 +264,13 @@ ns.data = {
                             id = 166398,
                             quest = 60834,
                             waypoint = 35974156,
-                            reputation = 80,
                         },
                         {
                             name = "Talaporas, Herald of Pain",
                             id = 170302,
                             quest = 60789,
                             waypoint = 28701204,
-                            reputation = 100,
                             items = {
-                                {
-                                    id = 184107,
-                                },
                                 {
                                     id = 182326,
                                     item = true,
@@ -316,14 +282,12 @@ ns.data = {
                             id = 170731,
                             quest = 60914,
                             waypoint = 27397152,
-                            reputation = 100,
                         },
                         {
                             name = "Yero the Skittish",
                             id = 172862,
                             quest = 61568,
                             waypoint = 37446212,
-                            reputation = 80,
                         },
                     },
                 },
@@ -340,24 +304,6 @@ ns.data = {
                             worldquest = true,
                             waypoint = 32306700,
                             items = {
-                                {
-                                    id = 184133,
-                                },
-                                {
-                                    id = 184140,
-                                },
-                                {
-                                    id = 184173,
-                                },
-                                {
-                                    id = 184128,
-                                },
-                                {
-                                    id = 184135,
-                                },
-                                {
-                                    id = 184143,
-                                },
                                 {
                                     id = 183295,
                                     guaranteed = true,
@@ -411,9 +357,6 @@ ns.data = {
                             waypoint = 62107580,
                             items = {
                                 {
-                                    id = 184287,
-                                },
-                                {
                                     id = 181267,
                                     pet = 2957,
                                 },
@@ -424,11 +367,6 @@ ns.data = {
                             id = 157226,
                             achievement = 14721,
                             waypoint = 58197421,
-                            items = {
-                                {
-                                    id = 183903,
-                                },
-                            },
                         },
                         {
                             name = "Violet Mistake",
@@ -436,9 +374,6 @@ ns.data = {
                             quest = 61720,
                             waypoint = 58197421,
                             items = {
-                                {
-                                    id = 184301,
-                                },
                                 {
                                     id = 182079,
                                     mount = 1410,
@@ -454,9 +389,6 @@ ns.data = {
                             quest = 61724,
                             waypoint = 58197421,
                             items = {
-                                {
-                                    id = 184300,
-                                },
                                 {
                                     id = 184155,
                                     quest = 62804,
@@ -476,11 +408,6 @@ ns.data = {
                             id = 157307,
                             quest = 61721,
                             waypoint = 58197421,
-                            items = {
-                                {
-                                    id = 182287,
-                                },
-                            },
                             notes = {
                                 "To Summon: 15+ |cffffff66Yellow|r",
                             },
@@ -490,11 +417,6 @@ ns.data = {
                             id = 48863,
                             quest = 61719,
                             waypoint = 58197421,
-                            items = {
-                                {
-                                    id = 184302,
-                                },
-                            },
                             notes = {
                                 "To Summon: 15+ |cff6666ffBlue|r",
                             },
@@ -504,11 +426,6 @@ ns.data = {
                             id = 48862,
                             quest = 61723,
                             waypoint = 58197421,
-                            items = {
-                                {
-                                    id = 184175,
-                                },
-                            },
                             notes = {
                                 "To Summon: |cffff6666Red|r = |cffffff66Yellow|r > |cff6666ffBlue|r",
                             },
@@ -538,9 +455,6 @@ ns.data = {
                             waypoint = 76835707,
                             items = {
                                 {
-                                    id = 184280,
-                                },
-                                {
                                     id = 181263,
                                     pet = 2953,
                                 },
@@ -552,9 +466,6 @@ ns.data = {
                             quest = 58851,
                             waypoint = 66023532,
                             items = {
-                                {
-                                    id = 184179,
-                                },
                                 {
                                     id = 182084,
                                     mount = 1373,
@@ -584,9 +495,6 @@ ns.data = {
                             waypoint = 52663542,
                             items = {
                                 {
-                                    id = 184290,
-                                },
-                                {
                                     id = 184154,
                                     transmog = true,
                                 },
@@ -603,9 +511,6 @@ ns.data = {
                             waypoint = 55502361,
                             items = {
                                 {
-                                    id = 184289,
-                                },
-                                {
                                     id = 181172,
                                     pet = 2948,
                                 },
@@ -616,45 +521,18 @@ ns.data = {
                             id = 159105,
                             quest = 58005,
                             waypoint = 49012351,
-                            items = {
-                                {
-                                    id = 184188,
-                                },
-                                {
-                                    id = 184181,
-                                },
-                                {
-                                    id = 184189,
-                                },
-                                {
-                                    id = 184182,
-                                },
-                            },
                         },
                         {
                             name = "Devour'us",
                             id = 162669,
                             quest = 58835,
                             waypoint = 45052842,
-                            items = {
-                                {
-                                    id = 184178,
-                                },
-                            },
                         },
                         {
                             name = "Corpsecutter Moroc",
                             id = 157058,
                             quest = 58335,
                             waypoint = 26392633,
-                            items = {
-                                {
-                                    id = 184177,
-                                },
-                                {
-                                    id = 184176,
-                                },
-                            },
                         },
                         {
                             name = "Gieger",
@@ -663,9 +541,6 @@ ns.data = {
                             waypoint = 31603540,
                             covenantRequired = true,
                             items = {
-                                {
-                                    id = 184298,
-                                },
                                 {
                                     id = 182080,
                                     mount = 1411,
@@ -680,9 +555,6 @@ ns.data = {
                             waypoint = 28965138,
                             items = {
                                 {
-                                    id = 184285,
-                                },
-                                {
                                     id = 181804,
                                     transmog = true,
                                     covenantOnly = true,
@@ -695,9 +567,6 @@ ns.data = {
                             quest = 58889,
                             waypoint = 33718016,
                             items = {
-                                {
-                                    id = 184288,
-                                },
                                 {
                                     id = 182085,
                                     mount = 1372,
@@ -712,9 +581,6 @@ ns.data = {
                             covenantRequired = true,
                             items = {
                                 {
-                                    id = 182190,
-                                },
-                                {
                                     id = 182075,
                                     mount = 1366,
                                     covenantOnly = true,
@@ -726,55 +592,30 @@ ns.data = {
                             id = 162797,
                             quest = 58878,
                             waypoint = 46734550,
-                            items = {
-                                {
-                                    id = 182191,
-                                },
-                            },
                         },
                         {
                             name = "Gristlebeak",
                             id = 162588,
                             quest = 58837,
                             waypoint = 57795155,
-                            items = {
-                                {
-                                    id = 182196,
-                                },
-                            },
                         },
                         {
                             name = "Indomitable Schmitd",
                             id = 161105,
                             quest = 58332,
                             waypoint = 38794333,
-                            items = {
-                                {
-                                    id = 182192,
-                                },
-                            },
                         },
                         {
                             name = "Nirvaska the Summoner",
                             id = 161857,
                             quest = 58629,
                             waypoint = 50346328,
-                            items = {
-                                {
-                                    id = 183700,
-                                },
-                            },
                         },
                         {
                             name = "Pesticide",
                             id = 162767,
                             quest = 58875,
                             waypoint = 53726132,
-                            items = {
-                                {
-                                    id = 182205,
-                                },
-                            },
                         },
                         {
                             name = "Ravenomous",
@@ -782,9 +623,6 @@ ns.data = {
                             quest = 58004,
                             waypoint = 53841877,
                             items = {
-                                {
-                                    id = 184184,
-                                },
                                 {
                                     id = 181283,
                                     pet = 2964,
@@ -797,9 +635,6 @@ ns.data = {
                             quest = 58768,
                             waypoint = 42465345,
                             items = {
-                                {
-                                    id = 184299,
-                                },
                                 {
                                     id = 181266,
                                     pet = 2956,
@@ -815,28 +650,12 @@ ns.data = {
                             id = 160059,
                             quest = 58091,
                             waypoint = 50562011,
-                            items = {
-                                {
-                                    id = 184186,
-                                },
-                                {
-                                    id = 184192,
-                                },
-                                {
-                                    id = 184187,
-                                },
-                            },
                         },
                         {
                             name = "Thread Mistress Leeda",
                             id = 162180,
                             quest = 58678,
                             waypoint = 24184297,
-                            items = {
-                                {
-                                    id = 184180,
-                                },
-                            },
                         },
                     },
                 },
@@ -854,24 +673,6 @@ ns.data = {
                             worldquest = true,
                             waypoint = 27601460,
                             items = {
-                                {
-                                    id = 184137,
-                                },
-                                {
-                                    id = 184131,
-                                },
-                                {
-                                    id = 184130,
-                                },
-                                {
-                                    id = 184134,
-                                },
-                                {
-                                    id = 184171,
-                                },
-                                {
-                                    id = 184144,
-                                },
                                 {
                                     id = 182638,
                                     guaranteed = true,
@@ -974,9 +775,6 @@ ns.data = {
                             waypoint = 62484716,
                             items = {
                                 {
-                                    id = 183739,
-                                },
-                                {
                                     id = 180582,
                                     mount = 1379,
                                 },
@@ -1012,11 +810,6 @@ ns.data = {
                             id = 166393,
                             quest = 59854,
                             waypoint = 53247300,
-                            items = {
-                                {
-                                    id = 183729,
-                                },
-                            },
                         },
                         {
                             name = "Amalgamation of Light",
@@ -1024,18 +817,6 @@ ns.data = {
                             quest = 59584,
                             waypoint = 25304850,
                             items = {
-                                {
-                                    id = 179926,
-                                },
-                                {
-                                    id = 179924,
-                                },
-                                {
-                                    id = 179653,
-                                },
-                                {
-                                    id = 179925,
-                                },
                                 {
                                     id = 180688,
                                     item = true,
@@ -1051,22 +832,12 @@ ns.data = {
                             id = 170434,
                             quest = 60836,
                             waypoint = 65782914,
-                            items = {
-                                {
-                                    id = 183730,
-                                },
-                            },
                         },
                         {
                             name = "Azgar",
                             id = 166576,
                             quest = 59893,
                             waypoint = 35817052,
-                            items = {
-                                {
-                                    id = 183731,
-                                },
-                            },
                         },
                         {
                             name = "Bog Beast",
@@ -1085,33 +856,18 @@ ns.data = {
                             id = 166710,
                             quest = 59913,
                             waypoint = 37084742,
-                            items = {
-                                {
-                                    id = 183737,
-                                },
-                            },
                         },
                         {
                             name = "Executioner Adrastia",
                             id = 161310,
                             quest = 58441,
                             waypoint = 43055183,
-                            items = {
-                                {
-                                    id = 180502,
-                                },
-                            },
                         },
                         {
                             name = "Grand Arcanist Dimitri",
                             id = 167464,
                             quest = 60173,
                             waypoint = 20485298,
-                            items = {
-                                {
-                                    id = 180503,
-                                },
-                            },
                         },
                         {
                             name = "Huntmaster Petrus",
@@ -1131,11 +887,6 @@ ns.data = {
                             id = 160640,
                             quest = 58210,
                             waypoint = 21803590,
-                            items = {
-                                {
-                                    id = 183735,
-                                },
-                            },
                         },
                         {
                             name = "Leeched Soul",
@@ -1143,9 +894,6 @@ ns.data = {
                             quest = 59580,
                             waypoint = 67978179,
                             items = {
-                                {
-                                    id = 183736,
-                                },
                                 {
                                     id = 180585,
                                     pet = 2897,
@@ -1157,11 +905,6 @@ ns.data = {
                             id = 161891,
                             quest = 58633,
                             waypoint = 75976161,
-                            items = {
-                                {
-                                    id = 180501,
-                                },
-                            },
                         },
                         {
                             name = "Manifestation of Wrath",
@@ -1180,22 +923,12 @@ ns.data = {
                             id = 162481,
                             quest = 62252,
                             waypoint = 67443048,
-                            items = {
-                                {
-                                    id = 183732,
-                                },
-                            },
                         },
                         {
                             name = "Stonefist",
                             id = 159503,
                             quest = 62220,
                             waypoint = 31312324,
-                            items = {
-                                {
-                                    id = 180488,
-                                },
-                            },
                         },
                         {
                             name = "Tomb Burster",
@@ -1224,24 +957,6 @@ ns.data = {
                             worldquest = true,
                             waypoint = 26602280,
                             items = {
-                                {
-                                    id = 184170,
-                                },
-                                {
-                                    id = 184136,
-                                },
-                                {
-                                    id = 184125,
-                                },
-                                {
-                                    id = 184132,
-                                },
-                                {
-                                    id = 184139,
-                                },
-                                {
-                                    id = 184141,
-                                },
                                 {
                                     id = 183311,
                                     guaranteed = true,
@@ -1292,11 +1007,6 @@ ns.data = {
                             id = 170623,
                             quest = 60883,
                             waypoint = 27823014,
-                            items = {
-                                {
-                                    id = 184297,
-                                },
-                            },
                         },
                         {
                             name = "Orstus & Sotiros",
@@ -1305,9 +1015,6 @@ ns.data = {
                             covenantRequired = true,
                             waypoint = 22432285,
                             items = {
-                                {
-                                    id = 184365,
-                                },
                                 {
                                     id = 184397,
                                     pet = 3062,
@@ -1359,11 +1066,6 @@ ns.data = {
                             id = 171211,
                             quest = 61083,
                             waypoint = 32592336,
-                            items = {
-                                {
-                                    id = 183607,
-                                },
-                            },
                         },
                         {
                             name = "Baedos",
@@ -1388,20 +1090,6 @@ ns.data = {
                             id = 161527,
                             quest = {60570, 60571, 60569, 58526},
                             waypoint = 55358024,
-                            items = {
-                                {
-                                    id = 179485,
-                                },
-                                {
-                                    id = 179486,
-                                },
-                                {
-                                    id = 179487,
-                                },
-                                {
-                                    id = 179488,
-                                },
-                            },
                         },
                         {
                             name = "Bookkeeper Mnemis",
@@ -1432,11 +1120,6 @@ ns.data = {
                             id = 171014,
                             quest = 61002,
                             waypoint = 66004367,
-                            items = {
-                                {
-                                    id = 183608,
-                                },
-                            },
                         },
                         {
                             name = "Corrupted Clawguard",
@@ -1449,26 +1132,6 @@ ns.data = {
                             id = 171011,
                             quest = {61069, 61000},
                             waypoint = 37004180,
-                            items = {
-                                {
-                                    id = 183606,
-                                },
-                                {
-                                    id = 183608,
-                                },
-                                {
-                                    id = 183613,
-                                },
-                                {
-                                    id = 183611,
-                                },
-                                {
-                                    id = 183609,
-                                },
-                                {
-                                    id = 183607,
-                                },
-                            },
                         },
                         {
                             name = "Dionae",
@@ -1499,11 +1162,6 @@ ns.data = {
                             id = 160721,
                             quest = 58222,
                             waypoint = 60427305,
-                            items = {
-                                {
-                                    id = 180444,
-                                },
-                            },
                         },
                         {
                             name = "Herculon",
@@ -1521,11 +1179,6 @@ ns.data = {
                             id = 160882,
                             quest = 58319,
                             waypoint = 51456859,
-                            items = {
-                                {
-                                    id = 183608,
-                                },
-                            },
                         },
                         {
                             name = "Reekmonger",
@@ -1537,11 +1190,6 @@ ns.data = {
                             id = 160985,
                             quest = 58320,
                             waypoint = 61295090,
-                            items = {
-                                {
-                                    id = 183608,
-                                },
-                            },
                         },
                         {
                             hidden = true,
@@ -1550,9 +1198,6 @@ ns.data = {
                             quest = {61001, 61046, 61047},
                             waypoint = 39604499,
                             items = {
-                                {
-                                    id = 183605,
-                                },
                                 {
                                     id = 180869,
                                     pet = 2940,
@@ -1574,24 +1219,6 @@ ns.data = {
                             worldquest = true,
                             waypoint = 20606360,
                             items = {
-                                {
-                                    id = 184127,
-                                },
-                                {
-                                    id = 184129,
-                                },
-                                {
-                                    id = 184172,
-                                },
-                                {
-                                    id = 184126,
-                                },
-                                {
-                                    id = 184138,
-                                },
-                                {
-                                    id = 184142,
-                                },
                                 {
                                     id = 183238,
                                     guaranteed = true,
@@ -1632,9 +1259,6 @@ ns.data = {
                             waypoint = 30115536,
                             covenantRequired = true,
                             items = {
-                                {
-                                    id = 180154,
-                                },
                                 {
                                     id = 180730,
                                     mount = 1393,
@@ -1716,22 +1340,12 @@ ns.data = {
                             id = 167851,
                             quest = 60266,
                             waypoint = 57862955,
-                            items = {
-                                {
-                                    id = 179539,
-                                },
-                            },
                         },
                         {
                             name = "Faeflayer",
                             id = 171688,
                             quest = 61184,
                             waypoint = 68612765,
-                            items = {
-                                {
-                                    id = 180144,
-                                },
-                            },
                         },
                         {
                             name = "Gormbore",
@@ -1763,11 +1377,6 @@ ns.data = {
                             id = 165053,
                             quest = 59431,
                             waypoint = 62102470,
-                            items = {
-                                {
-                                    id = 179502,
-                                },
-                            },
                         },
                         {
                             name = "Mystic Rainbowhorn",
@@ -1775,9 +1384,6 @@ ns.data = {
                             quest = 59235,
                             waypoint = 65702809,
                             items = {
-                                {
-                                    id = 179586,
-                                },
                                 {
                                     id = 182179,
                                     item = true,
@@ -1803,11 +1409,6 @@ ns.data = {
                             id = 167726,
                             quest = 60273,
                             waypoint = 65104430,
-                            items = {
-                                {
-                                    id = 179603,
-                                },
-                            },
                         },
                         {
                             name = "Rotbriar Boggart",
@@ -1826,11 +1427,6 @@ ns.data = {
                             id = 171451,
                             quest = 61177,
                             waypoint = 72425175,
-                            items = {
-                                {
-                                    id = 180164,
-                                },
-                            },
                         },
                         {
                             name = "Skuld Vit",
@@ -1839,9 +1435,6 @@ ns.data = {
                             waypoint = 37675917,
                             covenantRequired = true,
                             items = {
-                                {
-                                    id = 180146,
-                                },
                                 {
                                     id = 182183,
                                     item = true,
@@ -1867,11 +1460,6 @@ ns.data = {
                             id = 164147,
                             quest = 59170,
                             waypoint = 58306180,
-                            items = {
-                                {
-                                    id = 181396,
-                                },
-                            },
                         },
                     },
                 },
@@ -2337,6 +1925,11 @@ ns.data = {
             color = "d4b48d",
             icon = 463447,
         },
+        {
+            id = 1931, -- Cataloged Research
+            color = "dfd4ad",
+            icon = 1506458,
+        }
     },
     reputationColors = {
         "cc2222",
@@ -2375,78 +1968,4 @@ ns.data = {
             phrase = "Citadel of the %s",
         },
     },
-    renownLevels = {
-        {
-            level = 6,
-            year = 2020,
-            month = 12,
-            day = 1,
-        },
-        {
-            level = 9,
-            day = 8,
-        },
-        {
-            level = 12,
-            day = 15,
-        },
-        {
-            level = 15,
-            day = 22,
-        },
-        {
-            level = 18,
-            day = 29,
-        },
-        {
-            level = 21,
-            year = 2021,
-            month = 1,
-            day = 5,
-        },
-        {
-            level = 24,
-            day = 12,
-        },
-        {
-            level = 26,
-            day = 19,
-        },
-        {
-            level = 28,
-            day = 26,
-        },
-        {
-            level = 30,
-            month = 2,
-            day = 2,
-        },
-        {
-            level = 32,
-            day = 9,
-        },
-        {
-            level = 34,
-            day = 16,
-        },
-        {
-            level = 36,
-            day = 23,
-        },
-        {
-            level = 38,
-            month = 3,
-            day = 2,
-        },
-        {
-            level = 40,
-            day = 9,
-        },
-    },
-    animaValuesBySpellID = {
-        [347555] = 3,
-        [345706] = 5,
-        [336327] = 35,
-        [336456] = 250,
-    }
 }

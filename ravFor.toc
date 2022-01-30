@@ -1,9 +1,9 @@
-## Interface: 90005
-## Version: 1.4.4
+## Interface: 90105
+## Version: 2.0.0
 
-## Name: Ravenous For Shadowlands
-## Title: Ravenous For |cffffc478Shadowlands|r
-## Notes: Keep track of your progress through the expansion!|n|cffbbbbbbSlash command: /r4|r
+## Name: Ravenous For
+## Title: Ravenous |cff9eb8c9For|r
+## Notes: Keep track of your collection progress through zones in each expansion!|n|cffbbbbbbSlash command: /r4|r
 ## Author: RavenousAddons
 
 ## SavedVariables: RAVFOR_version

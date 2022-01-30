@@ -7,12 +7,10 @@ function ravFor_OnLoad(self)
     self:RegisterEvent("CHAT_MSG_CURRENCY")
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:RegisterEvent("UPDATE_FACTION")
-    self:RegisterEvent("PLAYER_FLAGS_CHANGED")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("MOUNT_JOURNAL_SEARCH_UPDATED")
     self:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
     self:RegisterEvent("NEW_TOY_ADDED")
-    self:RegisterEvent("COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED")
 end
 
 function ravFor_OnEvent(self, event, arg, ...)
@@ -89,10 +87,6 @@ function ravFor_OnEvent(self, event, arg, ...)
         if ns.Factions then
             ns:RefreshFactions()
         end
-    elseif event == "PLAYER_FLAGS_CHANGED" then
-        if ns.Warmodes then
-            ns:RefreshWarmodes()
-        end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local _, subtype = CombatLogGetCurrentEventInfo()
         if subtype == "UNIT_DIED" or subtype == "UNIT_DESTROYED" then
@@ -103,10 +97,6 @@ function ravFor_OnEvent(self, event, arg, ...)
     elseif event == "MOUNT_JOURNAL_SEARCH_UPDATED" or event == "PET_JOURNAL_LIST_UPDATE" or event == "NEW_TOY_ADDED" then
         if ns.Items then
             ns:RefreshItems()
-        end
-    elseif event == "COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED" then
-        if ns.Covenant and ns.Renown then
-            ns:RefreshCovenant()
         end
     end
 end
