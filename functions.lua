@@ -478,14 +478,14 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
     local Rares = {}
 
-    local ZoneFrame = CreateFrame("Frame", ADDON_NAME .. "ZoneFrame" .. zone.id, Parent)
+    local ZoneFrame = CreateFrame("Frame", ADDON_NAME .. "ZoneFrame" .. zone.id .. string.gsub(zone.name or "", "[ -']", ""), Parent)
     ZoneFrame:SetPoint("TOPLEFT", Relative, (relativePoint or "BOTTOMLEFT"), 0, -gigantic-(Relative.offset or 0))
     ZoneFrame:SetWidth(Parent:GetWidth())
     ZoneFrame:SetHeight(1)
     Parent = ZoneFrame
     Relative = ZoneFrame
 
-    local Zone = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id, "ARTWORK", "GameFontNormalLarge")
+    local Zone = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. (string.gsub(zone.name or "", "[ -']", "")), "ARTWORK", "GameFontNormalLarge")
     local ZoneAnchor = CreateFrame("Button", nil, Parent)
     Zone:SetPoint("TOPLEFT", Relative, "TOPLEFT")
     Zone:SetJustifyH("LEFT")
@@ -502,7 +502,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
     if zone.covenant then
         local zoneCovenant = string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords")
         local zonePhrase = TextColor("\"" .. string.format(covenants[zone.covenant].phrase, zoneCovenant) .. "\"", "bbbbbb")
-        local Covenant = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Covenant", "ARTWORK", "GameFontNormal")
+        local Covenant = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. (string.gsub(zone.name or "", "[ -']", "")) .. "Covenant", "ARTWORK", "GameFontNormal")
         Covenant:SetPoint("LEFT", LittleRelative, "RIGHT", large, 0)
         Covenant:SetJustifyH("LEFT")
         Covenant:SetText(zonePhrase)
@@ -512,7 +512,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
     if zone.faction then
         local zoneFactions = type(zone.faction) == "table" and zone.faction or {zone.faction}
         for i, faction in ipairs(zoneFactions) do
-            local Faction = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Faction", "ARTWORK", "GameFontNormal")
+            local Faction = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. (string.gsub(zone.name or "", "[ -']", "")) .. "Faction", "ARTWORK", "GameFontNormal")
             if i > 1 or zone.covenant then
                 Faction:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
                 Relative.offset = Relative.offset + large
@@ -532,7 +532,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
     end
 
     if zone.currency then
-        local Currency = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. "Currency", "ARTWORK", "GameFontNormal")
+        local Currency = Parent:CreateFontString(ADDON_NAME .. "Zone" .. zone.id .. (string.gsub(zone.name or "", "[ -']", "")) .. "Currency", "ARTWORK", "GameFontNormal")
         if zone.covenant or zone.faction then
             Currency:SetPoint("TOPLEFT", LittleRelative, "BOTTOMLEFT", 0, -medium)
             Relative.offset = Relative.offset + ((zone.covenant and zone.faction) and gigantic or large)

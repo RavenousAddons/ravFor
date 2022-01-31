@@ -49,13 +49,13 @@ ns.data = {
                         {id=179108,name="Kroke the Tormented",waypoint=59203580,items={{id=187250,},{id=187248,},},quest=64428,},
                         {id=179472,name="Konthrogz the Obliterator",waypoint=10008000,items={{id=187183,mount=1514,},},quest=64246,},
                         {id=179608,name="Screaming Shade",waypoint=44604240,quest=64263,},
-                        {id=179684,name="Malbog",waypoint=44202920,items={{id=186645,mount=1506,},},notes={"Talk to Caretaker Kah-Kay in town, then follow footprints"},quest=64233,},
+                        {id=179684,name="Malbog",waypoint=44202920,items={{id=186645,mount=1506,},},notes={"Talk to Caretaker Kah-Kay in town, then follow footprints."},quest=64233,},
                         {id=179760,name="Towering Exterminator",waypoint=12008000,items={{id=187241,},{id=187242,},{id=187035,},},quest=64245,},
                         {id=179768,name="Consumption",waypoint=51154165,items={{id=187245,},{id=187246,},{id=187247,},},notes={"Starts as a regular mob, eats Drab Gromit until it becomes a rare, and then a rare-elite. Loot gets better as it gets stronger, so wait."},quest=64243,},
                         {id=179802,name="Yarxhov the Pillager",waypoint=39405240,items={{id=187103,quest=63917,},},quest=64257,},
                         {id=179859,name="Xyraxz the Unknowable",waypoint=44903550,items={{id=186538,pet=3140,},{id=187104,quest=63918,},},quest=64278,},
                         {id=179911,name="Silent Soulstalker",waypoint=57607040,quest=64284,},
-                        {id=179912,name="Maelie the Wanderer",waypoint={30005560,33103865,35804650,35856225,38403140,39703490,41103980,41302750,42806040,43203130,49304170,50302290,59801510,61304040,62404970,},items={{id=186643,mount=1511,}},notes={"Tinybell asks you to find Maelie the Wanderer, who spawns in a different place each day. Find her each day, use Reassure on her, and get a mount from Tinybell"},quest={64292,64298,},},
+                        {id=179912,name="Maelie the Wanderer",waypoint={30005560,33103865,35804650,35856225,38403140,39703490,41103980,41302750,42806040,43203130,49304170,50302290,59801510,61304040,62404970,},items={{id=186643,mount=1511,}},notes={"Tinybell asks you to find Maelie the Wanderer, who spawns in a different place each day. Find her each day, use Reassure on her, and get a mount from Tinybell."},quest={64292,64298,},},
                         {id=179913,name="Deadsoul Hatcher",waypoint=59355220,items={{id=187174,toy=true,},},quest=64285,},
                         {id=179914,name="Observer Yorik",waypoint=50307590,items={{id=187420,toy=true,},},quest=64440,},
                         {id=179931,name="Relic Breaker Krelva",waypoint=22604140,quest=64291,},
@@ -322,8 +322,8 @@ ns.data = {
                     rares = {
                         {name="Anh-De the Loyal",id=157466,quest=57363,waypoint=34156805,items={{id=174840,mount=1328}}},
                         {name="Ha-Li",id=157153,quest=57344,waypoint={37323630,33973378,29053930,31524387,37313632,37323630},items={{id=173887,mount=1297}}},
-                        {name="Houndlord Ren",id=157160,quest=57345,assault="MOG",waypoint={13132578,11833049,08953570},items={{id=174841,mount=1327}}},
-                        {name="Rei Lun",id=157162,quest=57346,assault="MOG",waypoint=21901232,items={{id=174649,mount=1313}}},
+                        {name="Houndlord Ren",id=157160,quest=57345,waypoint={13132578,11833049,08953570},items={{id=174841,mount=1327}}},
+                        {name="Rei Lun",id=157162,quest=57346,waypoint=21901232,items={{id=174649,mount=1313}}},
                     },
                 },
             },
@@ -408,13 +408,67 @@ ns.data = {
             icon = 630787,
             zones = {
                 {
-                    -- Icecrown → Icecrown Citadel
-                    name = "Icecrown Citadel",
-                    id = 118,
-                    color = "c7fdfe",
-                    icon = 236793,
+                    -- Borean Tundra
+                    id = 114,
+                    color = "b4d455",
+                    icon = 9001,
                     rares = {
-                        {name="The Lich King",id=36597,waypoint=54008500,encounter=12,items={{id=50818,mount=363,chance=1}}},
+                        {id=32357,name="Old Crystalbark",waypoint={21002840,22003340,27003560,34002420,35402940},loot={id=44649}},
+                        {id=32358,name="Fumblub Gearwind",waypoint={59801460,59802540,62603480,68001920,68403660,73603260}},
+                    },
+                },
+                {
+                    -- Howling Fjord
+                    id = 117,
+                    color = "b4d455",
+                    icon = 9001,
+                    rares = {
+                        {id=32377,name="Perobas the Bloodthirster",waypoint={49800460,52801160,60802000,68201720},loot={id=44669}},
+                        {id=32386,name="Vigdis the War Maiden",waypoint={68604840,69405820,73403980,74004500,74005240,74406060},loot={id=44670}},
+                        {id=32398,name="King Ping",waypoint={26006380,30807120,31205660,33208020},loot={id=44668}},
+                    },
+                },
+                {
+                    -- Dragonblight
+                    id = 115,
+                    color = "b4d455",
+                    icon = 9001,
+                    rares = {
+                        {id=32400,name="Tukemuth",waypoint={54405540,57004980,59204240,60603020,61805660,62605100,66803280,68004600,68805780,70005140},loot={id=44673}},
+                        {id=32409,name="Crazed Indu'le Survivor",waypoint={15405820,15604560,20605520,28406140},loot={id=44672}},
+                        {id=32417,name="Scarlet Highlord Daion",waypoint={69207480,71002220,75202760,85803660}},
+                    },
+                },
+                {
+                    -- Grizzly Hills
+                    id = 116,
+                    color = "b4d455",
+                    icon = 9001,
+                    rares = {
+                        {id=32422,name="Grocklar",waypoint={10603920,11207100,12005560,12204440,12805000,17207040,20605620,22407320,28004180},loot={id=44675}},
+                        {id=32429,name="Seething Hate",waypoint={28004540,34004920,39605060}},
+                        {id=32438,name="Syreian the Bonecarver",waypoint={62803700,65202940,71603500,74204240}},
+                    },
+                },
+                {
+                    -- Zul'Drak
+                    id = 121,
+                    color = "b4d455",
+                    icon = 9001,
+                    rares = {
+                        {id=32447,name="Zul'drak Sentinel",waypoint={21208260,26208280,28807220,40405460,40406000,42607060,45806040,45807580,49808240},loot={id=44677}},
+                        {id=32471,name="Griegen",waypoint={14405620,17407020,20807880,22406180,26205560,26607100},loot={id=44686}},
+                    },
+                },
+                {
+                    -- Storm Peaks
+                    id = 120,
+                    color = "9ffcfa",
+                    icon = 236834,
+                    rares = {
+                        {name="Time-Lost Proto-Drake",id=32491,waypoint={31006940,35607660,51007000,52003400},loot={{id=44168,mount=265}}},
+                        {name="Dirkee",id=32500,waypoint={37805840,41005180,41404020,68004760},loot={id=44681,id=44708}},
+                        {name="Vyragosa",id=32630,waypoint={31056945,35657665,51057005,52053405},loot={id=44732}},
                     },
                 },
                 {
@@ -424,7 +478,28 @@ ns.data = {
                     color = "9ffcfa",
                     icon = 254113,
                     rares = {
-                        {name="Yogg-Saron",id=33288,waypoint=41001600,encounter=13,items={{id=45693,mount=304,chance=1}},notes={"Must be done on Hard Mode (Alone in the Dark)"}},
+                        {name="Yogg-Saron",id=33288,waypoint=41001600,encounter=13,items={{id=45693,mount=304,chance=1}},notes={"Must be done on Hard Mode (Alone in the Dark)."}},
+                    },
+                },
+                {
+                    -- Icecrown
+                    id = 118,
+                    color = "c7fdfe",
+                    icon = 236794,
+                    rares = {
+                        {id=32487,name="Putridus the Ancient",waypoint={44005820,45205020,49004280,54004120,60804120,65004740,66205260,67405820,68406420},loot={id=44696}},
+                        {id=32495,name="Hildana Deathstealer",waypoint={28604540,29603800,30803280,36802540,54005300,59605940},loot={id=44697}},
+                        {id=32501,name="High Thane Jorfus",waypoint={31206220,33607060,47407820,48408500,67603860,72803500},loot={id=44695}},
+                    },
+                },
+                {
+                    -- Icecrown → Icecrown Citadel
+                    name = "Icecrown Citadel",
+                    id = 118,
+                    color = "c7fdfe",
+                    icon = 236793,
+                    rares = {
+                        {name="The Lich King",id=36597,waypoint=54008500,encounter=12,items={{id=50818,mount=363,chance=1}}},
                     },
                 },
             },
@@ -476,7 +551,7 @@ ns.data = {
             id = 1931, -- Cataloged Research
             color = "dfd4ad",
             icon = 1506458,
-        }
+        },
     },
     reputationColors = {
         "cc2222",
