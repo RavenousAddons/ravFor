@@ -93,11 +93,11 @@ local function IsRareDead(rare)
         return true
     elseif rare.quest then
         return CQL.IsQuestFlaggedCompleted(rare.quest)
-    elseif rare.instance then
+    elseif rare.encounter then
         for i = 1, GetNumSavedInstances(), 1 do
-            local zoneName, zoneID, reset, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, _, totalBoss, totalDown = GetSavedInstanceInfo(i)
-            if zoneID == rare.instance and (rare.instanceLimit and (rare.instanceLimit == maxPlayer) or true) then
-                return (locked and true or false)
+            local bossName, fileDataID, isKilled, _ = GetSavedInstanceEncounterInfo(i, rare.encounter)
+            if bossName == rare.name then
+                return isKilled
             end
         end
     end
@@ -226,7 +226,7 @@ function ns:RefreshRares()
             without = string.gsub(without, icon, "")
         end
         Rare.rare.quest = Rare.rare.quest or (faction == "Alliance" and (Rare.rare.questAlliance or nil) or (Rare.rare.questHorde or nil))
-        Rare:SetText((IsRareDead(Rare.rare) and icons.Checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.LegendaryQuest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.Daily or (Rare.rare.quest or Rare.rare.instance) and icons.Skull or icons.Achievement) .. without)
+        Rare:SetText((IsRareDead(Rare.rare) and icons.Checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.LegendaryQuest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly or Rare.rare.encounter) and icons.Daily or Rare.rare.quest and icons.Skull or icons.Achievement) .. without)
     end
 end
 
@@ -612,7 +612,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         tinsert(c, d)
     end
 
-    local lockedIcon = IsRareDead(rare) and icons.Checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.LegendaryQuest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.Daily or (rare.quest or rare.instance) and icons.Skull or icons.Achievement
+    local lockedIcon = IsRareDead(rare) and icons.Checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.LegendaryQuest or (rare.biweekly or rare.weekly or rare.fortnightly or rare.encounter) and icons.Daily or rare.quest and icons.Skull or icons.Achievement
     local rareFaction = rare.faction and "|cff" .. (rare.faction == "Alliance" and "0078ff" or "b30000") .. rare.faction .. "|r" or nil
     local factionOnly = rareFaction and TextColor(L.OnlyFor) .. rareFaction or ""
     local rareControl = rare.control and "|cff" .. (rare.control == "Alliance" and "0078ff" or "b30000") .. rare.control .. "|r" or nil

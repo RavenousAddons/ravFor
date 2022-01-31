@@ -339,7 +339,7 @@ ns.data = {
                     color = "76fafb",
                     icon = 651996,
                     rares = {
-                        {name="Elegon",id=60410,waypoint=60003800,instance=123123141,items={{id=87777,mount=478}}},
+                        {name="Elegon",id=60410,waypoint=60003800,encounter=5,items={{id=87777,mount=478}}},
                     },
                 },
             },
@@ -355,8 +355,8 @@ ns.data = {
                     color = "a7eb67",
                     icon = 135723,
                     rares = {
-                        {name="Bloodlord Mandokir",id=52151,waypoint=72003280,instance=351263602,items={{id=68823,mount=410}}},
-                        {name="High Priestess Kilnara",id=52059,waypoint=72003280,instance=351263602,items={{id=68824,mount=411}}},
+                        {name="Bloodlord Mandokir",id=52151,waypoint=72003280,encounter=2,items={{id=68823,mount=410}}},
+                        {name="High Priestess Kilnara",id=52059,waypoint=72003280,encounter=4,items={{id=68824,mount=411}}},
                     },
                 },
                 {
@@ -366,7 +366,7 @@ ns.data = {
                     color = "96a3aa",
                     icon = 462522,
                     rares = {
-                        {name="Altairus",id=43873,waypoint=77008400,instance=99999,items={{id=63040,mount=395}}},
+                        {name="Altairus",id=43873,waypoint=77008400,encounter=2,items={{id=63040,mount=395}}},
                     },
                 },
                 {
@@ -376,7 +376,7 @@ ns.data = {
                     color = "96a3aa",
                     icon = 1035054,
                     rares = {
-                        {name="Al'Akir",id=46753,waypoint=36008400,instance=99999,items={{id=63041,mount=396}}},
+                        {name="Al'Akir",id=46753,waypoint=36008400,encounter=2,items={{id=63041,mount=396}}},
                     },
                 },
                 {
@@ -386,8 +386,8 @@ ns.data = {
                     color = "f19d4b",
                     icon = 512617,
                     rares = {
-                        {name="Alysrazor",id=52530,waypoint=47007700,instance=351241394,items={{id=71665,mount=425}}},
-                        {name="Ragnaros",id=52409,waypoint=47007700,instance=351241394,items={{id=69224,mount=415}}},
+                        {name="Alysrazor",id=52530,waypoint=47007700,encounter=4,items={{id=71665,mount=425}}},
+                        {name="Ragnaros",id=52409,waypoint=47007700,encounter=7,items={{id=69224,mount=415}}},
                     },
                 },
                 {
@@ -397,8 +397,8 @@ ns.data = {
                     color = "f9d8fc",
                     icon = 609811,
                     rares = {
-                        {name="Ultraxion",id=55294,waypoint=65005000,instance=1111111,items={{id=78919,mount=445}}},
-                        {name="Deathwing",id=56173,waypoint=65005000,instance=1111111,items={{id=77067,mount=442},{id=77069,mount=444}}},
+                        {name="Ultraxion",id=55294,waypoint=65005000,encounter=5,items={{id=78919,mount=445}}},
+                        {name="Deathwing",id=56173,waypoint=65005000,encounter=8,items={{id=77067,mount=442},{id=77069,mount=444}}},
                     },
                 },
             },
@@ -414,7 +414,7 @@ ns.data = {
                     color = "c7fdfe",
                     icon = 236793,
                     rares = {
-                        {name="The Lich King",id=36597,waypoint=54008500,instance=123123123123,items={{id=50818,mount=363,chance=1}}},
+                        {name="The Lich King",id=36597,waypoint=54008500,encounter=12,items={{id=50818,mount=363,chance=1}}},
                     },
                 },
                 {
@@ -424,7 +424,7 @@ ns.data = {
                     color = "9ffcfa",
                     icon = 254113,
                     rares = {
-                        {name="Yogg-Saron",id=33288,waypoint=41001600,instance=31231231231,items={{id=45693,mount=304,chance=1}},notes={"Must be done on Hard Mode (Alone in the Dark)"}},
+                        {name="Yogg-Saron",id=33288,waypoint=41001600,encounter=13,items={{id=45693,mount=304,chance=1}},notes={"Must be done on Hard Mode (Alone in the Dark)"}},
                     },
                 },
             },
@@ -440,7 +440,7 @@ ns.data = {
                     color = "96a3aa",
                     icon = 1530372,
                     rares = {
-                        {name="Attumen the Huntsman",id=16152,waypoint=47007700,instance=999999999,items={{id=30480,mount=168,chance=1}}},
+                        {name="Attumen the Huntsman",id=16152,waypoint=47007700,encounter=2,items={{id=30480,mount=168,chance=1}}},
                     },
                 },
                 {
@@ -450,7 +450,7 @@ ns.data = {
                     color = "e96944",
                     icon = 250117,
                     rares = {
-                        {name="Kael'thas Sunstrider",id=19622,waypoint=74006500,instance=999999999,items={{id=32458,mount=183,chance=1.7}}},
+                        {name="Kael'thas Sunstrider",id=19622,waypoint=74006500,encounter=4,items={{id=32458,mount=183,chance=1.7}}},
                     },
                 },
             },
