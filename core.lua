@@ -26,7 +26,7 @@ function ravFor_OnEvent(self, event, arg, ...)
             zoneID = math.floor(string.gsub(zoneID, "target={", ""))
             rareID = math.floor(string.gsub(rareID, "}", ""))
             local rare
-            for title, expansion in pairs(ns.data.expansions) do
+            for _, expansion in ipairs(ns.data.expansions) do
                 for _, zone in ipairs(expansion.zones) do
                     if zone.id == zoneID then
                         for _, rare in ipairs(zone.rares) do

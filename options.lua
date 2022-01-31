@@ -96,7 +96,7 @@ function ns:BuildOptions()
         local defaultValue = ns.defaults[Default.var]
         if type(defaultValue) == "boolean" then
             local Checkbox = CreateFrame("CheckButton", ADDON_NAME .. "OptionsCheckbox" .. Default.var, Options, "InterfaceOptionsCheckButtonTemplate")
-            Checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -large)
+            Checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -medium)
             Checkbox.Text:SetText(Default.text)
             Checkbox.tooltipText = Default.tooltip
             Checkbox.restart = false

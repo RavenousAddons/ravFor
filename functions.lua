@@ -93,6 +93,13 @@ local function IsRareDead(rare)
         return true
     elseif rare.quest then
         return CQL.IsQuestFlaggedCompleted(rare.quest)
+    elseif rare.instance then
+        for i = 1, GetNumSavedInstances(), 1 do
+            local zoneName, zoneID, reset, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, _, totalBoss, totalDown = GetSavedInstanceInfo(i)
+            if zoneID == rare.instance and (rare.instanceLimit and (rare.instanceLimit == maxPlayer) or true) then
+                return (locked and true or false)
+            end
+        end
     end
     return false
 end
@@ -219,7 +226,7 @@ function ns:RefreshRares()
             without = string.gsub(without, icon, "")
         end
         Rare.rare.quest = Rare.rare.quest or (faction == "Alliance" and (Rare.rare.questAlliance or nil) or (Rare.rare.questHorde or nil))
-        Rare:SetText((IsRareDead(Rare.rare) and icons.Checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.LegendaryQuest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.Daily or Rare.rare.quest and icons.Skull or icons.Achievement) .. without)
+        Rare:SetText((IsRareDead(Rare.rare) and icons.Checkmark or ((type(Rare.rare.quest) == "number" and CQL.IsWorldQuest(Rare.rare.quest))) and icons.LegendaryQuest or (Rare.rare.biweekly or Rare.rare.weekly or Rare.rare.fortnightly) and icons.Daily or (Rare.rare.quest or Rare.rare.instance) and icons.Skull or icons.Achievement) .. without)
     end
 end
 
@@ -261,7 +268,7 @@ function ns:CacheAndBuild(callback)
         end
     end
     local itemIDs = {}
-    for title, expansion in pairs(expansions) do
+    for _, expansion in ipairs(expansions) do
         for _, zone in ipairs(expansion.zones) do
             for _, rare in ipairs(zone.rares) do
                 local isWorldQuest, isAvailable = false, false
@@ -466,7 +473,7 @@ end
 ---
 
 function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePoint)
-    local mapName = C_Map.GetMapInfo(zone.id).name
+    local mapName = zone.name and zone.name or C_Map.GetMapInfo(zone.id).name
     local zoneColor = zone.covenant and covenants[zone.covenant].color or zone.color and zone.color or "ffffff"
     local zoneIcon = zone.covenant and covenants[zone.covenant].icon or zone.icon and zone.icon or nil
     local Rares = {}
@@ -482,7 +489,7 @@ function ns:CreateZone(Parent, Relative, zone, worldQuests, covenant, relativePo
     local ZoneAnchor = CreateFrame("Button", nil, Parent)
     Zone:SetPoint("TOPLEFT", Relative, "TOPLEFT")
     Zone:SetJustifyH("LEFT")
-    Zone:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName:upper(), zoneColor))
+    Zone:SetText(TextIcon(zoneIcon) .. "  " .. TextColor(mapName, zoneColor))
     ZoneAnchor:SetAllPoints(Zone)
     ZoneAnchor:SetScript("OnClick", function()
         -- TODO How to reliably expand/collapse
@@ -605,7 +612,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         tinsert(c, d)
     end
 
-    local dead = IsRareDead(rare) and icons.Checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.LegendaryQuest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.Daily or rare.quest and icons.Skull or icons.Achievement
+    local lockedIcon = IsRareDead(rare) and icons.Checkmark or ((type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest))) and icons.LegendaryQuest or (rare.biweekly or rare.weekly or rare.fortnightly) and icons.Daily or (rare.quest or rare.instance) and icons.Skull or icons.Achievement
     local rareFaction = rare.faction and "|cff" .. (rare.faction == "Alliance" and "0078ff" or "b30000") .. rare.faction .. "|r" or nil
     local factionOnly = rareFaction and TextColor(L.OnlyFor) .. rareFaction or ""
     local rareControl = rare.control and "|cff" .. (rare.control == "Alliance" and "0078ff" or "b30000") .. rare.control .. "|r" or nil
@@ -616,7 +623,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
     local Rare = CreateFrame("Button", ADDON_NAME .. "Rare" .. rare.id, Parent)
     local RareLabel = Rare:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     RareLabel:SetJustifyH("LEFT")
-    RareLabel:SetText(dead .. " " .. TextColor(i .. ". ") .. rare.name .. controlRequired .. factionOnly .. covenantRequired .. drops)
+    RareLabel:SetText(lockedIcon .. " " .. TextColor(i .. ". ") .. rare.name .. controlRequired .. factionOnly .. covenantRequired .. drops)
     RareLabel:SetHeight(16)
     RareLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -gigantic-(Relative.offset or 0))
     Rare:SetAllPoints(RareLabel)
@@ -628,7 +635,7 @@ function ns:CreateRare(Parent, Relative, i, zone, rare, items, covenant)
         if isLead then
             GameTooltip:AddLine(TextColor(L.ModifierToShare, "bbbbbb"))
         end
-        GameTooltip:AddLine(rare.name .. ((rare.quest and IsRareDead(rare)) and TextColor(" (" .. _G.DEAD .. ")", "bbbbbb") or ""))
+        GameTooltip:AddLine(rare.name .. (IsRareDead(rare) and TextColor(" (" .. _G.DEAD .. ")", "bbbbbb") or ""))
         GameTooltip:AddLine(TextColor(zoneName, zoneColor) .. " " .. c[1] .. "." .. c[2] .. ", " .. c[3] .. "." .. c[4])
         if type(rare.quest) == "number" and CQL.IsWorldQuest(rare.quest) then
             GameTooltip:AddLine(icons.Quest .. " World Quest")
@@ -681,11 +688,11 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     local zoneCovenant = zone.covenant and TextColor(string.gsub(C_Covenants.GetCovenantData(zone.covenant).name, "lord", "lords"), zoneColor) or nil
 
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.id)
-    local itemFaction = item.faction and "|cff" .. (item.faction == "Alliance" and "0078ff" or "b30000") .. item.faction .. "|r" or nil
-    local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
-    local guaranteed = item.guaranteed and TextColor(L.HundredDrop) or ""
+    local chance = item.chance and TextColor(" " .. item.chance .. "%", "bbbbbb") .. (item.chance < 100 and TextColor(" (~" .. RunsUntilDrop(item.chance) .. " runs exp.)", "bbbbbb") or "") or ""
     local achievement = item.achievement and TextColor(L.From) .. GetAchievementLink(item.achievement) or ""
+    local itemFaction = item.faction and "|cff" .. (item.faction == "Alliance" and "0078ff" or "b30000") .. item.faction .. "|r" or nil
     local factionOnly = itemFaction and TextColor(L.OnlyFor) .. itemFaction or ""
+    local itemClass = item.class and "|c" .. select(4, GetClassColor(string.gsub(item.class, "%s+", ""):upper())) .. item.class .. "s|r" or nil
     local classOnly = item.class and TextColor(L.OnlyFor) .. itemClass or ""
     local covenantOnly = item.covenantOnly and TextColor(L.OnlyFor) .. zoneCovenant or ""
     local owned = IsItemOwned(item) and " " .. icons.Checkmark or ""
@@ -693,7 +700,7 @@ function ns:CreateItem(Parent, Relative, zone, rare, item, covenant)
     local Item = CreateFrame("Button", ADDON_NAME .. "Item" .. item.id, Parent)
     local ItemLabel = Item:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     ItemLabel:SetJustifyH("LEFT")
-    ItemLabel:SetText("    " .. TextIcon(itemTexture) .. "  " .. itemLink .. guaranteed .. achievement .. factionOnly .. classOnly .. covenantOnly .. owned)
+    ItemLabel:SetText("    " .. TextIcon(itemTexture) .. "  " .. itemLink .. chance .. achievement .. factionOnly .. classOnly .. covenantOnly .. owned)
     ItemLabel:SetPoint("TOPLEFT", Relative, "BOTTOMLEFT", 0, -small)
     ItemLabel:SetWidth(Parent:GetWidth())
     Item:SetAllPoints(ItemLabel)
@@ -812,14 +819,14 @@ function ns:BuildWindow()
     })
     Scroller:Show()
     Scrollers["General"] = Scroller
-    for title, expansion in pairs(expansions) do
+    for _, expansion in ipairs(expansions) do
         local Scroller = CreateScroller({
-            label = title,
+            label = expansion.name,
             parent = Window,
             width = Window:GetWidth() - 42,
             height = Window:GetHeight() - Heading:GetHeight() - 6,
         })
-        Scrollers[title] = Scroller
+        Scrollers[expansion.name] = Scroller
     end
 
     local Tab = CreateTab({
@@ -829,14 +836,14 @@ function ns:BuildWindow()
         relativeTo = Window,
         relativePoint = "TOPRIGHT",
         x = -3,
-        y = -Heading:GetHeight(),
+        y = -Heading:GetHeight() / 2,
         current = true,
     })
     Tabs["General"] = Tab
     local previousTab = Tab
-    for title, expansion in pairs(expansions) do
+    for _, expansion in ipairs(expansions) do
         local Tab = CreateTab({
-            label = title,
+            label = expansion.name,
             icon = expansion.icon,
             parent = Window,
             relativeTo = previousTab,
@@ -844,7 +851,7 @@ function ns:BuildWindow()
             x = 0,
             y = 0,
         })
-        Tabs[title] = Tab
+        Tabs[expansion.name] = Tab
         previousTab = Tab
     end
 
@@ -895,8 +902,8 @@ function ns:BuildWindow()
     Relative = Notes
     local Spacer = CreateSpacer(Parent, Relative)
 
-    for title, expansion in pairs(expansions) do
-        Parent = Scrollers[title].Content
+    for _, expansion in ipairs(expansions) do
+        Parent = Scrollers[expansion.name].Content
         Relative = Parent
         for i, zone in ipairs(expansion.zones) do
             if i > 1 then
